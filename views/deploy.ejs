@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Deploy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="/stylesheets/ui.css"
+    />
+    <link rel="stylesheet" href="/stylesheets/deploy.css" />
+    <script src="https://cdn.socket.io/4.8.0/socket.io.min.js"></script>
+  </head>
+  <body>
+    <div class="wrappper">
+    <div class="wrappper__main">
+        <p>选择语言:</p>
+        <div class="checkboxes">
+          <div class="lan_boxs lan_all">
+            <input type="checkbox" id="all" name="all">
+            <label for="all" class="ui-checkbox"></label>
+            <label for="all" style="padding-left: 5px;">ALL</label>
+          </div>
+          <hr>
+          <% lans.forEach(function(lan, idx){ %>
+            <div class="lan_boxs">
+              <input type="checkbox" id="checkbox<%=idx%>" value="<%=lan%>" name="checkbox">
+              <label for="checkbox<%=idx%>" class="ui-checkbox"></label>
+              <label for="checkbox<%=idx%>" style="padding-left: 5px;"><%=lan.toUpperCase()%></label>
+            </div>
+          <% }); %>
+        </div>
+       <div class="wrapper__btns">
+        <a href="javascript:" class="ui-button ui-button-primary all-deploy" role="button"
+        >DEPLOY</a>
+      </div>
+      <pre id="pre" style="display: none;" data-lans="<%= JSON.stringify(lans) %>"></pre>
+    </div>
+    <script src="/javascripts/jquery.js"></script>
+    <script src="/javascripts/all.js"></script>
+    <script src="/javascripts/deploy.js"></script>
+  </body>
+</html>

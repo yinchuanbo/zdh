@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="/stylesheets/ui.css"
+    />
+    <link rel="stylesheet" href="/stylesheets/mergely.css" />
+    <link rel="stylesheet" href="/stylesheets/index.css" />
+    <script src="https://cdn.socket.io/4.8.0/socket.io.min.js"></script>
+  </head>
+  <body>
+    <div class="wrappper">
+      <header class="wrappper__header">
+        <a
+          href="javascript:"
+          class="ui-button ui-button-primary watch-btn"
+          role="button"
+          >Watch</a
+        >
+        <a
+          href="javascript:"
+          class="ui-button ui-button-primary"
+          role="button"
+          onclick="window.open('/ftp')"
+          >FTP操作</a
+        >
+        <% if (role !== "user") { %>
+          <a
+          href="javascript:"
+          class="ui-button ui-button-primary"
+          role="button"
+          onclick="window.open('/deploy')"
+          >Pro部署</a
+        >
+        <% } %>
+      </header>
+      <main class="wrappper__main">
+        <div class="wrappper__sider">
+          <div class="wrappper__sider_01">
+            <p>Reference Lan:</p>
+            <select>
+              <% lans.forEach(function(lan){ %>
+              <option value="<%= lan %>"><%= lan %></option>
+              <% }); %>
+            </select>
+          </div>
+          <div class="wrappper__sider_03">
+            <p>Commit Ids:</p>
+            <input id="commit-ids" class="ui-input" placeholder="多个 commit id 用 , 逗号分隔">
+          </div>
+          <div class="wrappper__sider_02">
+            <p>Async Lan:</p>
+            <div class="wrappper__sider_02-label">
+              <% lans.forEach(function(lan, idx){ %>
+              <div class="div-lan div-<%= lan %> <%= lan === 'en' ? 'disabled' : '' %>">
+                <input
+                  type="checkbox"
+                  id="checkbox<%=idx%>"
+                  value="<%= lan %>"
+                  name="checkbox"
+                />
+                <label for="checkbox<%=idx%>" class="ui-checkbox"></label
+                ><label for="checkbox<%=idx%>" style="padding-left: 5px;"><%= lan %></label>
+              </div>
+              <% }); %>
+            </div>
+            <a
+              href="javascript:"
+              class="ui-button ui-button-primary handle-btn"
+              role="button"
+              >Handle</a
+            >
+          </div>
+        </div>
+        <div class="wrappper__content">
+          <div class="wrappper__content-header"></div>
+          <div class="wrappper__content-content"></div>
+        </div>
+      </main>
+    </div>
+    <script src="/javascripts/jquery.js"></script>
+    <script src="/javascripts/all.js"></script>
+    <script src="/javascripts/mergely.min.js"></script>
+    <script src="/javascripts/index.js"></script>
+  </body>
+</html>

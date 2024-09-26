@@ -1,0 +1,61 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: "JetBrains Mono";
+  font-style: italic;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  user-select: none;
+  color: #fff;
+}
+
+.wrappper {
+  width: 100%;
+  height: 100vh;
+  background-color: #212121;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+select {
+  opacity: 1;
+  font-family: "JetBrains Mono";
+  border-right-width: 1px;
+  width: 400px;
+  outline: none;
+  border: 0;
+  margin-left: 20px;
+}
+
+.wrappper__main {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.ui-dialog {
+  padding-bottom: 20px;
+}
+
+.ui-lightip {
+  height: 50px;
+  top: 20px;
+}
+
+.lan_boxs {
+  display: flex;
+}
+
+.checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
