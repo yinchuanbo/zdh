@@ -25,12 +25,9 @@ let localPaths = {},
   preview = "\\preview\\",
   templates = "\\templates\\new-template\\";
 
-const getConf = (uname = "") => {
-  if (!userInfo[uname] && uname !== "admin") {
-    console.log("没有配置");
-    return;
-  }
+const getConf = (uname = "", resObj = {}) => {
   let pathname = `D:\\PROJECT`;
+  let domain = "yinchuanbo.vidnoz.com";
   let lans = {
     en: "pc.makevideoclip.com",
     jp: "jp.makevideoclip.com",
@@ -59,6 +56,15 @@ const getConf = (uname = "") => {
     tr: "9898",
     tw: "9999",
   };
+  if (!userInfo[uname] && uname !== "admin") {
+    resObj.redirect("/settings");
+    return;
+  } else if (userInfo[uname] && uname !== "admin") {
+    pathname = userInfo[uname]["pathname"];
+    domain = userInfo[uname]["domain"];
+    lans = userInfo[uname]["lans"];
+    ports = userInfo[uname]["ports"];
+  }
   for (const key in lans) {
     const element = lans[key];
     localPaths[key] = `${pathname}\\${element}`;
@@ -76,7 +82,7 @@ const getConf = (uname = "") => {
   }
   const params = {
     pathname,
-    domain: "yinchuanbo.vidnoz.com",
+    domain,
     lans,
     ports,
     localPaths,

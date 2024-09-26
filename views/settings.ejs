@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Settings</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="//qidian.gtimg.com/lulu/theme/peak/css/common/ui.css"
+    />
+    <link rel="stylesheet" href="/stylesheets/settings.css" />
+  </head>
+  <body>
+    <div class="wrappper">
+      <div class="wrappper__left">
+        <input
+          class="ui-input path"
+          value="<%=info.pathname%>"
+          placeholder="输入路径，如 D:\PROJECT"
+        />
+        <input
+          class="ui-input domain"
+          value="<%=info.domain%>"
+          placeholder="输入域名，如 192.168.9.1"
+        />
+      </div>
+      <div class="wrappper__center">
+        <% keys.forEach(function(key){ %>
+          <div class="wrappper__center__item">
+            <input class="ui-input lan" value="<%=key%>" placeholder="语言" />
+            <input class="ui-input filename" value="<%=info['lans'][key]%>"  placeholder="文件夹" />
+            <input class="ui-input port" value="<%=info['ports'][key]%>" placeholder="端口号" />
+          </div>
+        <% }); %>
+        <span class="add"></span>
+      </div>
+      <div class="wrappper__right">
+        <a
+          href="javascript:"
+          class="ui-button ui-button-primary set"
+          role="button"
+          >设置</a
+        >
+      </div>
+    </div>
+    <script src="/javascripts/jquery.js"></script>
+    <script src="//qidian.gtimg.com/lulu/theme/peak/js/common/all.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/loader.js"></script>
+    <script src="/javascripts/settings.js"></script>
+  </body>
+</html>

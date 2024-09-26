@@ -15,7 +15,7 @@ var router = express.Router();
 let watchProcess = null;
 
 router.get("/", authenticateToken, function (req, res, next) {
-  const { lans } = getConf(req.uname);
+  const { lans } = getConf(req.uname, res);
   res.render("index", {
     title: "Index",
     lans: Object.keys(lans),
@@ -24,7 +24,7 @@ router.get("/", authenticateToken, function (req, res, next) {
 });
 
 router.get("/watching", authenticateToken, function (req, res, next) {
-  const { pathname, lans, ports, domain } = getConf(req.uname);
+  const { pathname, lans, ports, domain } = getConf(req.uname, res);
   const isWatching = req.query.bool;
   const watchScriptPath = path.join(__dirname, "../utils", "watch.js");
   watchProcess?.kill?.();
@@ -57,7 +57,7 @@ router.get("/watching", authenticateToken, function (req, res, next) {
 });
 
 router.post("/handle-files", authenticateToken, async (req, res) => {
-  const configs = getConf(req.uname);
+  const configs = getConf(req.uname, res);
   const { init, async, commitIds } = req.body;
   await getFileFunc(init, async, commitIds, configs).then(() => {
     delete require.cache[require.resolve("../utils/output")];
@@ -72,7 +72,7 @@ router.post("/handle-files", authenticateToken, async (req, res) => {
 });
 
 router.post("/publish", authenticateToken, async (req, res) => {
-  const { ports, domain } = getConf(req.uname);
+  const { ports, domain } = getConf(req.uname, res);
   const { lan } = req.body;
   try {
     await handlePublish(lan, ports, domain);
@@ -89,7 +89,7 @@ router.post("/publish", authenticateToken, async (req, res) => {
 });
 
 router.post("/receive-files", authenticateToken, async (req, res) => {
-  const { LocalListPro, ports, domain } = getConf(req.uname);
+  const { LocalListPro, ports, domain } = getConf(req.uname, res);
   const { path, path2, lan, initLan } = req.body;
   if (path.includes("img/")) {
     try {
@@ -122,7 +122,7 @@ router.post("/receive-files", authenticateToken, async (req, res) => {
 });
 
 router.post("/receive-imgs", authenticateToken, async (req, res) => {
-  const { ports, domain } = getConf(req.uname);
+  const { ports, domain } = getConf(req.uname, res);
   const { lan, imgs, initLan } = req.body;
   try {
     for (let i = 0; i < imgs.length; i++) {
@@ -143,7 +143,7 @@ router.post("/receive-imgs", authenticateToken, async (req, res) => {
 });
 
 router.post("/set-file", authenticateToken, async (req, res) => {
-  const { ports, domain } = getConf(req.uname);
+  const { ports, domain } = getConf(req.uname, res);
   const { path, content, lan } = req.body;
   try {
     await setFile({ path, content });
@@ -165,7 +165,7 @@ router.post("/set-file", authenticateToken, async (req, res) => {
 });
 
 router.post("/deploy-to-ftp", authenticateToken, async (req, res) => {
-  const configs = getConf(req.uname);
+  const configs = getConf(req.uname, res);
   const { lan, data, env } = req.body;
   try {
     await deployToFtp({ lan, data, env, configs });
@@ -182,7 +182,7 @@ router.post("/deploy-to-ftp", authenticateToken, async (req, res) => {
 });
 
 router.post("/pull-code", authenticateToken, async (req, res) => {
-  const { localPaths } = getConf(req.uname);
+  const { localPaths } = getConf(req.uname, res);
   const { lan } = req.body;
   try {
     const result = await pullCode({ lan, localPaths });
@@ -200,7 +200,7 @@ router.post("/pull-code", authenticateToken, async (req, res) => {
   }
 });
 router.post("/push-code", authenticateToken, async (req, res) => {
-  const { localPaths } = getConf(req.uname);
+  const { localPaths } = getConf(req.uname, res);
   const { lan, commit } = req.body;
   try {
     const result = await pushCode({ lan, commit, localPaths });

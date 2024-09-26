@@ -10,6 +10,7 @@ var usersRouter = require("./routes/users");
 var deployRouter = require("./routes/deploy");
 var ftpRouter = require("./routes/ftp");
 var loginRouter = require("./routes/login");
+var settingsRouter = require("./routes/settings");
 
 app.locals.globalRole = "123";
 
@@ -27,6 +28,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", indexRouter);
 app.use("/", loginRouter);
+app.use("/", settingsRouter);
 app.use("/users", usersRouter);
 app.use("/deploy", deployRouter);
 app.use("/ftp", ftpRouter);

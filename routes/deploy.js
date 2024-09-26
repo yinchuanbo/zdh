@@ -5,12 +5,12 @@ const { authenticateToken } = require("../checkRole");
 var router = express.Router();
 
 router.get("/", authenticateToken, function (req, res, next) {
-  const { lans } = getConf(req.uname);
+  const { lans } = getConf(req.uname, res);
   res.render("deploy", { title: "Deploy", lans: Object.keys(lans) });
 });
 
 router.post("/deploy-one", authenticateToken, async function (req, res, next) {
-  const configs = getConf(req.uname);
+  const configs = getConf(req.uname, res);
   const { lan } = req.body;
   deployAllLanguages(lan, configs);
   res.json({
