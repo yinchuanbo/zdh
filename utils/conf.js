@@ -1,3 +1,5 @@
+const userInfo = require("./user-info");
+
 let localPaths = {},
   LocalListTest = {},
   LocalListPro = {},
@@ -24,6 +26,10 @@ let localPaths = {},
   templates = "\\templates\\new-template\\";
 
 const getConf = (uname = "") => {
+  if (!userInfo[uname] && uname !== "admin") {
+    console.log("没有配置");
+    return;
+  }
   let pathname = `D:\\PROJECT`;
   let lans = {
     en: "pc.makevideoclip.com",
@@ -82,7 +88,6 @@ const getConf = (uname = "") => {
     proConn,
     deployInfo,
   };
-  console.log("params", params);
   return params;
 };
 
