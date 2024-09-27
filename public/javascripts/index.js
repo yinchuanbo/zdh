@@ -534,7 +534,7 @@ const diffHTML = function (data = {}, lan = "", path = "") {
   Cancel.onclick = () => {
     diffHTML.remove();
   };
-  setEditor(data.nowC.content, path);
+  setEditor(path, data.initC.content, data.nowC.content)
   // const doc = new Mergely("#compare", {
   //   sidebar: true,
   //   ignorews: false,
