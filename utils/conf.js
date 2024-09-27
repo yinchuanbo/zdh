@@ -26,40 +26,11 @@ let localPaths = {},
 const getConf = (uname = "", resObj = {}) => {
   delete require.cache[require.resolve("./user-info")];
   let userInfo = require("./user-info");
-  let pathname = `D:\\PROJECT`;
-  let domain = "yinchuanbo.vidnoz.com";
-  let lans = {
-    en: "pc.makevideoclip.com",
-    jp: "jp.makevideoclip.com",
-    it: "it.makevideoclip.com",
-    fr: "fr.makevideoclip.com",
-    de: "de.makevideoclip.com",
-    ar: "ar.makevideoclip.com",
-    pt: "pt.makevideoclip.com",
-    es: "es.makevideoclip.com",
-    kr: "kr.makevideoclip.com",
-    nl: "nl.makevideoclip.com",
-    tr: "tr.makevideoclip.com",
-    tw: "tw.makevideoclip.com",
-  };
-  let ports = {
-    en: "9292",
-    jp: "9090",
-    it: "8888",
-    fr: "8989",
-    de: "8585",
-    ar: "9191",
-    pt: "8787",
-    es: "8686",
-    kr: "9696",
-    nl: "9797",
-    tr: "9898",
-    tw: "9999",
-  };
-  if (!userInfo[uname] && uname !== "admin") {
+  let pathname, domain, lans, ports;
+  if (!userInfo[uname]) {
     resObj.redirect("/settings");
     return;
-  } else if (userInfo[uname] && uname !== "admin") {
+  } else if (userInfo[uname]) {
     pathname = userInfo[uname]["pathname"];
     domain = userInfo[uname]["domain"];
     lans = userInfo[uname]["lans"];

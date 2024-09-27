@@ -17,9 +17,11 @@ addDom.onclick = () => {
       <input class="ui-input lan" placeholder="语言" />
       <input class="ui-input filename" placeholder="文件夹" />
       <input class="ui-input port" placeholder="端口号" />
+      <span class="delete"></span>
     </div>
   `;
   addDom.insertAdjacentHTML("beforebegin", html);
+  deleteFun()
 };
 
 setDom.onclick = () => {
@@ -48,13 +50,26 @@ setDom.onclick = () => {
     body: JSON.stringify({
       data: obj,
     }),
-  }).then((res) => {
-    return res.json();
-  }).then(res => {
-    if(res?.code === 200 && res?.message === "settings-success") {
-      new LightTip().success("设置成功");
-    } else {
-      new LightTip().error("设置失败");
-    }
   })
+    .then((res) => {
+      return res.json();
+    })
+    .then((res) => {
+      if (res?.code === 200 && res?.message === "settings-success") {
+        new LightTip().success("设置成功");
+      } else {
+        new LightTip().error("设置失败");
+      }
+    });
 };
+
+function deleteFun() {
+  const deleteDom = document.querySelectorAll(".delete");
+  deleteDom.forEach((item) => {
+    item.onclick = () => {
+      item.parentNode.remove();
+    };
+  });
+}
+
+deleteFun();
