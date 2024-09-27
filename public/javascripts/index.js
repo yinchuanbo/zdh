@@ -2,6 +2,8 @@ const socket = io();
 let imgs = [];
 let isWatching = false;
 
+let editor = null;
+
 const watchBtn = document.querySelector(".watch-btn");
 const handleBtn = document.querySelector(".handle-btn");
 
@@ -117,7 +119,7 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
           </div>
         [${initLan}] ${info}&nbsp;->&nbsp;<p class="tpl__ele" contentEditable="${info.endsWith(".tpl") && selectLan !== lan ? true : false}">[${lan}] ${lujing}</p>
             <a href="javascript:" class="ui-button ui-button-primary async-res" style="display: ${selectLan === lan ? "none" : ""}" role="button">同步</a>
-            <a href="javascript:" class="ui-button ui-button-primary one-deploy" role="button" style="display: ${info.endsWith(".json") ? 'none' : ''}">单文件传测试</a>
+            <a href="javascript:" class="ui-button ui-button-primary one-deploy" role="button" style="display: ${info.endsWith(".json") ? "none" : ""}">单文件传测试</a>
           </li>`;
         })
         .join("")}
@@ -305,14 +307,14 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
   });
 
   function convertTplToHtml(fileName) {
-    return fileName.replace(/^tpl\//, '').replace(/\.tpl$/, '.html');
+    return fileName.replace(/^tpl\//, "").replace(/\.tpl$/, ".html");
   }
 
   oneDeploy.forEach((item) => {
     item.onclick = () => {
       const { path2 } = item.parentNode.dataset;
       const urlPath = path2.includes("tpl/") ? convertTplToHtml(path2) : path2;
-      console.log('urlPath', urlPath)
+      console.log("urlPath", urlPath);
       const lan = item.parentNode.dataset.lan;
       item.classList.add("loading");
       fetch("/deploy-to-ftp", {
@@ -457,7 +459,43 @@ const setCommit = (item, lan) => {
   };
 };
 
-const diffHTML = function (data = {}, lan = "", path = '') {
+function setEditor(obj = {}, path = "") {
+  if (editor) editor.dispose();
+  require.config({
+    paths: {
+      vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs",
+    },
+  });
+  let lan = "";
+  if (path.endsWith(".js")) lan = "javascript";
+  if (path.endsWith(".css")) lan = "css";
+  if (path.endsWith(".scss")) lan = "scss";
+  if (path.endsWith(".json")) lan = "json";
+  if (path.endsWith(".tpl")) lan = "html";
+
+  require(["vs/editor/editor.main"], function () {
+    editor = monaco.editor.create(document.querySelector("#compare"), {
+      value: obj,
+      language: lan,
+      automaticLayout: true,
+      theme: "vs-dark",
+      fontSize: 16,
+      fontFamily: "JetBrains Mono",
+      scrollbar: {
+        vertical: "hidden",
+        horizontal: "hidden",
+      },
+      wordWrap: "on",
+      lineNumbers: true,
+      lineHeight: 40,
+      minimap: {
+        enabled: false,
+      },
+    });
+  });
+}
+
+const diffHTML = function (data = {}, lan = "", path = "") {
   const html = `
     <div class="diffHTML">
       <div class="diffHTML-header">
@@ -475,22 +513,23 @@ const diffHTML = function (data = {}, lan = "", path = '') {
   Cancel.onclick = () => {
     diffHTML.remove();
   };
-  const doc = new Mergely("#compare", {
-    sidebar: true,
-    ignorews: false,
-    license: "lgpl-separate-notice",
-    lhs: data.nowC.content,
-    rhs: data.initC.content,
-    cmsettings: {
-      readOnly: false,
-    },
-    theme: "dark",
-  });
-  doc.once('updated', () => {
-    doc.once('updated', () => {
-      doc.scrollToDiff('next');
-    });
-  });
+  setEditor(data.nowC.content, path);
+  // const doc = new Mergely("#compare", {
+  //   sidebar: true,
+  //   ignorews: false,
+  //   license: "lgpl-separate-notice",
+  //   lhs: data.nowC.content,
+  //   rhs: data.initC.content,
+  //   cmsettings: {
+  //     readOnly: false,
+  //   },
+  //   theme: "dark",
+  // });
+  // doc.once('updated', () => {
+  //   doc.once('updated', () => {
+  //     doc.scrollToDiff('next');
+  //   });
+  // });
 
   Save.onclick = () => {
     const content = doc.get("lhs");
