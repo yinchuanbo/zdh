@@ -59,3 +59,11 @@ select {
   flex-direction: column;
   gap: 20px;
 }
+
+.ui-button-primary,
+.ui-button-primary.disabled:hover,
+.ui-button-primary.loading,
+.ui-button-primary.loading:hover {
+  border: 0;
+  overflow: hidden;
+}

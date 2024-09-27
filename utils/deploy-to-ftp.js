@@ -22,21 +22,17 @@ async function deployToFtp({ lan = "", data = [], env = "test", configs }) {
     LocalList = configs.LocalListPro;
     devList = configs.proFoldList;
   }
-
   const dirs = outputs;
-
   function bufferToStream(buffer) {
     const stream = new Readable();
     stream.push(buffer);
     stream.push(null);
     return stream;
   }
-
   async function getRemoteFileSize(sftp, remoteFilePath) {
     const remoteFileInfo = await sftp.stat(remoteFilePath);
     return remoteFileInfo.size;
   }
-
   function fileHash(readStream) {
     return new Promise((resolve, reject) => {
       const hash = crypto.createHash("sha256");
@@ -51,7 +47,6 @@ async function deployToFtp({ lan = "", data = [], env = "test", configs }) {
       });
     });
   }
-
   return new Promise((resolve, reject) => {
     const sftp = new Client();
     let imgHasPath = [];

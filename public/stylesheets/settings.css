@@ -116,3 +116,11 @@ body {
   flex-shrink: 0;
   padding-right: 10px;
 }
+
+.ui-button-primary,
+.ui-button-primary.disabled:hover,
+.ui-button-primary.loading,
+.ui-button-primary.loading:hover {
+  border: 0;
+  overflow: hidden;
+}

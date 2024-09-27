@@ -5,6 +5,8 @@ let isWatching = false;
 const watchBtn = document.querySelector(".watch-btn");
 const handleBtn = document.querySelector(".handle-btn");
 
+let selectLan = document.querySelector(".wrappper__sider_01 select").value;
+
 let isFirst = false;
 
 let curP = null;
@@ -100,19 +102,21 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
       <a href="javascript:" class="ui-button ui-button-primary push-code" role="button" data-lan="${lan}">Push</a>
       <a href="javascript:" class="ui-button ui-button-primary dey-to-test" role="button" data-lan="${lan}" style="display: none">上传至 ${lan} Test Ftp</a>
       <a href="javascript:" class="ui-button ui-button-primary dey-to-pro" role="button" data-lan="${lan}" style="display: none">上传至 ${lan} Pro Ftp</a>
-      <a href="javascript:" class="ui-button ui-button-primary all-img" role="button" data-lan="${lan}">资源批处理</a>
+      <a href="javascript:" class="ui-button ui-button-primary all-img ${selectLan === lan ? "disabled" : ""}"" role="button" data-lan="${lan}">资源批处理</a>
     </div>
     <ul>
       ${data
         .map((info) => {
           const str = generateRandomString(20);
-          return `<li data-path="${info}" data-path2="${curDatas2?.[info] || "unknown"}" data-lan="${lan}">
+          let lujing = curDatas2?.[info] || "unknown";
+          if (selectLan === lan) lujing = info;
+          return `<li data-path="${info}" data-path2="${lujing}" data-lan="${lan}">
           <div class="check-handle" title="已完成可选中">
             <input type="checkbox" id="${str}" name="${str}">
             <label for="${str}" class="ui-checkbox"></label>
           </div>
-        [${initLan}] ${info}&nbsp;->&nbsp;<p class="tpl__ele" contentEditable="${info.endsWith(".tpl") ? true : false}">[${lan}] ${curDatas2?.[info] || "unknown"}</p>
-            <a href="javascript:" class="ui-button ui-button-primary async-res" role="button">同步</a>
+        [${initLan}] ${info}&nbsp;->&nbsp;<p class="tpl__ele" contentEditable="${info.endsWith(".tpl") && selectLan !== lan ? true : false}">[${lan}] ${lujing}</p>
+            <a href="javascript:" class="ui-button ui-button-primary async-res ${selectLan === lan ? "disabled" : ""}" role="button">同步</a>
             <a href="javascript:" class="ui-button ui-button-primary one-deploy" role="button">上传至测试服</a>
           </li>`;
         })
@@ -257,7 +261,6 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
         .then((res) => {
           if (res?.code === 200 && res?.message === "async-imgs-success") {
             new LightTip().success("图片批量同步成功");
-            item.classList.add("disabled");
             const elements = document.querySelectorAll(
               `li[data-lan="${lan}"][data-path^="img/"]`
             );
@@ -576,14 +579,19 @@ const selectOnChange = () => {
   const select = document.querySelector(".wrappper__sider_01 select");
   select.addEventListener("change", function () {
     const selectedValue = select.value;
-    const divLanActive = document.querySelector(".div-lan.disabled");
-    if (divLanActive) divLanActive.classList.remove("disabled");
-    const divLan = document.querySelector(`.div-${selectedValue}`);
-    if (divLan) divLan.classList.add("disabled");
-    const checkboxes = document.querySelectorAll("input[name='checkbox']");
-    checkboxes.forEach(function (checkbox) {
-      checkbox.checked = false;
-    });
+    selectLan = selectedValue;
+    const header = document.querySelector(".wrappper__content-header");
+    const content = document.querySelector(".wrappper__content-content");
+    header.innerHTML = "";
+    content.innerHTML = "";
+    // const divLanActive = document.querySelector(".div-lan.disabled");
+    // if (divLanActive) divLanActive.classList.remove("disabled");
+    // const divLan = document.querySelector(`.div-${selectedValue}`);
+    // if (divLan) divLan.classList.add("disabled");
+    // const checkboxes = document.querySelectorAll("input[name='checkbox']");
+    // checkboxes.forEach(function (checkbox) {
+    //   checkbox.checked = false;
+    // });
   });
 };
 

@@ -10,7 +10,6 @@ function authenticateToken(req, res, next) {
     req.user = user;
     req.role = user.role;
     req.uname = user.uname;
-    console.log("user", user);
     next();
   });
 }
