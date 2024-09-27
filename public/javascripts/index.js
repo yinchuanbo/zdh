@@ -464,7 +464,6 @@ function setEditor(path = "", originalText = "", modifiedText = "") {
   if (originalModel) originalModel.dispose();
   if (modifiedModel) modifiedModel.dispose();
   if (diffEditor) diffEditor.dispose();
-  if (editor) editor.dispose();
   require.config({
     paths: {
       vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs",
@@ -483,6 +482,8 @@ function setEditor(path = "", originalText = "", modifiedText = "") {
     diffEditor = monaco.editor.createDiffEditor(
       document.querySelector("#compare"),
       {
+        language: lan,
+        theme: "vs-dark",
         scrollBeyondLastLine: false,
         diffWordWrap: true,
         wordWrap: "on",
@@ -534,7 +535,7 @@ const diffHTML = function (data = {}, lan = "", path = "") {
   Cancel.onclick = () => {
     diffHTML.remove();
   };
-  setEditor(path, data.initC.content, data.nowC.content)
+  setEditor(path, data.initC.content, data.nowC.content);
   // const doc = new Mergely("#compare", {
   //   sidebar: true,
   //   ignorews: false,
