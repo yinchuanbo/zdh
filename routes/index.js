@@ -147,10 +147,14 @@ router.post("/set-file", authenticateToken, async (req, res) => {
   const { path, content, lan } = req.body;
   try {
     await setFile({ path, content });
-    if (
-      !(path.endsWith(".scss") || path.endsWith(".css") || path.endsWith(".js"))
-    ) {
-      await handlePublish(lan, ports, domain);
+    try {
+      if (
+        !(path.endsWith(".scss") || path.endsWith(".css") || path.endsWith(".js"))
+      ) {
+        await handlePublish(lan, ports, domain);
+      }
+    } catch (error) {
+      throw new Error("Publish 失败")
     }
     res.json({
       code: 200,
@@ -159,7 +163,7 @@ router.post("/set-file", authenticateToken, async (req, res) => {
   } catch (error) {
     res.json({
       code: 200,
-      message: "nocomplete",
+      message: error?.message || error || "nocomplete",
     });
   }
 });

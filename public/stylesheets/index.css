@@ -209,10 +209,6 @@ body {
   margin-top: 10px;
 }
 
-.async-res {
-  margin-left: auto;
-}
-
 .disabled {
   pointer-events: none;
   opacity: 0.2;
@@ -293,6 +289,7 @@ body {
 .tpl__ele {
   color: #2486ff;
   font-weight: 600;
+  margin-right: auto;
 }
 
 .check-handle {

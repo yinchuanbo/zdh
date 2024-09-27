@@ -1,5 +1,5 @@
 module.exports = {
-  "jp": {
+  "en": {
     "Dev/js/ai-talking-avatar.js": "Dev/js/ai-talking-avatar.js",
     "Dev/js/credit-pay-dialog.js": "Dev/js/credit-pay-dialog.js",
     "Dev/scss/about.scss": "Dev/scss/about.scss",
@@ -9,7 +9,7 @@ module.exports = {
     "lan/lan.json": "lan/lan.json",
     "tpl/talking-head.tpl": "tpl/talking-head.tpl"
   },
-  "ar": {
+  "jp": {
     "Dev/js/ai-talking-avatar.js": "Dev/js/ai-talking-avatar.js",
     "Dev/js/credit-pay-dialog.js": "Dev/js/credit-pay-dialog.js",
     "Dev/scss/about.scss": "Dev/scss/about.scss",

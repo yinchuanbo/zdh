@@ -98,3 +98,9 @@ body {
 .ui-input>input, input.ui-input {
   border: 0!important;
 }
+
+.wrappper__getFiles {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}

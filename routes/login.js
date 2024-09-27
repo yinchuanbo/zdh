@@ -5,7 +5,7 @@ var router = express.Router();
 var { bcrypt, jwt, JWT_SECRET } = require("../permissions");
 
 router.get("/login", function (req, res, next) {
-  res.render("Login");
+  res.render("login");
 });
 
 router.post("/login", async (req, res) => {
@@ -19,7 +19,7 @@ router.post("/login", async (req, res) => {
       { id: user.id, role: user.role, uname: user.username },
       JWT_SECRET,
       {
-        expiresIn: "1h",
+        expiresIn: "24h",
       }
     );
     res.cookie("token", token, {

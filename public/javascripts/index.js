@@ -102,7 +102,7 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
       <a href="javascript:" class="ui-button ui-button-primary push-code" role="button" data-lan="${lan}">Push</a>
       <a href="javascript:" class="ui-button ui-button-primary dey-to-test" role="button" data-lan="${lan}" style="display: none">上传至 ${lan} Test Ftp</a>
       <a href="javascript:" class="ui-button ui-button-primary dey-to-pro" role="button" data-lan="${lan}" style="display: none">上传至 ${lan} Pro Ftp</a>
-      <a href="javascript:" class="ui-button ui-button-primary all-img ${selectLan === lan ? "disabled" : ""}"" role="button" data-lan="${lan}">资源批处理</a>
+      <a href="javascript:" class="ui-button ui-button-primary all-img" style="display: ${selectLan === lan ? "none" : ""}" role="button" data-lan="${lan}">资源批处理</a>
     </div>
     <ul>
       ${data
@@ -116,8 +116,8 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
             <label for="${str}" class="ui-checkbox"></label>
           </div>
         [${initLan}] ${info}&nbsp;->&nbsp;<p class="tpl__ele" contentEditable="${info.endsWith(".tpl") && selectLan !== lan ? true : false}">[${lan}] ${lujing}</p>
-            <a href="javascript:" class="ui-button ui-button-primary async-res ${selectLan === lan ? "disabled" : ""}" role="button">同步</a>
-            <a href="javascript:" class="ui-button ui-button-primary one-deploy" role="button">上传至测试服</a>
+            <a href="javascript:" class="ui-button ui-button-primary async-res" style="display: ${selectLan === lan ? "none" : ""}" role="button">同步</a>
+            <a href="javascript:" class="ui-button ui-button-primary one-deploy" role="button" style="display: ${info.endsWith(".json") ? 'none' : ''}">单文件传测试</a>
           </li>`;
         })
         .join("")}
@@ -196,7 +196,7 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
             p.querySelector(".check-handle input").checked = true;
             new LightTip().success("同步成功");
           } else if (res.code === 200 && res.message === "processing") {
-            diffHTML(res.data, lan);
+            diffHTML(res.data, lan, path);
           }
           item.classList.remove("loading");
         })
@@ -304,9 +304,15 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
     };
   });
 
+  function convertTplToHtml(fileName) {
+    return fileName.replace(/^tpl\//, '').replace(/\.tpl$/, '.html');
+  }
+
   oneDeploy.forEach((item) => {
     item.onclick = () => {
       const { path2 } = item.parentNode.dataset;
+      const urlPath = path2.includes("tpl/") ? convertTplToHtml(path2) : path2;
+      console.log('urlPath', urlPath)
       const lan = item.parentNode.dataset.lan;
       item.classList.add("loading");
       fetch("/deploy-to-ftp", {
@@ -317,7 +323,7 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
         body: JSON.stringify({
           env: "test",
           lan,
-          data: [path2],
+          data: [urlPath],
         }),
       })
         .then((res) => {
@@ -326,9 +332,9 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
         .then((res) => {
           item.classList.remove("loading");
           if (res?.code === 200 && res?.message === "deploy-success") {
-            new LightTip().success(`${path2} 部署到 test 成功`);
+            new LightTip().success(`${urlPath} 部署到 test 成功`);
           } else {
-            new LightTip().success(`${path2} 部署到 test 失败`);
+            new LightTip().error(`${urlPath} 部署到 test 失败`);
           }
         });
     };
@@ -451,7 +457,7 @@ const setCommit = (item, lan) => {
   };
 };
 
-const diffHTML = function (data = {}, lan = "") {
+const diffHTML = function (data = {}, lan = "", path = '') {
   const html = `
     <div class="diffHTML">
       <div class="diffHTML-header">
@@ -480,9 +486,9 @@ const diffHTML = function (data = {}, lan = "") {
     },
     theme: "dark",
   });
-  doc.once("updated", () => {
-    doc.once("updated", () => {
-      doc.scrollToDiff("next");
+  doc.once('updated', () => {
+    doc.once('updated', () => {
+      doc.scrollToDiff('next');
     });
   });
 
