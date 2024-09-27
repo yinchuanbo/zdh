@@ -459,7 +459,11 @@ const setCommit = (item, lan) => {
   };
 };
 
-function setEditor(obj = {}, path = "") {
+let modifiedModel, originalModel, diffEditor;
+function setEditor(path = "", originalText = "", modifiedText = "") {
+  if (originalModel) originalModel.dispose();
+  if (modifiedModel) modifiedModel.dispose();
+  if (diffEditor) diffEditor.dispose();
   if (editor) editor.dispose();
   require.config({
     paths: {
@@ -474,24 +478,41 @@ function setEditor(obj = {}, path = "") {
   if (path.endsWith(".tpl")) lan = "html";
 
   require(["vs/editor/editor.main"], function () {
-    editor = monaco.editor.create(document.querySelector("#compare"), {
-      value: obj,
-      language: lan,
-      automaticLayout: true,
-      theme: "vs-dark",
-      fontSize: 16,
-      fontFamily: "JetBrains Mono",
-      scrollbar: {
-        vertical: "hidden",
-        horizontal: "hidden",
-      },
-      wordWrap: "on",
-      lineNumbers: true,
-      lineHeight: 40,
-      minimap: {
-        enabled: false,
-      },
+    originalModel = monaco.editor.createModel(originalText, "text/plain");
+    modifiedModel = monaco.editor.createModel(modifiedText, "text/plain");
+    diffEditor = monaco.editor.createDiffEditor(
+      document.querySelector("#compare"),
+      {
+        scrollBeyondLastLine: false,
+        diffWordWrap: true,
+        wordWrap: "on",
+        enableSplitViewResizing: false,
+        originalEditable: true,
+        automaticLayout: true,
+      }
+    );
+    diffEditor.setModel({
+      original: originalModel,
+      modified: modifiedModel,
     });
+    // editor = monaco.editor.create(document.querySelector("#compare"), {
+    //   value: obj,
+    //   language: lan,
+    //   automaticLayout: true,
+    //   theme: "vs-dark",
+    //   fontSize: 16,
+    //   fontFamily: "JetBrains Mono",
+    //   scrollbar: {
+    //     vertical: "hidden",
+    //     horizontal: "hidden",
+    //   },
+    //   wordWrap: "on",
+    //   lineNumbers: true,
+    //   lineHeight: 40,
+    //   minimap: {
+    //     enabled: false,
+    //   },
+    // });
   });
 }
 
