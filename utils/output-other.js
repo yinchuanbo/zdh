@@ -1,6 +1,7 @@
 module.exports = {
   "jp": {
     "Dev/js/ai-talking-avatar.js": "Dev/js/ai-talking-avatar.js",
+    "Dev/js/credit-pay-dialog.js": "Dev/js/credit-pay-dialog.js",
     "Dev/scss/about.scss": "Dev/scss/about.scss",
     "Dev/scss/ai-talking-avatar.scss": "Dev/scss/ai-talking-avatar.scss",
     "img/ai-talking-avatar/360.png": "img/ai-talking-avatar/360.png",
@@ -10,6 +11,7 @@ module.exports = {
   },
   "ar": {
     "Dev/js/ai-talking-avatar.js": "Dev/js/ai-talking-avatar.js",
+    "Dev/js/credit-pay-dialog.js": "Dev/js/credit-pay-dialog.js",
     "Dev/scss/about.scss": "Dev/scss/about.scss",
     "Dev/scss/ai-talking-avatar.scss": "Dev/scss/ai-talking-avatar.scss",
     "img/ai-talking-avatar/360.png": "img/ai-talking-avatar/360.png",

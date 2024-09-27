@@ -25,9 +25,8 @@ async function getFileContent({ path, lan, initLan, path2, LocalListPro }) {
     }
     fs.copyFileSync(initPath, nowPath);
   }
-
-  const initC = fs.readFileSync(initPath, "utf-8");
-  const nowC = fs.readFileSync(nowPath, "utf-8");
+  const nowC = fs.readFileSync(nowPath, { encoding: "utf-8", flag: "rs" });
+  const initC = fs.readFileSync(initPath, { encoding: "utf-8", flag: "rs" });
 
   let setInfo = {};
 
@@ -46,8 +45,20 @@ async function getFileContent({ path, lan, initLan, path2, LocalListPro }) {
   if (path.endsWith(".scss")) {
     setInfo = settings("scss");
   }
-  const formattedinitC = await prettier.format(initC, setInfo);
-  const formattednowC = await prettier.format(nowC, setInfo);
+
+  if (path.endsWith(".json")) {
+    setInfo = settings("json");
+  }
+
+  let formattedinitC, formattednowC;
+
+  try {
+    formattedinitC = await prettier.format(initC, setInfo);
+    formattednowC = await prettier.format(nowC, setInfo);
+  } catch (error) {
+    formattedinitC = initC;
+    formattednowC = nowC;
+  }
 
   return {
     initC: {
