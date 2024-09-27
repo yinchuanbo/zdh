@@ -2,11 +2,12 @@ const { execSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 
-function getFileFunc(onlyLan = "en", asyncLans = [], commitIds = '', configs) {
+function getFileFunc(onlyLan = "en", asyncLans = [], commitIds = "", configs) {
   const folderList = configs.localPaths;
   let allData = {};
 
   const getAllCommitName = (commitList = [], lanPath = "") => {
+    console.log("lanPath", lanPath);
     let fileNames = {},
       fileNameArr = [];
     commitList.forEach((commit) => {
@@ -146,16 +147,16 @@ function handleAsyncLans(oLan, aLan, onlyLan, configs) {
         const tplFiles = findTplFiles(allP);
         const matchingFiles = checkLinkHrefInTplFiles(tplFiles, url);
         if (matchingFiles.length > 0) {
-          if(!obj[al]) {
+          if (!obj[al]) {
             obj[al] = {};
           }
-          obj[al][ol] = `${curPath}/${matchingFiles[0]}`
+          obj[al][ol] = `${curPath}/${matchingFiles[0]}`;
         }
       } else {
-        if(!obj[al]) {
+        if (!obj[al]) {
           obj[al] = {};
         }
-        obj[al][ol] = ol
+        obj[al][ol] = ol;
       }
     }
   }

@@ -587,9 +587,19 @@ const selectOnChange = () => {
   });
 };
 
+function logOut() {
+  const lo = document.querySelector(".log-out");
+  lo.onclick = () => {
+    fetch("/log-out").then((res) => {
+      window.location.href = "/login";
+    });
+  };
+}
+
 window.addEventListener("load", () => {
   watchBtnListen();
   handleSocket();
   handleGetFile();
   selectOnChange();
+  logOut();
 });

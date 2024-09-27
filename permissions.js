@@ -1,6 +1,5 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const users = require("./account");
 
 const JWT_SECRET = "agfygsfyuedasdfsf65465YUGYUFwegweySWMFSG";
 function authenticateToken(req, res, next) {
@@ -24,11 +23,9 @@ function checkRole(role) {
     next();
   };
 }
-
 module.exports = {
   authenticateToken,
   checkRole,
-  users,
   bcrypt,
   jwt,
   JWT_SECRET,

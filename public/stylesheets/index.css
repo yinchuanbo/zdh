@@ -328,3 +328,7 @@ body {
 .setCommit_btns {
   text-align: right;
 }
+
+.log-out {
+  margin-left: auto;
+}

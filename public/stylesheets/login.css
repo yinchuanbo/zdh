@@ -44,3 +44,42 @@ body {
   height: 50px;
   top: 20px;
 }
+
+.login_box,
+.register_box {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.wrappper__btns {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.register_method,
+.login_method {
+  color: #fff;
+}
+
+.isLogin .login_box {
+  display: flex;
+}
+
+.isLogin .register_box {
+  display: none;
+}
+
+.isR .login_box {
+  display: none;
+}
+
+.isR .register_box {
+  display: flex;
+}
+
+h2 {
+  text-align: center;
+}
