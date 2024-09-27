@@ -8,7 +8,7 @@ const handlePublish = require("../utils/publish");
 const pullCode = require("../utils/pull-code");
 const pushCode = require("../utils/push-code");
 const { copyAndMoveImg, getFileContent } = require("../utils/handle-file");
-const { authenticateToken } = require("../checkRole");
+const { authenticateToken } = require("../permissions");
 const path = require("path");
 var router = express.Router();
 

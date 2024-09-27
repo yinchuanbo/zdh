@@ -1,5 +1,3 @@
-const userInfo = require("./user-info");
-
 let localPaths = {},
   LocalListTest = {},
   LocalListPro = {},
@@ -26,6 +24,8 @@ let localPaths = {},
   templates = "\\templates\\new-template\\";
 
 const getConf = (uname = "", resObj = {}) => {
+  delete require.cache[require.resolve("./user-info")];
+  let userInfo = require("./user-info");
   let pathname = `D:\\PROJECT`;
   let domain = "yinchuanbo.vidnoz.com";
   let lans = {

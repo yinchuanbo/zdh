@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-var { users, bcrypt, jwt, JWT_SECRET } = require("../checkRole");
+var { users, bcrypt, jwt, JWT_SECRET } = require("../permissions");
 
 router.get("/login", function (req, res, next) {
   res.render("Login");

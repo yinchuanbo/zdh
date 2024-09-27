@@ -1,7 +1,7 @@
 var express = require("express");
 const getConf = require("../utils/conf");
 const { getAllFiles, handleFtp } = require("../utils/handle-ftp");
-const { authenticateToken } = require("../checkRole");
+const { authenticateToken } = require("../permissions");
 var router = express.Router();
 
 router.get("/", authenticateToken, function (req, res, next) {

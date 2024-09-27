@@ -1,15 +1,24 @@
 var express = require("express");
 var router = express.Router();
-const userInfo = require("../utils/user-info");
 const setSettings = require("../utils/set-settings");
-const { authenticateToken } = require("../checkRole");
+const { authenticateToken } = require("../permissions");
 
 router.get("/settings", authenticateToken, function (req, res, next) {
+  delete require.cache[require.resolve("../utils/user-info")];
+  let userInfo = require("../utils/user-info");
   const info = userInfo[req.uname];
-  res.render("settings", {
-    info,
-    keys: Object.keys(info.lans),
-  });
+  const params = {};
+  if (info && info?.lans) {
+    params.info = info;
+    params.keys = Object.keys(info.lans);
+  } else {
+    params.info = {
+      pathname: "",
+      domain: "",
+    };
+    params.keys = [];
+  }
+  res.render("settings", params);
 });
 
 router.post("/settings", authenticateToken, async function (req, res, next) {
