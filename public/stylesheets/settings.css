@@ -124,3 +124,16 @@ body {
   border: 0;
   overflow: hidden;
 }
+
+.ui-button {
+  border-radius: 0 !important;
+}
+
+.ui-checkbox {
+  border-radius: 0 !important;
+}
+
+.ui-input > input,
+input.ui-input {
+  border: 0 !important;
+}

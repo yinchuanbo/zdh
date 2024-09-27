@@ -94,7 +94,7 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
 
   const curDatas2 = data2[lan];
 
-  const html01 = `<div class="header-item active">${lan}<div>`;
+  const html01 = `<div class="header-item active">${lan.toUpperCase()}<div>`;
   const html02 = `<div class="content-item active">
     <div class="content-item-btns">
       <a href="javascript:" class="ui-button ui-button-primary publish" role="button" data-lan="${lan}">Publish</a>

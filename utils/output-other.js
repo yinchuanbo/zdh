@@ -1,5 +1,5 @@
 module.exports = {
-  "en": {
+  "jp": {
     "Dev/js/ai-talking-avatar.js": "Dev/js/ai-talking-avatar.js",
     "Dev/scss/about.scss": "Dev/scss/about.scss",
     "Dev/scss/ai-talking-avatar.scss": "Dev/scss/ai-talking-avatar.scss",
@@ -8,7 +8,7 @@ module.exports = {
     "lan/lan.json": "lan/lan.json",
     "tpl/talking-head.tpl": "tpl/talking-head.tpl"
   },
-  "de": {
+  "ar": {
     "Dev/js/ai-talking-avatar.js": "Dev/js/ai-talking-avatar.js",
     "Dev/scss/about.scss": "Dev/scss/about.scss",
     "Dev/scss/ai-talking-avatar.scss": "Dev/scss/ai-talking-avatar.scss",
