@@ -59,7 +59,7 @@ router.get("/watching", authenticateToken, function (req, res, next) {
 router.post("/handle-files", authenticateToken, async (req, res) => {
   const configs = getConf(req.uname, res);
   const { init, async, commitIds } = req.body;
-  await getFileFunc(init, async, commitIds, configs).then(() => {
+  getFileFunc(init, async, commitIds, configs).then(() => {
     delete require.cache[require.resolve("../utils/output")];
     delete require.cache[require.resolve("../utils/output-other")];
     res.json({
