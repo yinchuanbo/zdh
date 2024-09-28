@@ -477,14 +477,12 @@ function setEditor(path = "", originalText = "", modifiedText = "") {
     ".json": "json",
     ".tpl": "html",
   };
-
   const lan =
     Object.keys(extensionToLanguageMap).find((ext) => path.endsWith(ext)) ||
     "text/plain";
-
   require(["vs/editor/editor.main"], function () {
-    originalModel = monaco.editor.createModel(originalText, lan);
-    modifiedModel = monaco.editor.createModel(modifiedText, lan);
+    originalModel = monaco.editor.createModel(originalText, extensionToLanguageMap[lan]);
+    modifiedModel = monaco.editor.createModel(modifiedText, extensionToLanguageMap[lan]);
     diffEditor = monaco.editor.createDiffEditor(
       document.querySelector("#compare"),
       {
@@ -528,6 +526,10 @@ const diffHTML = function (data = {}, lan = "", path = "") {
       <div class="diffHTML-header">
         <a href="javascript:" data-lan="${lan}" class="ui-button ui-button-primary" id="Save" role="button">Save</a>
         <a href="javascript:" class="ui-button ui-button-warning" id="Cancel" role="button">Cancel</a>
+      </div>
+      <div class="diffHTML__path">
+        <span class="diffHTML__path-title">${data.initC.path}</span>
+        <span class="diffHTML__path-title">${data.nowC.path}</span>
       </div>
       <div class="diffHTML-content" id="compare">
       </div>
