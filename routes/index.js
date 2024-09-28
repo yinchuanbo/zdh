@@ -9,7 +9,7 @@ const pullCode = require("../utils/pull-code");
 const pushCode = require("../utils/push-code");
 const { copyAndMoveImg, getFileContent } = require("../utils/handle-file");
 const { authenticateToken } = require("../permissions");
-const fs = require('fs').promises;
+const fs = require("fs").promises;
 const path = require("path");
 var router = express.Router();
 
@@ -26,11 +26,20 @@ router.get("/", authenticateToken, function (req, res, next) {
 
 router.get("/watching", authenticateToken, function (req, res, next) {
   const { pathname, lans, ports, domain } = getConf(req.uname, res);
-  const isWatching = req.query.bool;
+  const isWatching = req.query.bool === "true";
   const watchScriptPath = path.join(__dirname, "../utils", "watch.js");
-  watchProcess?.kill?.();
-  watchProcess = null;
-  if (isWatching === "true") {
+
+  // 如果有正在运行的进程，安全地杀死它
+  if (watchProcess && typeof watchProcess.kill === "function") {
+    watchProcess.kill();
+    watchProcess.on("close", (code) => {
+      console.log(`Previous watch process exited with code ${code}`);
+    });
+    watchProcess = null;
+  }
+
+  // 启动新进程
+  if (isWatching) {
     if (!watchProcess) {
       watchProcess = spawn(
         "node",
@@ -45,11 +54,28 @@ router.get("/watching", authenticateToken, function (req, res, next) {
           stdio: "inherit",
         }
       );
+
+      // 错误处理
+      watchProcess.on("error", (err) => {
+        console.error("Failed to start watch process:", err);
+        res.json({
+          success: false,
+          message: "Failed to start watch process",
+          error: err.message,
+        });
+        return;
+      });
+
+      watchProcess.on("close", (code) => {
+        console.log(`Watch process exited with code ${code}`);
+      });
+
       console.log("Watch process started:", watchProcess.pid);
     } else {
       console.log("Watch process is already running:", watchProcess.pid);
     }
   }
+
   res.json({
     success: true,
     watchingStatus: isWatching,
@@ -62,8 +88,8 @@ router.post("/handle-files", authenticateToken, async (req, res) => {
   const { init, async, commitIds } = req.body;
   try {
     await getFileFunc(init, async, commitIds, configs);
-    const output = getRequireDynamicFile('output.js', {});
-    const outputOther = getRequireDynamicFile('output-other.js', {});
+    const output = getRequireDynamicFile("output.js", {});
+    const outputOther = getRequireDynamicFile("output-other.js", {});
     res.json({
       code: 200,
       message: "handle-files-success",
@@ -74,7 +100,7 @@ router.post("/handle-files", authenticateToken, async (req, res) => {
     res.json({
       code: 200,
       message: "handle-files-fail",
-      data: error?.message || error || "获取数据失败"
+      data: error?.message || error || "获取数据失败",
     });
   }
 });
@@ -157,12 +183,16 @@ router.post("/set-file", authenticateToken, async (req, res) => {
     await setFile({ path, content });
     try {
       if (
-        !(path.endsWith(".scss") || path.endsWith(".css") || path.endsWith(".js"))
+        !(
+          path.endsWith(".scss") ||
+          path.endsWith(".css") ||
+          path.endsWith(".js")
+        )
       ) {
         await handlePublish(lan, ports, domain);
       }
     } catch (error) {
-      throw new Error("Publish 失败")
+      throw new Error("Publish 失败");
     }
     res.json({
       code: 200,

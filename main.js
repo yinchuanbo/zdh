@@ -1,5 +1,4 @@
 const { app, BrowserWindow, session, Menu } = require("electron");
-const path = require("path");
 const express = require("./app");
 
 let mainWindow;
@@ -13,7 +12,7 @@ function createWindow() {
       nodeIntegration: true,
       contextIsolation: false,
       sandbox: true,
-      // preload: path.join(__dirname, 'preload.js')
+      preload: path.join(__dirname, 'preload.js')
     }
   });
   Menu.setApplicationMenu(null);
