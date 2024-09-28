@@ -1,3 +1,5 @@
+const { getRequireDynamicFile } = require("./setData")
+
 let localPaths = {},
   LocalListTest = {},
   LocalListPro = {},
@@ -24,10 +26,9 @@ let localPaths = {},
   templates = "\\templates\\new-template\\";
 
 const getConf = (uname = "", resObj = {}) => {
-  delete require.cache[require.resolve("./user-info")];
-  let userInfo = require("./user-info");
+  const userInfo = getRequireDynamicFile("user-info.js", {});
   let pathname, domain, lans, ports;
-  if (!userInfo[uname]) {
+  if (!userInfo?.[uname]) {
     resObj.redirect("/settings");
     return;
   } else if (userInfo[uname]) {

@@ -2,11 +2,11 @@ var express = require("express");
 var router = express.Router();
 const setSettings = require("../utils/set-settings");
 const { authenticateToken } = require("../permissions");
+const {getRequireDynamicFile} = require("../utils/setData")
 
 router.get("/settings", authenticateToken, function (req, res, next) {
-  delete require.cache[require.resolve("../utils/user-info")];
-  let userInfo = require("../utils/user-info");
-  const info = userInfo[req.uname];
+  let userInfo = getRequireDynamicFile("user-info.js", {});
+  const info = userInfo?.[req.uname];
   const params = {};
   if (info && info?.lans) {
     params.info = info;
@@ -23,14 +23,14 @@ router.get("/settings", authenticateToken, function (req, res, next) {
 
 router.post("/settings", authenticateToken, async function (req, res, next) {
   const { data } = req.body;
-
   try {
-    setSettings({ data, uname: req.uname });
+    await setSettings({ data, uname: req.uname });
     res.json({
       code: 200,
       message: "settings-success",
     });
   } catch (error) {
+    console.log('setting error ', error)
     res.json({
       code: 200,
       message: "settings-fail",

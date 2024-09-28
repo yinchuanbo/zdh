@@ -1,7 +1,10 @@
-const fs = require("fs");
-const userInfo = require("./user-info");
-function setSettings({ data, uname }) {
-  if (!userInfo[uname]) {
+const fs = require("fs").promises;
+const path = require("path")
+const { getDynamicFilePath, getRequireDynamicFile } = require("./setData")
+
+async function setSettings({ data, uname }) {
+  const userInfo = getRequireDynamicFile("user-info.js", {})
+  if (!userInfo?.[uname]) {
     userInfo[uname] = data;
   } else {
     userInfo[uname] = {
@@ -10,7 +13,10 @@ function setSettings({ data, uname }) {
     };
   }
   const jsContent = `module.exports = ${JSON.stringify(userInfo, null, 2)};`;
-  fs.writeFileSync("./utils/user-info.js", jsContent);
+  const outputPath = getDynamicFilePath('user-info.js');
+  await fs.mkdir(path.dirname(outputPath), { recursive: true });
+  await fs.writeFile(outputPath, jsContent);
+  return Promise.resolve()
 }
 
 module.exports = setSettings;

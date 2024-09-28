@@ -62,8 +62,8 @@ router.post("/handle-files", authenticateToken, async (req, res) => {
   const { init, async, commitIds } = req.body;
   try {
     await getFileFunc(init, async, commitIds, configs);
-    const output = getRequireDynamicFile('output.js');
-    const outputOther = getRequireDynamicFile('output-other.js');
+    const output = getRequireDynamicFile('output.js', {});
+    const outputOther = getRequireDynamicFile('output-other.js', {});
     res.json({
       code: 200,
       message: "handle-files-success",

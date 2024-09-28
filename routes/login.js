@@ -1,16 +1,19 @@
+
 var express = require("express");
-const fs = require("fs");
+const { getDynamicFilePath, getRequireDynamicFile } = require("../utils/setData")
+const fs = require("fs").promises;
+const path = require("path");
 var router = express.Router();
 
 var { bcrypt, jwt, JWT_SECRET } = require("../permissions");
+
 
 router.get("/login", function (req, res, next) {
   res.render("login");
 });
 
 router.post("/login", async (req, res) => {
-  delete require.cache[require.resolve("../account")];
-  let accounts = require("../account");
+  let accounts = getRequireDynamicFile("account.js");
   const { username, password } = req.body;
   const user = accounts.find((u) => u.username === username);
   // const newP = await bcrypt.hash(password, 10);
@@ -34,8 +37,7 @@ router.post("/login", async (req, res) => {
 
 router.post("/register", async (req, res) => {
   const { username, password } = req.body;
-  delete require.cache[require.resolve("../account")];
-  let accounts = require("../account");
+  let accounts = getRequireDynamicFile("account.js");
   const has = accounts.find(
     (u) => u.username.toLowerCase() === username.toLowerCase()
   );
@@ -51,9 +53,10 @@ router.post("/register", async (req, res) => {
     role: "user",
   };
   accounts = [...accounts, data];
-
   const jsContent = `module.exports = ${JSON.stringify(accounts, null, 2)};`;
-  fs.writeFileSync("./account.js", jsContent);
+  const outputPath = getDynamicFilePath('account.js');
+  await fs.mkdir(path.dirname(outputPath), { recursive: true });
+  await fs.writeFile(outputPath, jsContent);
   res.json({ code: 200, message: "注册成功" });
 });
 

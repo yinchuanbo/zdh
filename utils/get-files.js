@@ -1,18 +1,7 @@
-const { app } = require('electron');
+const { getDynamicFilePath, getRequireDynamicFile } = require("./setData")
 const { execSync } = require("child_process");
 const fs = require("fs").promises;
 const path = require("path");
-
-// 在应用的用户数据目录中创建一个子目录来存储动态文件
-const getDynamicFilePath = (fileName) => {
-  return path.join(app.getPath('userData'), 'dynamic_files', fileName);
-};
-
-const getRequireDynamicFile = (fileName) => {
-  const filePath = getDynamicFilePath(fileName);
-  delete require.cache[filePath];  // 清除缓存
-  return require(filePath);
-};
 
 async function getFileFunc(onlyLan = "en", asyncLans = [], commitIds = "", configs) {
   // 验证配置
@@ -144,9 +133,9 @@ async function handleAsyncLans(oLan, aLan, onlyLan, configs) {
   }
   const jsContent = `module.exports = ${JSON.stringify(obj, null, 2)};`;
 
-    const outputOtherPath = getDynamicFilePath('output-other.js');
+  const outputOtherPath = getDynamicFilePath('output-other.js');
   await fs.mkdir(path.dirname(outputOtherPath), { recursive: true });
   await fs.writeFile(outputOtherPath, jsContent);
 }
 
-module.exports = { getFileFunc,  getRequireDynamicFile };
+module.exports = { getFileFunc, getRequireDynamicFile };
