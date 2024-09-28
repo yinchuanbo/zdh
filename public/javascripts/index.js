@@ -469,20 +469,25 @@ function setEditor(path = "", originalText = "", modifiedText = "") {
       vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs",
     },
   });
-  let lan = "";
-  if (path.endsWith(".js")) lan = "javascript";
-  if (path.endsWith(".css")) lan = "css";
-  if (path.endsWith(".scss")) lan = "scss";
-  if (path.endsWith(".json")) lan = "json";
-  if (path.endsWith(".tpl")) lan = "html";
+
+  const extensionToLanguageMap = {
+    ".js": "javascript",
+    ".css": "css",
+    ".scss": "scss",
+    ".json": "json",
+    ".tpl": "html",
+  };
+
+  const lan =
+    Object.keys(extensionToLanguageMap).find((ext) => path.endsWith(ext)) ||
+    "text/plain";
 
   require(["vs/editor/editor.main"], function () {
-    originalModel = monaco.editor.createModel(originalText, "text/plain");
-    modifiedModel = monaco.editor.createModel(modifiedText, "text/plain");
+    originalModel = monaco.editor.createModel(originalText, lan);
+    modifiedModel = monaco.editor.createModel(modifiedText, lan);
     diffEditor = monaco.editor.createDiffEditor(
       document.querySelector("#compare"),
       {
-        language: lan,
         theme: "vs-dark",
         scrollBeyondLastLine: false,
         diffWordWrap: true,
@@ -552,7 +557,6 @@ const diffHTML = function (data = {}, lan = "", path = "") {
   //     doc.scrollToDiff('next');
   //   });
   // });
-
   Save.onclick = () => {
     const content = doc.get("lhs");
     const { lan } = Save.dataset;
