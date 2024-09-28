@@ -104,7 +104,7 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
       <a href="javascript:" class="ui-button ui-button-primary push-code" role="button" data-lan="${lan}">Push</a>
       <a href="javascript:" class="ui-button ui-button-primary dey-to-test" role="button" data-lan="${lan}" style="display: none">上传至 ${lan} Test Ftp</a>
       <a href="javascript:" class="ui-button ui-button-primary dey-to-pro" role="button" data-lan="${lan}" style="display: none">上传至 ${lan} Pro Ftp</a>
-      <a href="javascript:" class="ui-button ui-button-primary all-img" style="display: ${selectLan === lan ? "none" : ""}" role="button" data-lan="${lan}">资源批处理</a>
+      <a href="javascript:" class="ui-button ui-button-primary all-img" style="display: ${selectLan === lan ? "none" : ""}" role="button" data-lan="${lan}">Resource Batching</a>
     </div>
     <ul>
       ${data
@@ -118,8 +118,8 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
             <label for="${str}" class="ui-checkbox"></label>
           </div>
         [${initLan}] ${info}&nbsp;->&nbsp;<p class="tpl__ele" contentEditable="${info.endsWith(".tpl") && selectLan !== lan ? true : false}">[${lan}] ${lujing}</p>
-            <a href="javascript:" class="ui-button ui-button-primary async-res" style="display: ${selectLan === lan ? "none" : ""}" role="button">同步</a>
-            <a href="javascript:" class="ui-button ui-button-primary one-deploy" role="button" style="display: ${info.endsWith(".json") ? "none" : ""}">单文件传测试</a>
+            <a href="javascript:" class="ui-button ui-button-primary async-res" style="display: ${selectLan === lan ? "none" : ""}" role="button">Diff</a>
+            <a href="javascript:" class="ui-button ui-button-primary one-deploy" role="button" style="display: ${info.endsWith(".json") ? "none" : ""}">To Test</a>
           </li>`;
         })
         .join("")}
@@ -242,7 +242,7 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
     item.onclick = () => {
       const { lan } = item.dataset;
       if (!imgs?.length) {
-        new LightTip().error("此次未涉及到图片修改");
+        new LightTip().error("此次未涉及到图片等资源修改");
         return;
       }
       item.classList.add("loading");
@@ -477,14 +477,12 @@ function setEditor(path = "", originalText = "", modifiedText = "") {
     ".json": "json",
     ".tpl": "html",
   };
-
   const lan =
     Object.keys(extensionToLanguageMap).find((ext) => path.endsWith(ext)) ||
     "text/plain";
-
   require(["vs/editor/editor.main"], function () {
-    originalModel = monaco.editor.createModel(originalText, lan);
-    modifiedModel = monaco.editor.createModel(modifiedText, lan);
+    originalModel = monaco.editor.createModel(originalText, extensionToLanguageMap[lan]);
+    modifiedModel = monaco.editor.createModel(modifiedText, extensionToLanguageMap[lan]);
     diffEditor = monaco.editor.createDiffEditor(
       document.querySelector("#compare"),
       {
@@ -528,6 +526,10 @@ const diffHTML = function (data = {}, lan = "", path = "") {
       <div class="diffHTML-header">
         <a href="javascript:" data-lan="${lan}" class="ui-button ui-button-primary" id="Save" role="button">Save</a>
         <a href="javascript:" class="ui-button ui-button-warning" id="Cancel" role="button">Cancel</a>
+      </div>
+      <div class="diffHTML__path">
+        <span class="diffHTML__path-title">${data.initC.path}</span>
+        <span class="diffHTML__path-title">${data.nowC.path}</span>
       </div>
       <div class="diffHTML-content" id="compare">
       </div>
