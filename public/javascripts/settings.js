@@ -3,6 +3,7 @@ const addDom = document.querySelector(".add");
 const setDom = document.querySelector(".set");
 const pathDom = document.querySelector(".path");
 const domainDom = document.querySelector(".domain");
+const wrapperBack = document.querySelector(".wrapper__back")
 
 let lansObj = {};
 let portsObj = {};
@@ -73,3 +74,7 @@ function deleteFun() {
 }
 
 deleteFun();
+
+wrapperBack.onclick = () => {
+  window.location.href = "/";
+}

@@ -1,123 +1,113 @@
+const { app } = require('electron');
 const { execSync } = require("child_process");
-const fs = require("fs");
+const fs = require("fs").promises;
 const path = require("path");
 
-function getFileFunc(onlyLan = "en", asyncLans = [], commitIds = "", configs) {
+// 在应用的用户数据目录中创建一个子目录来存储动态文件
+const getDynamicFilePath = (fileName) => {
+  return path.join(app.getPath('userData'), 'dynamic_files', fileName);
+};
+
+const getRequireDynamicFile = (fileName) => {
+  const filePath = getDynamicFilePath(fileName);
+  delete require.cache[filePath];  // 清除缓存
+  return require(filePath);
+};
+
+async function getFileFunc(onlyLan = "en", asyncLans = [], commitIds = "", configs) {
+  // 验证配置
+  if (!configs || !configs.localPaths || !configs.LocalListPro) {
+    throw new Error("Invalid configuration");
+  }
+
   const folderList = configs.localPaths;
   let allData = {};
 
-  const getAllCommitName = (commitList = [], lanPath = "") => {
+  // 将 getAllCommitName 移到外部
+  const getAllCommitName = async (commitList, lanPath) => {
     console.log("lanPath", lanPath);
-    let fileNames = {},
-      fileNameArr = [];
-    commitList.forEach((commit) => {
+    let fileNameArr = [];
+    for (const commit of commitList) {
       try {
-        // const stdout = execSync(
-        //   `git -C ${lanPath} log -1 ${commit} --name-only --pretty=format:`
-        // );
-        const stdout = execSync(
+        const stdout = await execSync(
           `git -C ${lanPath} log --first-parent -1 ${commit} --name-only --pretty=format:`
         );
-        fileNames = stdout
+        const fileNames = stdout
           .toString()
           .split("\n")
-          .map((fileName) => {
-            if (
-              (fileName.endsWith(".js") ||
-                fileName.endsWith(".scss") ||
-                fileName.endsWith(".css")) &&
-              !fileName.includes("/Dev/")
-            ) {
-              return null;
-            }
-            return fileName;
-          })
-          .filter(Boolean);
-        for (let i = 0; i < fileNames.length; i++) {
-          const fileName = fileNames[i];
-          fileNameArr.push(fileName.replace("templates/new-template/", ""));
-        }
+          .filter(fileName =>
+            fileName.includes("/Dev/") || fileName.includes("/lan/") || fileName.includes("/img/") || fileName.includes("/tpl/")
+          )
+          .map(fileName => fileName.replace("templates/new-template/", ""));
+        fileNameArr.push(...fileNames);
       } catch (error) {
         console.error(`执行Git命令时出错: ${error.message}`);
       }
-    });
-    fileNameArr = Array.from(new Set(fileNameArr));
-    return fileNameArr;
+    }
+    return Array.from(new Set(fileNameArr));
   };
 
   for (const lanName in folderList) {
     if (onlyLan?.length && !onlyLan.includes(lanName)) continue;
     const lanPath = folderList[lanName];
-    let commitList = [],
-      last = -1;
+    let commitList = [], last = -1;
     const curCommit = commitIds;
+
     if (curCommit) {
       if (curCommit.includes("-")) {
         last = Number(curCommit);
       } else {
         commitList = curCommit.split(",");
-        allData[lanName] = getAllCommitName(commitList, lanPath);
+        const cData = await getAllCommitName(commitList, lanPath)
+        allData[lanName] = cData.filter(Boolean);
         continue;
       }
     }
+
     try {
-      let stdout = execSync(`git -C ${lanPath} diff --cached --name-only`);
+      let stdout = await execSync(`git -C ${lanPath} diff --cached --name-only`);
       if (!stdout?.length) {
-        stdout = execSync(
-          `git -C ${lanPath} log ${last} --name-only --pretty=format:`
-        );
+        stdout = await execSync(`git -C ${lanPath} log ${last} --name-only --pretty=format:`);
       }
       const fileNames = stdout
         .toString()
         .split("\n")
-        .map((fileName) => {
-          if (
-            (fileName.endsWith(".js") ||
-              fileName.endsWith(".scss") ||
-              fileName.endsWith(".css")) &&
-            !fileName.includes("/Dev/")
-          ) {
-            return null;
-          }
-          return fileName;
-        })
-        .filter(Boolean);
-      let fileNameArr = [];
-      fileNames.forEach((fileName) => {
-        fileNameArr.push(fileName.replace("templates/new-template/", ""));
-      });
-      fileNameArr = Array.from(new Set(fileNameArr));
-      allData[lanName] = fileNameArr;
+        .filter(fileName =>
+          fileName.includes("/Dev/") || fileName.includes("/lan/") || fileName.includes("/img/") || fileName.includes("/tpl/")
+        )
+        .map(fileName => fileName.replace("templates/new-template/", ""));
+      const cData = Array.from(new Set(fileNames));
+      allData[lanName] = cData.filter(Boolean);
     } catch (error) {
       console.error(`执行Git命令时出错: ${error.message}`);
     }
   }
-
-  handleAsyncLans(allData[onlyLan], asyncLans, onlyLan, configs);
-
+  await handleAsyncLans(allData[onlyLan], asyncLans, onlyLan, configs);
   const jsContent = `module.exports = ${JSON.stringify(allData, null, 2)};`;
-  fs.writeFileSync("./utils/output.js", jsContent);
-  return Promise.resolve();
+  const outputPath = getDynamicFilePath('output.js');
+  await fs.mkdir(path.dirname(outputPath), { recursive: true });
+  await fs.writeFile(outputPath, jsContent);
 }
 
-function findTplFiles(dirPath) {
-  let tplFiles = [];
-  fs.readdirSync(dirPath).forEach((file) => {
+async function findTplFiles(dirPath) {
+  const tplFiles = [];
+  const files = await fs.readdir(dirPath);
+  for (const file of files) {
     const filePath = path.join(dirPath, file);
-    const stat = fs.statSync(filePath);
+    const stat = await fs.stat(filePath);
     if (stat.isDirectory()) {
-      tplFiles = tplFiles.concat(findTplFiles(filePath));
+      tplFiles.push(...(await findTplFiles(filePath)));
     } else if (path.extname(file) === ".tpl") {
       tplFiles.push(filePath);
     }
-  });
+  }
   return tplFiles;
 }
 
-function checkLinkHrefInTplFiles(tplFiles, url) {
+async function checkLinkHrefInTplFiles(tplFiles, url) {
   const matchingFiles = [];
-  tplFiles.forEach((file) => {
-    const content = fs.readFileSync(file, "utf-8");
+  for (const file of tplFiles) {
+    const content = await fs.readFile(file, "utf-8");
     const linkRegex = /<link[^>]+href="([^"]+)"/g;
     let match;
     while ((match = linkRegex.exec(content)) !== null) {
@@ -127,41 +117,36 @@ function checkLinkHrefInTplFiles(tplFiles, url) {
         break;
       }
     }
-  });
-
+  }
   return matchingFiles;
 }
 
-function handleAsyncLans(oLan, aLan, onlyLan, configs) {
+async function handleAsyncLans(oLan, aLan, onlyLan, configs) {
   const obj = {};
-  for (let j = 0; j < aLan.length; j++) {
-    const al = aLan[j];
+  for (const al of aLan) {
     const alP = configs.LocalListPro[al];
-    for (let i = 0; i < oLan.length; i++) {
-      const ol = oLan[i];
+    obj[al] = {};
+    for (const ol of oLan) {
       if (ol.endsWith(".tpl") && ol.split("/").length === 2) {
         const name = path.basename(ol);
         const curPath = path.dirname(ol);
         const url = `https://${onlyLan === "en" ? "www" : onlyLan}.vidnoz.com/${name.replace(".tpl", ".html")}`;
         const allP = alP + "tpl";
-        const tplFiles = findTplFiles(allP);
-        const matchingFiles = checkLinkHrefInTplFiles(tplFiles, url);
+        const tplFiles = await findTplFiles(allP);
+        const matchingFiles = await checkLinkHrefInTplFiles(tplFiles, url);
         if (matchingFiles.length > 0) {
-          if (!obj[al]) {
-            obj[al] = {};
-          }
           obj[al][ol] = `${curPath}/${matchingFiles[0]}`;
         }
       } else {
-        if (!obj[al]) {
-          obj[al] = {};
-        }
         obj[al][ol] = ol;
       }
     }
   }
   const jsContent = `module.exports = ${JSON.stringify(obj, null, 2)};`;
-  fs.writeFileSync("./utils/output-other.js", jsContent);
+
+    const outputOtherPath = getDynamicFilePath('output-other.js');
+  await fs.mkdir(path.dirname(outputOtherPath), { recursive: true });
+  await fs.writeFile(outputOtherPath, jsContent);
 }
 
-module.exports = getFileFunc;
+module.exports = { getFileFunc,  getRequireDynamicFile };

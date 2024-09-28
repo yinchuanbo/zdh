@@ -313,8 +313,9 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
   oneDeploy.forEach((item) => {
     item.onclick = () => {
       const { path2 } = item.parentNode.dataset;
-      const urlPath = path2.includes("tpl/") ? convertTplToHtml(path2) : path2;
-      console.log("urlPath", urlPath);
+      let urlPath = path2.includes("tpl/") ? convertTplToHtml(path2) : path2;
+      urlPath = urlPath.startsWith("Dev/") ? urlPath.replace("Dev/", "") : urlPath;
+      urlPath = urlPath.startsWith("scss/") ? urlPath.replaceAll("scss", "css") : urlPath;
       const lan = item.parentNode.dataset.lan;
       item.classList.add("loading");
       fetch("/deploy-to-ftp", {
@@ -625,7 +626,11 @@ const handleGetFile = () => {
         return res.json();
       })
       .then((res) => {
-        if (res.code === 200 && res?.data?.length) {
+        if (res.code === 200 && res?.message === "handle-files-success") {
+          if(!res?.data?.length) {
+            new LightTip().error("No Modified Files");
+            return;
+          }
           res?.data.forEach((item) => {
             if (item.startsWith("img/")) {
               imgs.push(item);
@@ -639,7 +644,7 @@ const handleGetFile = () => {
             createContent(lan, res?.data, res?.data2, select.value);
           });
         } else {
-          new LightTip().error("无数据");
+          new LightTip().error(`${res?.message || "获取文件失败"}`);
         }
       })
       .catch((err) => {

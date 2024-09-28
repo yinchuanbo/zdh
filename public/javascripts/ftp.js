@@ -147,3 +147,8 @@ upload.onclick = () => {
       upload.classList.remove("loading");
     });
 };
+
+const wrapperBack = document.querySelector(".wrapper__back")
+wrapperBack.onclick = () => {
+  window.close()
+}

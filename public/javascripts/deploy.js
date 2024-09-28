@@ -88,3 +88,8 @@ socket.on("chat message", (msg) => {
     allDeploy.classList.remove("loading");
   }
 });
+
+const wrapperBack = document.querySelector(".wrapper__back")
+wrapperBack.onclick = () => {
+  window.close()
+}

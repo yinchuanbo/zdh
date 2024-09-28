@@ -1,7 +1,7 @@
 var express = require("express");
 const getConf = require("../utils/conf");
 const { spawn } = require("child_process");
-const getFileFunc = require("../utils/get-files");
+const { getFileFunc, getRequireDynamicFile } = require("../utils/get-files");
 const { setFile } = require("../utils/set-file");
 const deployToFtp = require("../utils/deploy-to-ftp");
 const handlePublish = require("../utils/publish");
@@ -9,6 +9,7 @@ const pullCode = require("../utils/pull-code");
 const pushCode = require("../utils/push-code");
 const { copyAndMoveImg, getFileContent } = require("../utils/handle-file");
 const { authenticateToken } = require("../permissions");
+const fs = require('fs').promises;
 const path = require("path");
 var router = express.Router();
 
@@ -59,16 +60,23 @@ router.get("/watching", authenticateToken, function (req, res, next) {
 router.post("/handle-files", authenticateToken, async (req, res) => {
   const configs = getConf(req.uname, res);
   const { init, async, commitIds } = req.body;
-  getFileFunc(init, async, commitIds, configs).then(() => {
-    delete require.cache[require.resolve("../utils/output")];
-    delete require.cache[require.resolve("../utils/output-other")];
+  try {
+    await getFileFunc(init, async, commitIds, configs);
+    const output = getRequireDynamicFile('output.js');
+    const outputOther = getRequireDynamicFile('output-other.js');
     res.json({
       code: 200,
-      message: "数据接收成功",
-      data: require("../utils/output")[init],
-      data2: require("../utils/output-other"),
+      message: "handle-files-success",
+      data: output[init],
+      data2: outputOther,
     });
-  });
+  } catch (error) {
+    res.json({
+      code: 200,
+      message: "handle-files-fail",
+      data: error?.message || error || "获取数据失败"
+    });
+  }
 });
 
 router.post("/publish", authenticateToken, async (req, res) => {
