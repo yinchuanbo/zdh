@@ -12,8 +12,7 @@
     "appId": "com.yourcompany.lanasync",
     "productName": "LanAsync",
     "win": {
-      "target": "portable",
-      "icon": "img/async.svg"
+      "target": "portable"
     },
     "files": [
       "**/*",

@@ -1,20 +1,20 @@
 var express = require("express");
 const getConf = require("../utils/conf");
-const { spawn } = require("child_process");
-const fs = require('fs');
 const { getFileFunc, getRequireDynamicFile } = require("../utils/get-files");
 const { setFile } = require("../utils/set-file");
 const deployToFtp = require("../utils/deploy-to-ftp");
 const listenWatch = require("../utils/watch");
 const handlePublish = require("../utils/publish");
 const pullCode = require("../utils/pull-code");
+const checkStaus = require("../utils/check-status");
 const pushCode = require("../utils/push-code");
+const mergeCode = require("../utils/merge-code");
+const getBranchs = require("../utils/get-branchs");
+
 const { copyAndMoveImg, getFileContent } = require("../utils/handle-file");
 const { authenticateToken } = require("../permissions");
-const path = require("path");
 var router = express.Router();
 
-let watchProcess = null;
 
 router.get("/", authenticateToken, function (req, res, next) {
   const { lans } = getConf(req.uname, res);
@@ -255,11 +255,31 @@ router.post("/pull-code", authenticateToken, async (req, res) => {
     });
   }
 });
+
+router.post("/check-status", authenticateToken, async (req, res) => {
+  const { localPaths } = getConf(req.uname, res);
+  const { lan } = req.body;
+  try {
+    const result = await checkStaus({ lan, localPaths });
+    res.json({
+      code: 200,
+      message: "check-status-success",
+      data: result,
+    });
+  } catch (error) {
+    res.json({
+      code: 200,
+      message: "check-status-error",
+      data: error?.message || error,
+    });
+  }
+});
+
 router.post("/push-code", authenticateToken, async (req, res) => {
   const { localPaths } = getConf(req.uname, res);
-  const { lan, commit } = req.body;
+  const { lan, commit, status } = req.body;
   try {
-    const result = await pushCode({ lan, commit, localPaths });
+    const result = await pushCode({ lan, commit, localPaths, status });
     res.json({
       code: 200,
       message: "push-success",
@@ -269,6 +289,44 @@ router.post("/push-code", authenticateToken, async (req, res) => {
     res.json({
       code: 200,
       message: "push-error",
+      data: error?.message || error,
+    });
+  }
+});
+
+router.post("/get-branchs", authenticateToken, async (req, res) => {
+  const { localPaths } = getConf(req.uname, res);
+  const { lan } = req.body;
+  try {
+    const result = await getBranchs({ lan, localPaths });
+    res.json({
+      code: 200,
+      message: "get-branchs-success",
+      data: result,
+    });
+  } catch (error) {
+    res.json({
+      code: 200,
+      message: "get-branchs-error",
+      data: error?.message || error,
+    });
+  }
+});
+
+router.post("/merge-code", authenticateToken, async (req, res) => {
+  const { localPaths } = getConf(req.uname, res);
+  const { lan, from, to } = req.body;
+  try {
+    const result = await mergeCode({ lan, localPaths, from, to });
+    res.json({
+      code: 200,
+      message: "merge-success",
+      data: result,
+    });
+  } catch (error) {
+    res.json({
+      code: 200,
+      message: "merge-error",
       data: error?.message || error,
     });
   }

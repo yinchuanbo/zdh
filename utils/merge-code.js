@@ -1,6 +1,6 @@
 const { exec } = require("child_process");
 
-async function pullCode({ lan, localPaths }) {
+async function mergeCode({ lan, localPaths, from, to }) {
   const curP = localPaths[lan];
 
   function executeGitCommand(command) {
@@ -18,10 +18,13 @@ async function pullCode({ lan, localPaths }) {
     const { stdout: status } = await executeGitCommand(
       "git status --porcelain"
     );
-    console.log("status", status);
     if (status) {
       throw new Error("工作目录不干净，有未提交的更改");
     }
+  }
+
+  async function gitCheckout(branch) {
+    await executeGitCommand(`git checkout ${branch}`);
   }
 
   async function gitPullRebase() {
@@ -54,13 +57,21 @@ async function pullCode({ lan, localPaths }) {
     }
   }
 
+  async function gitMerge(branch) {
+    const { stdout, stderr } = await executeGitCommand(`git merge ${branch} --no-ff`);
+    if (stderr.includes("CONFLICT") || stdout.includes("CONFLICT")) {
+      throw new Error("执行git merge时发生冲突");
+    }
+  }
   try {
     await checkGitStatus();
+    await gitCheckout(to);
     await gitPullRebase();
-    return Promise.resolve("代码成功拉取并rebase");
+    await gitMerge(from);
+    return Promise.resolve("代码成功合并");
   } catch (error) {
     return Promise.reject(error.message);
   }
 }
 
-module.exports = pullCode;
+module.exports = mergeCode;

@@ -47,7 +47,7 @@ body {
   align-items: center;
   padding: 0 10px;
   gap: 10px;
-  border-bottom: 1px solid rgb(68,71,70);
+  border-bottom: 1px solid rgb(68, 71, 70);
 }
 
 .wrappper__main {
@@ -330,7 +330,10 @@ body {
 }
 
 .setCommit_btns {
-  text-align: right;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
 }
 
 /* .log-out {
@@ -382,5 +385,25 @@ input.ui-input {
   width: 100%;
   background-color: #2486ff;
   color: #fff;
-  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+.arrow-icon:before {
+  content: "▶";
+  margin-right: 5px;
+  color: #ccc;
+}
+
+.setMerge {
+  top: 10%;
+  transform: translate(-50%, 0);
+}
+
+.setMerge .setCommit_left {
+  align-items: center;
+  justify-content: space-between;
+}
+
+.setMerge .setCommit_left select {
+  width: 150px;
 }

@@ -113,6 +113,7 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
     <div class="content-item-btns">
       <a href="javascript:" class="ui-button ui-button-primary publish" role="button" data-lan="${lan}">Publish</a>
       <a href="javascript:" class="ui-button ui-button-primary pull-code" role="button" data-lan="${lan}">Pull Rebase</a>
+      <a href="javascript:" class="ui-button ui-button-primary merge-code" role="button" data-lan="${lan}">Merge</a>
       <a href="javascript:" class="ui-button ui-button-primary push-code" role="button" data-lan="${lan}">Push</a>
       <a href="javascript:" class="ui-button ui-button-primary dey-to-test" role="button" data-lan="${lan}" style="display: none">上传至 ${lan} Test Ftp</a>
       <a href="javascript:" class="ui-button ui-button-primary dey-to-pro" role="button" data-lan="${lan}" style="display: none">上传至 ${lan} Pro Ftp</a>
@@ -162,6 +163,7 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
 
   const pullCodes = document.querySelectorAll(".pull-code");
   const pushCodes = document.querySelectorAll(".push-code");
+  const mergeCodes = document.querySelectorAll(".merge-code");
 
   tplEles.forEach((item) => {
     item.addEventListener("input", function () {
@@ -394,12 +396,65 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
       }
       item.classList.add("loading");
       const { lan } = item.dataset;
-      setCommit(item, lan);
+      fetch("/check-status", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          lan
+        }),
+      })
+        .then((res) => {
+          return res.json();
+        }).then(res => {
+          if (res?.code === 200 && res?.message === 'check-status-success') {
+            setCommit(item, lan, res?.data || false);
+          } else {
+            setCommit(item, lan);
+          }
+        })
+    };
+  });
+
+  mergeCodes.forEach((item) => {
+    item.onclick = () => {
+      if (isWatching) {
+        new LightTip().error("请先关闭 Watching，其他操作需要开启");
+        return;
+      }
+      item.classList.add("loading");
+      const { lan } = item.dataset;
+      setMerge(item, lan);
     };
   });
 };
 
-const setCommit = (item, lan) => {
+const setCommit = (item, lan, status = false) => {
+  if (status) {
+    fetch("/push-code", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        lan,
+        status
+      }),
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((res) => {
+        if (res?.code === 200 && res?.message === "push-success") {
+          new LightTip().success(res?.data || lan + " Push 成功");
+        } else {
+          new LightTip().error(res?.data || lan + " Push 失败");
+        }
+        item.classList.remove("loading");
+      });
+    return;
+  }
   const html = `
     <div class="setCommit">
       <div class="setCommit_left">
@@ -472,6 +527,97 @@ const setCommit = (item, lan) => {
   };
 };
 
+const setMerge = (item, lan) => {
+  fetch("/get-branchs", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      lan
+    }),
+  })
+    .then((res) => {
+      return res.json();
+    }).then(res => {
+      if (res?.code === 200 && res.message === "get-branchs-success") {
+        renderHtml(res?.data || []);
+      }
+    })
+  function renderHtml(data = []) {
+    const html = `
+      <div class="setCommit setMerge">
+        <div class="setCommit_left">
+          <select name="from">
+              ${data.map((h) => {
+      return `<option class="feat" value="${h}" title="${h}">${h}</option>`
+    })
+      }
+          </select>
+          <p>Mergr To</p>
+          <select name="to">
+          ${data.map((h) => {
+        return `<option class="feat" value="${h}" title="${h}">${h}</option>`
+      })
+      }
+          </select>
+        </div>
+        <div class="setCommit_btns">
+          <a href="javascript:" class="ui-button ui-button-primary" role="button">Merge</a>
+          <a href="javascript:" class="ui-button ui-button-warning" role="button">Cancel</a>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML("beforeend", html);
+    const setCommit = document.querySelector(".setCommit");
+    const saveBtn = document.querySelector(".setCommit .ui-button-primary");
+    const cancelBtn = document.querySelector(".setCommit .ui-button-warning");
+    const selectFrom = document.querySelector('[name="from"]');
+    const selectTo = document.querySelector('[name="to"]');
+
+    saveBtn.onclick = () => {
+      if (selectFrom.value.trim() === selectTo.value.trim()) {
+        new LightTip().error("分支名不能相同");
+        return;
+      }
+      saveBtn.classList.add("loading");
+      cancelBtn.classList.add("disabled");
+      fetch("/merge-code", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          lan,
+          from: selectFrom.value.trim(),
+          to: selectTo.value.trim()
+        }),
+      })
+        .then((res) => {
+          return res.json();
+        })
+        .then((res) => {
+          if (res?.code === 200 && res?.message === "merge-success") {
+            new LightTip().success(res?.data || lan + " merge 成功");
+            saveBtn.classList.remove("loading");
+            item.classList.remove("loading");
+            cancelBtn.classList.remove("disabled");
+            setCommit.remove();
+          } else {
+            new LightTip().error(res?.data || lan + " merge 失败");
+            saveBtn.classList.remove("loading");
+            cancelBtn.classList.remove("disabled");
+          }
+        });
+    };
+
+    cancelBtn.onclick = () => {
+      item.classList.remove("loading");
+      setCommit.remove();
+    };
+  }
+};
+
 let modifiedModel, originalModel, diffEditor;
 function setEditor(path = "", originalText = "", modifiedText = "") {
   if (originalModel) originalModel.dispose();
@@ -506,30 +652,14 @@ function setEditor(path = "", originalText = "", modifiedText = "") {
         enableSplitViewResizing: false,
         originalEditable: true,
         automaticLayout: true,
+        fontSize: 16,
+        lineHeight: 35,
       }
     );
     diffEditor.setModel({
       original: originalModel,
       modified: modifiedModel,
     });
-    // editor = monaco.editor.create(document.querySelector("#compare"), {
-    //   value: obj,
-    //   language: lan,
-    //   automaticLayout: true,
-    //   theme: "vs-dark",
-    //   fontSize: 16,
-    //   fontFamily: "JetBrains Mono",
-    //   scrollbar: {
-    //     vertical: "hidden",
-    //     horizontal: "hidden",
-    //   },
-    //   wordWrap: "on",
-    //   lineNumbers: true,
-    //   lineHeight: 40,
-    //   minimap: {
-    //     enabled: false,
-    //   },
-    // });
   });
 }
 
@@ -612,6 +742,7 @@ const handleGetFile = () => {
       new LightTip().error("请点击开启 Watch 监听");
       return;
     }
+    handleBtn.classList.add('loading')
     const select = document.querySelector(".wrappper__sider_01 select");
     const checkboxes = document.querySelectorAll("[name='checkbox']:checked");
     var selectedValues = [];
@@ -619,6 +750,7 @@ const handleGetFile = () => {
       selectedValues.push(checkbox.value);
     });
     if (!selectedValues?.length) {
+      handleBtn.classList.remove('loading')
       new LightTip().error("请选择需要同步的语言");
       return;
     }
@@ -641,6 +773,7 @@ const handleGetFile = () => {
         if (res.code === 200 && res?.message === "handle-files-success") {
           if (!res?.data?.length) {
             new LightTip().error("No Modified Files");
+            handleBtn.classList.remove('loading')
             return;
           }
           res?.data.forEach((item) => {
@@ -658,8 +791,10 @@ const handleGetFile = () => {
         } else {
           new LightTip().error(`${res?.message || "获取文件失败"}`);
         }
+        handleBtn.classList.remove('loading')
       })
       .catch((err) => {
+        handleBtn.classList.remove('loading')
         console.log("err", err);
       });
   };
