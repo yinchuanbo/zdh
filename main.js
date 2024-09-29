@@ -1,5 +1,6 @@
 const { app, BrowserWindow, session, Menu } = require("electron");
 const express = require("./app");
+const path = require("path")
 
 let mainWindow;
 
@@ -32,7 +33,6 @@ function createWindow() {
       }
     });
   });
-  // 处理各种类型的 URL
   mainWindow.webContents.session.webRequest.onBeforeRequest((details, callback) => {
     let resourceUrl;
     try {
@@ -76,7 +76,23 @@ function createWindow() {
   });
 
   const port = 3000;
-  express.listen(port, () => {
+
+  const expressApp = express();
+  const server = require('http').createServer(expressApp);
+  const io = require('socket.io')(server);
+
+  io.on('connection', (socket) => {
+    console.log('A client connected');
+    socket.on('chat message', (msg) => {
+      console.log('Message received:', msg);
+      io.emit('chat message', msg);
+    });
+    socket.on('disconnect', () => {
+      console.log('A client disconnected');
+    });
+  });
+
+  server.listen(port, () => {
     console.log(`Express server running on port ${port}`);
     mainWindow.loadURL(`http://localhost:${port}`);
   });

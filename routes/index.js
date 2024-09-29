@@ -1,15 +1,16 @@
 var express = require("express");
 const getConf = require("../utils/conf");
 const { spawn } = require("child_process");
+const fs = require('fs');
 const { getFileFunc, getRequireDynamicFile } = require("../utils/get-files");
 const { setFile } = require("../utils/set-file");
 const deployToFtp = require("../utils/deploy-to-ftp");
+const listenWatch = require("../utils/watch");
 const handlePublish = require("../utils/publish");
 const pullCode = require("../utils/pull-code");
 const pushCode = require("../utils/push-code");
 const { copyAndMoveImg, getFileContent } = require("../utils/handle-file");
 const { authenticateToken } = require("../permissions");
-const fs = require("fs").promises;
 const path = require("path");
 var router = express.Router();
 
@@ -27,60 +28,73 @@ router.get("/", authenticateToken, function (req, res, next) {
 router.get("/watching", authenticateToken, function (req, res, next) {
   const { pathname, lans, ports, domain } = getConf(req.uname, res);
   const isWatching = req.query.bool === "true";
-  const watchScriptPath = path.join(__dirname, "../utils", "watch.js");
 
-  // 如果有正在运行的进程，安全地杀死它
-  if (watchProcess && typeof watchProcess.kill === "function") {
-    watchProcess.kill();
-    watchProcess.on("close", (code) => {
-      console.log(`Previous watch process exited with code ${code}`);
-    });
-    watchProcess = null;
-  }
-
-  // 启动新进程
   if (isWatching) {
-    if (!watchProcess) {
-      watchProcess = spawn(
-        "node",
-        [
-          watchScriptPath,
-          pathname,
-          JSON.stringify(lans),
-          JSON.stringify(ports),
-          domain,
-        ],
-        {
-          stdio: "inherit",
-        }
-      );
-
-      // 错误处理
-      watchProcess.on("error", (err) => {
-        console.error("Failed to start watch process:", err);
-        res.json({
-          success: false,
-          message: "Failed to start watch process",
-          error: err.message,
-        });
-        return;
-      });
-
-      watchProcess.on("close", (code) => {
-        console.log(`Watch process exited with code ${code}`);
-      });
-
-      console.log("Watch process started:", watchProcess.pid);
-    } else {
-      console.log("Watch process is already running:", watchProcess.pid);
-    }
+    listenWatch(
+      isWatching,
+      pathname,
+      JSON.stringify(lans),
+      JSON.stringify(ports),
+      domain
+    );
+    res.json({
+      code: 200,
+      watchingStatus: true,
+      message: "watching",
+    });
+  } else {
+    listenWatch(isWatching)
+    res.json({
+      code: 200,
+      watchingStatus: false,
+      message: "not watching",
+    });
   }
-
-  res.json({
-    success: true,
-    watchingStatus: isWatching,
-    message: isWatching ? "User is watching" : "User is not watching",
-  });
+  // const watchScriptPath = path.join(__dirname, "../utils", "watch.js");
+  // if (!fs.existsSync(watchScriptPath)) {
+  //   res.json({
+  //     code: 404,
+  //     message: "watch.js 路径不存在" + watchScriptPath,
+  //   });
+  //   return;
+  // }
+  // if (watchProcess && typeof watchProcess.kill === "function") {
+  //   watchProcess.kill();
+  //   watchProcess = null;
+  //   res.json({
+  //     code: 200,
+  //     watchingStatus: false,
+  //     message: "not watching",
+  //   });
+  //   return;
+  // }
+  // if (isWatching) {
+  //   if (!watchProcess) {
+  //     watchProcess = spawn(
+  //       "node",
+  //       [
+  //         watchScriptPath,
+  //         pathname,
+  //         JSON.stringify(lans),
+  //         JSON.stringify(ports),
+  //         domain,
+  //       ],
+  //       {
+  //         stdio: "inherit",
+  //       }
+  //     );
+  //     res.json({
+  //       code: 200,
+  //       watchingStatus: true,
+  //       message: "watching",
+  //     });
+  //   } else {
+  //     res.json({
+  //       code: 403,
+  //       message: "Watch process is already running",
+  //     });
+  //   }
+  // }
 });
 
 router.post("/handle-files", authenticateToken, async (req, res) => {

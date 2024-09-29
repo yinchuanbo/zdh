@@ -7,8 +7,6 @@
 var app = require("../app");
 var debug = require("debug")("zdh:server");
 var http = require("http");
-const { Server } = require("socket.io");
-
 /**
  * Get port from environment and store in Express.
  */
@@ -21,16 +19,21 @@ app.set("port", port);
  */
 
 var server = http.createServer(app);
+// const io = require("socket.io")(server, {
+//   cors: {
+//     origin: "*", // 允许所有来源，或者根据需求限制某些域名
+//     methods: ["GET", "POST"],
+//     credentials: true,
+//   },
+// });
 
-const io = new Server(server);
-
-io.on("connection", (socket) => {
-  console.log("a user connected");
-  socket.on("chat message", (msg) => {
-    console.log("message: " + msg);
-    io.emit("chat message", msg);
-  });
-});
+// io.on("connection", (socket) => {
+//   console.log("a user connected");
+//   socket.on("chat message", (msg) => {
+//     console.log("message: " + msg);
+//     io.emit("chat message", msg);
+//   });
+// });
 
 /**
  * Listen on provided port, on all network interfaces.

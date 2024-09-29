@@ -138,4 +138,4 @@ async function handleAsyncLans(oLan, aLan, onlyLan, configs) {
   await fs.writeFile(outputOtherPath, jsContent);
 }
 
-module.exports = { getFileFunc, getRequireDynamicFile };
+module.exports = { getFileFunc, getRequireDynamicFile, getDynamicFilePath };

@@ -1,4 +1,4 @@
-const socket = io();
+const socket = io("http://localhost:3000");
 let imgs = [];
 let isWatching = false;
 
@@ -16,9 +16,21 @@ let curP = null;
 let data2Info = {};
 
 const setWatch = () => {
-  fetch("/watching?bool=" + isWatching)
+  fetch("/watching?bool=" + isWatching).then((res) => {
+    return res.json()
+  })
     .then((res) => {
-      console.log("res", res);
+      if (res?.code === 200) {
+        if (res?.watchingStatus) {
+          new LightTip().success(res?.message);
+        } else {
+          new LightTip().error(res?.message);
+        }
+      } else if (res?.code === 403) {
+        new LightTip().error(res?.message);
+      } else if (res?.code === 404) {
+        new LightTip().error(res?.message);
+      }
     })
     .catch((err) => {
       console.log("err", err);
@@ -108,11 +120,11 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
     </div>
     <ul>
       ${data
-        .map((info) => {
-          const str = generateRandomString(20);
-          let lujing = curDatas2?.[info] || "unknown";
-          if (selectLan === lan) lujing = info;
-          return `<li data-path="${info}" data-path2="${lujing}" data-lan="${lan}">
+      .map((info) => {
+        const str = generateRandomString(20);
+        let lujing = curDatas2?.[info] || "unknown";
+        if (selectLan === lan) lujing = info;
+        return `<li data-path="${info}" data-path2="${lujing}" data-lan="${lan}">
           <div class="check-handle" title="已完成可选中">
             <input type="checkbox" id="${str}" name="${str}">
             <label for="${str}" class="ui-checkbox"></label>
@@ -121,8 +133,8 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
             <a href="javascript:" class="ui-button ui-button-primary async-res" style="display: ${selectLan === lan ? "none" : ""}" role="button">Diff</a>
             <a href="javascript:" class="ui-button ui-button-primary one-deploy" role="button" style="display: ${info.endsWith(".json") ? "none" : ""}">To Test</a>
           </li>`;
-        })
-        .join("")}
+      })
+      .join("")}
     </ul>
   </div>`;
 
@@ -627,7 +639,7 @@ const handleGetFile = () => {
       })
       .then((res) => {
         if (res.code === 200 && res?.message === "handle-files-success") {
-          if(!res?.data?.length) {
+          if (!res?.data?.length) {
             new LightTip().error("No Modified Files");
             return;
           }
