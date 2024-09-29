@@ -50,51 +50,6 @@ router.get("/watching", authenticateToken, function (req, res, next) {
       message: "not watching",
     });
   }
-  // const watchScriptPath = path.join(__dirname, "../utils", "watch.js");
-  // if (!fs.existsSync(watchScriptPath)) {
-  //   res.json({
-  //     code: 404,
-  //     message: "watch.js 路径不存在" + watchScriptPath,
-  //   });
-  //   return;
-  // }
-  // if (watchProcess && typeof watchProcess.kill === "function") {
-  //   watchProcess.kill();
-  //   watchProcess = null;
-  //   res.json({
-  //     code: 200,
-  //     watchingStatus: false,
-  //     message: "not watching",
-  //   });
-  //   return;
-  // }
-  // if (isWatching) {
-  //   if (!watchProcess) {
-  //     watchProcess = spawn(
-  //       "node",
-  //       [
-  //         watchScriptPath,
-  //         pathname,
-  //         JSON.stringify(lans),
-  //         JSON.stringify(ports),
-  //         domain,
-  //       ],
-  //       {
-  //         stdio: "inherit",
-  //       }
-  //     );
-  //     res.json({
-  //       code: 200,
-  //       watchingStatus: true,
-  //       message: "watching",
-  //     });
-  //   } else {
-  //     res.json({
-  //       code: 403,
-  //       message: "Watch process is already running",
-  //     });
-  //   }
-  // }
 });
 
 router.post("/handle-files", authenticateToken, async (req, res) => {

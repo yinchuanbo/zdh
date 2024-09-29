@@ -103,3 +103,7 @@ h2 {
 .ui-input>input, input.ui-input {
   border: 0!important;
 }
+
+select {
+  border: 0!important;
+}

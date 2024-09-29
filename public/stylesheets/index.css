@@ -407,3 +407,7 @@ input.ui-input {
 .setMerge .setCommit_left select {
   width: 150px;
 }
+
+select {
+  border: 0!important;
+}

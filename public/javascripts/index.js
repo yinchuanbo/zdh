@@ -16,25 +16,7 @@ let curP = null;
 let data2Info = {};
 
 const setWatch = () => {
-  fetch("/watching?bool=" + isWatching).then((res) => {
-    return res.json()
-  })
-    .then((res) => {
-      if (res?.code === 200) {
-        if (res?.watchingStatus) {
-          new LightTip().success(res?.message);
-        } else {
-          new LightTip().error(res?.message);
-        }
-      } else if (res?.code === 403) {
-        new LightTip().error(res?.message);
-      } else if (res?.code === 404) {
-        new LightTip().error(res?.message);
-      }
-    })
-    .catch((err) => {
-      console.log("err", err);
-    });
+  fetch("/watching?bool=" + isWatching);
 };
 
 const watchBtnListen = () => {
@@ -112,7 +94,7 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
   const html02 = `<div class="content-item active">
     <div class="content-item-btns">
       <a href="javascript:" class="ui-button ui-button-primary publish" role="button" data-lan="${lan}">Publish</a>
-      <a href="javascript:" class="ui-button ui-button-primary pull-code" role="button" data-lan="${lan}">Pull Rebase</a>
+      <a href="javascript:" class="ui-button ui-button-primary pull-code" role="button" data-lan="${lan}">Pull</a>
       <a href="javascript:" class="ui-button ui-button-primary merge-code" role="button" data-lan="${lan}">Merge</a>
       <a href="javascript:" class="ui-button ui-button-primary push-code" role="button" data-lan="${lan}">Push</a>
       <a href="javascript:" class="ui-button ui-button-primary dey-to-test" role="button" data-lan="${lan}" style="display: none">上传至 ${lan} Test Ftp</a>
