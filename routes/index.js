@@ -125,12 +125,12 @@ router.post("/receive-files", authenticateToken, async (req, res) => {
 });
 
 router.post("/receive-imgs", authenticateToken, async (req, res) => {
-  const { ports, domain } = getConf(req.uname, res);
+  const { LocalListPro, ports, domain } = getConf(req.uname, res);
   const { lan, imgs, initLan } = req.body;
   try {
     for (let i = 0; i < imgs.length; i++) {
       const imgPath = imgs[i];
-      await copyAndMoveImg({ path: imgPath, lan, initLan });
+      await copyAndMoveImg({ path: imgPath, lan, initLan, LocalListPro });
     }
     await handlePublish(lan, ports, domain);
     res.json({
@@ -140,7 +140,7 @@ router.post("/receive-imgs", authenticateToken, async (req, res) => {
   } catch (error) {
     res.json({
       code: 200,
-      message: "fail",
+      message: error?.message || error || "async-imgs-success",
     });
   }
 });

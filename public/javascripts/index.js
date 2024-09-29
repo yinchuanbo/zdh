@@ -112,7 +112,7 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
             <input type="checkbox" id="${str}" name="${str}">
             <label for="${str}" class="ui-checkbox"></label>
           </div>
-        [${initLan}] ${info}&nbsp;->&nbsp;<p class="tpl__ele" contentEditable="${info.endsWith(".tpl") && selectLan !== lan ? true : false}">[${lan}] ${lujing}</p>
+        [${initLan}] ${info}&nbsp;->&nbsp;<div class="tpl__ele" data-es="${info.endsWith(".tpl") && selectLan !== lan ? 'tpl' : ''}">[${lan}] ${lujing}</div>
             <a href="javascript:" class="ui-button ui-button-primary async-res" style="display: ${selectLan === lan ? "none" : ""}" role="button">Diff</a>
             <a href="javascript:" class="ui-button ui-button-primary one-deploy" role="button" style="display: ${info.endsWith(".json") ? "none" : ""}">To Test</a>
           </li>`;
@@ -148,13 +148,21 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
   const mergeCodes = document.querySelectorAll(".merge-code");
 
   tplEles.forEach((item) => {
-    item.addEventListener("input", function () {
-      item.innerText = item.innerText;
+    item.onclick = () => {
+      const { es } = item.dataset;
+      if (es === 'tpl') {
+        item.setAttribute("contentEditable", true)
+      }
+    }
+    item.oninput = () => {
       let path = item.innerText.split("]")[1] || "";
       path = path.trim();
       const p = item.parentNode;
       p.setAttribute("data-path2", path);
-    });
+    }
+    item.onblur = () => {
+      item.removeAttribute("contentEditable")
+    }
   });
 
   allHeaderItem.forEach((item, idx) => {

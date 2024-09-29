@@ -291,6 +291,11 @@ body {
   color: #2486ff;
   font-weight: 600;
   margin-right: auto;
+  outline: none;
+}
+
+.tpl__ele:focus {
+  background-color: #f2f2f2;
 }
 
 .check-handle {

@@ -6,6 +6,7 @@ const fs = require("fs");
 function copyAndMoveImg({ path, lan, initLan, LocalListPro }) {
   const initPath = LocalListPro[initLan] + path.replaceAll("/", "\\");
   const nowPath = LocalListPro[lan] + path.replaceAll("/", "\\");
+  
   try {
     fs.copyFileSync(initPath, nowPath);
     return Promise.resolve();
