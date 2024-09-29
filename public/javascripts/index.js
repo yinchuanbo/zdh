@@ -316,7 +316,13 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
 
   oneDeploy.forEach((item) => {
     item.onclick = () => {
-      const { path2 } = item.parentNode.dataset;
+      const { path2, path } = item.parentNode.dataset;
+      if (path.startsWith("tpl/")) {
+        if (!path2.startsWith("tpl/") || !path2.endsWith(".tpl") || path2.trim() === "tpl/.tpl") {
+          new LightTip().error(`Tpl 文件名不合法`);
+          return;
+        }
+      }
       let urlPath = path2.includes("tpl/") ? convertTplToHtml(path2) : path2;
       urlPath = urlPath.startsWith("Dev/") ? urlPath.replace("Dev/", "") : urlPath;
       urlPath = urlPath.startsWith("scss/") ? urlPath.replaceAll("scss", "css") : urlPath;
