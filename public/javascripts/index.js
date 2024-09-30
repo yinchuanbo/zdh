@@ -163,7 +163,7 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
     item.oninput = () => {
       let path = item.innerText.split("]")[1] || "";
       path = path.trim();
-      const p = item.parentNode;
+      const p = item.parentNode.parentNode;
       p.setAttribute("data-path2", path);
     }
     item.onblur = () => {
@@ -185,7 +185,7 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
   asyncRes.forEach((item) => {
     item.onclick = () => {
       item.classList.add("loading");
-      const p = item.parentNode;
+      const p = item.parentNode.parentNode;
       curP = p;
       const { path, lan, path2 } = p.dataset;
       fetch("/receive-files", {
@@ -322,7 +322,7 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
 
   oneDeploy.forEach((item) => {
     item.onclick = () => {
-      const { path2, path } = item.parentNode.dataset;
+      const { path2, path, lan } = item.parentNode.parentNode.dataset;
       if (path.startsWith("tpl/")) {
         if (!path2.startsWith("tpl/") || !path2.endsWith(".tpl") || path2.trim() === "tpl/.tpl") {
           new LightTip().error(`Tpl 文件名不合法`);
@@ -332,7 +332,6 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
       let urlPath = path2.includes("tpl/") ? convertTplToHtml(path2) : path2;
       urlPath = urlPath.startsWith("Dev/") ? urlPath.replace("Dev/", "") : urlPath;
       urlPath = urlPath.startsWith("scss/") ? urlPath.replaceAll("scss", "css") : urlPath;
-      const lan = item.parentNode.dataset.lan;
       item.classList.add("loading");
       fetch("/deploy-to-ftp", {
         method: "POST",

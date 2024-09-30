@@ -290,7 +290,7 @@ body {
 .diffHTML {
   position: fixed;
   inset: 0;
-  background-color: #fff;
+  background-color: #3c3c3c;
   z-index: 10000;
   display: flex;
   flex-direction: column;
