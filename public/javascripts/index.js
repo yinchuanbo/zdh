@@ -655,7 +655,6 @@ function setEditor(path = "", originalText = "", modifiedText = "") {
         fontSize: 16,
       }
     );
-    diffEditor.layout();
     diffEditor.setModel({
       original: originalModel,
       modified: modifiedModel,
