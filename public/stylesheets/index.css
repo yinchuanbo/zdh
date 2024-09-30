@@ -511,3 +511,9 @@ select,
   display: block;
   transition: 0.5s;
 }
+
+.monaco-editor .suggest-details, .monaco-editor .suggest-widget {
+  display: flex !important;
+  justify-content: flex-start!important;
+  flex-direction: column!important;
+}

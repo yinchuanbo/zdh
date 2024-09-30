@@ -629,7 +629,6 @@ function setEditor(path = "", originalText = "", modifiedText = "") {
       vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs",
     },
   });
-
   const extensionToLanguageMap = {
     ".js": "javascript",
     ".css": "css",
@@ -654,9 +653,9 @@ function setEditor(path = "", originalText = "", modifiedText = "") {
         originalEditable: true,
         automaticLayout: true,
         fontSize: 16,
-        lineHeight: 35,
       }
     );
+    diffEditor.layout();
     diffEditor.setModel({
       original: originalModel,
       modified: modifiedModel,
