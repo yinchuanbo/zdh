@@ -117,8 +117,10 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
             <!--<div class="tpl__ele_arrow">↓</div>-->
             <div class="tpl__ele" title="[${lan}] ${lujing}" data-es="${info.endsWith(".tpl") && selectLan !== lan ? 'tpl' : ''}">[${lan}] ${lujing}</div>
           </div>
-          <a href="javascript:" class="ui-button ui-button-primary async-res" style="display: ${selectLan === lan ? "none" : ""}" role="button">Diff</a>
-          <a href="javascript:" class="ui-button ui-button-primary one-deploy" role="button" style="display: ${info.endsWith(".json") ? "none" : ""}">To Test</a>
+          <div class="btns">
+           <a href="javascript:" class="ui-button ui-button-primary async-res" style="display: ${selectLan === lan ? "none" : ""}" role="button">Diff</a>
+           <a href="javascript:" class="ui-button ui-button-primary one-deploy" role="button" style="display: ${info.endsWith(".json") ? "none" : ""}">To Test</a>          
+          </div>
         </li>`;
       })
       .join("")}
