@@ -57,6 +57,7 @@ function deployAllLanguages(needLans = [], configs) {
   return new Promise(async (resolve, reject) => {
     successArr = [];
     deployInfo = configs.deployInfo;
+    console.log('这里2')
     const deployInfoCopy = JSON.parse(JSON.stringify(deployInfo));
     const filteredLanguages = Object.entries(deployInfoCopy.languages).filter(
       ([lang]) => needLans.length === 0 || needLans.includes(lang)

@@ -82,6 +82,7 @@ preview.onclick = () => {
   saveFiles.onclick = () => {
     if (editor) {
       const value = editor.getValue();
+      console.log('这里2')
       filesObj = JSON.stringify(JSON.parse(value), null, 2);
       removeMark();
     }

@@ -23,7 +23,7 @@ const watchBtnListen = () => {
   watchBtn.onclick = () => {
     isWatching = !isWatching;
     if (isWatching) {
-      watchBtn.innerHTML = "Watching...";
+      watchBtn.innerHTML = "Watching";
     } else {
       watchBtn.innerHTML = "Watch";
     }
@@ -40,7 +40,7 @@ const handleSocket = () => {
     if (type === "watch error") {
       isWatching = !isWatching;
       if (isWatching) {
-        watchBtn.innerHTML = "Watching...";
+        watchBtn.innerHTML = "Watching";
       } else {
         watchBtn.innerHTML = "Watch";
       }
@@ -112,10 +112,14 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
             <input type="checkbox" id="${str}" name="${str}">
             <label for="${str}" class="ui-checkbox"></label>
           </div>
-        [${initLan}] ${info}&nbsp;->&nbsp;<div class="tpl__ele" data-es="${info.endsWith(".tpl") && selectLan !== lan ? 'tpl' : ''}">[${lan}] ${lujing}</div>
-            <a href="javascript:" class="ui-button ui-button-primary async-res" style="display: ${selectLan === lan ? "none" : ""}" role="button">Diff</a>
-            <a href="javascript:" class="ui-button ui-button-primary one-deploy" role="button" style="display: ${info.endsWith(".json") ? "none" : ""}">To Test</a>
-          </li>`;
+          <div class="filename">
+            <div class="tpl__ele_origin" title="[${initLan}] ${info}">[${initLan}] ${info}</div>
+            <!--<div class="tpl__ele_arrow">↓</div>-->
+            <div class="tpl__ele" title="[${lan}] ${lujing}" data-es="${info.endsWith(".tpl") && selectLan !== lan ? 'tpl' : ''}">[${lan}] ${lujing}</div>
+          </div>
+          <a href="javascript:" class="ui-button ui-button-primary async-res" style="display: ${selectLan === lan ? "none" : ""}" role="button">Diff</a>
+          <a href="javascript:" class="ui-button ui-button-primary one-deploy" role="button" style="display: ${info.endsWith(".json") ? "none" : ""}">To Test</a>
+        </li>`;
       })
       .join("")}
     </ul>
@@ -470,7 +474,7 @@ const setCommit = (item, lan, status = false) => {
       </div>
       <div class="setCommit_btns">
         <a href="javascript:" class="ui-button ui-button-primary" role="button">Send</a>
-        <a href="javascript:" class="ui-button ui-button-warning" role="button">Cancel</a>
+        <a href="javascript:" class="ui-button ui-button-warning red_button" role="button">Cancel</a>
       </div>
     </div>
   `;
@@ -560,7 +564,7 @@ const setMerge = (item, lan) => {
         </div>
         <div class="setCommit_btns">
           <a href="javascript:" class="ui-button ui-button-primary" role="button">Merge</a>
-          <a href="javascript:" class="ui-button ui-button-warning" role="button">Cancel</a>
+          <a href="javascript:" class="ui-button ui-button-warning red_button" role="button">Cancel</a>
         </div>
       </div>
     `;
@@ -664,7 +668,7 @@ const diffHTML = function (data = {}, lan = "", path = "") {
     <div class="diffHTML">
       <div class="diffHTML-header">
         <a href="javascript:" data-lan="${lan}" class="ui-button ui-button-primary" id="Save" role="button">Save</a>
-        <a href="javascript:" class="ui-button ui-button-warning" id="Cancel" role="button">Cancel</a>
+        <a href="javascript:" class="ui-button ui-button-warning red_button" id="Cancel" role="button">Cancel</a>
       </div>
       <div class="diffHTML__path">
         <span class="diffHTML__path-title">${data.initC.path}</span>
@@ -732,7 +736,15 @@ const diffHTML = function (data = {}, lan = "", path = "") {
   };
 };
 
+const handleNoData = () => {
+  const contentDom = document.querySelector(".wrappper__content-content");
+  const noData = `<div class="no-data"><p>No Data</p></div>`;
+  contentDom.innerHTML = "";
+  contentDom.insertAdjacentHTML("beforeend", noData);
+}
+
 const handleGetFile = () => {
+  handleNoData()
   handleBtn.onclick = () => {
     if (!isWatching) {
       new LightTip().error("请点击开启 Watch 监听");
@@ -768,6 +780,7 @@ const handleGetFile = () => {
       .then((res) => {
         if (res.code === 200 && res?.message === "handle-files-success") {
           if (!res?.data?.length) {
+            handleNoData()
             new LightTip().error("No Modified Files");
             handleBtn.classList.remove('loading')
             return;
@@ -785,6 +798,7 @@ const handleGetFile = () => {
             createContent(lan, res?.data, res?.data2, select.value);
           });
         } else {
+          handleNoData()
           new LightTip().error(`${res?.message || "获取文件失败"}`);
         }
         handleBtn.classList.remove('loading')
@@ -805,6 +819,7 @@ const selectOnChange = () => {
     const content = document.querySelector(".wrappper__content-content");
     header.innerHTML = "";
     content.innerHTML = "";
+    handleNoData()
     // const divLanActive = document.querySelector(".div-lan.disabled");
     // if (divLanActive) divLanActive.classList.remove("disabled");
     // const divLan = document.querySelector(`.div-${selectedValue}`);

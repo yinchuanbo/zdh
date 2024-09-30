@@ -6,7 +6,10 @@ function authenticateToken(req, res, next) {
   const token = req.cookies.token;
   if (token == null) return res.redirect("/login");
   jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) return res.redirect("/login");
+    if (err) {
+     console.log('err', err)
+     return res.redirect("/login")
+    };
     req.user = user;
     req.role = user.role;
     req.uname = user.uname;

@@ -2,6 +2,7 @@ const allDeploy = document.querySelector(".all-deploy");
 // const selectVal = document.querySelector('[name="lans"]');
 const pre = document.querySelector("pre");
 let { lans } = pre.dataset;
+console.log('这里1')
 lans = JSON.parse(lans);
 let selectVals = [];
 

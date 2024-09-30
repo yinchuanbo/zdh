@@ -25,36 +25,36 @@
       <header class="wrappper__header">
         <a
           href="javascript:"
-          class="ui-button ui-button-primary watch-btn"
+          class="watch-btn ui-button ui-button-primary "
           role="button"
           >Watch</a
         >
         <a
           href="javascript:"
-          class="ui-button ui-button-primary"
           role="button"
+          class="nav_a"
           onclick="location.href = '/settings'"
           >Settings</a
         >
         <a
           href="javascript:"
-          class="ui-button ui-button-primary"
           role="button"
+          class="nav_a"
           onclick="window.open('/ftp')"
           >FTP Handle</a
         >
         <% if (role !== "user") { %>
           <a
           href="javascript:"
-          class="ui-button ui-button-primary"
           role="button"
+          class="nav_a"
           onclick="window.open('/deploy')"
           >Pro Deploy</a
         >
         <% } %>
         <a
           href="javascript:"
-          class="ui-button ui-button-warning log-out"
+          class="log-out red_button ui-button ui-button-warning"
           role="button"
           >Log Out</a
         >
@@ -101,6 +101,8 @@
           <div class="wrappper__content-header"></div>
           <div class="wrappper__content-content"></div>
         </div>
+        <!-- <div class="wrappper__sider wrappper__sider2">
+        </div> -->
       </main>
     </div>
     <script src="/javascripts/jquery.js"></script>
