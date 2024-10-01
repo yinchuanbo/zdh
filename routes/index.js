@@ -15,7 +15,6 @@ const { copyAndMoveImg, getFileContent } = require("../utils/handle-file");
 const { authenticateToken } = require("../permissions");
 var router = express.Router();
 
-
 router.get("/", authenticateToken, function (req, res, next) {
   const { lans } = getConf(req.uname, res);
   res.render("index", {
@@ -43,7 +42,7 @@ router.get("/watching", authenticateToken, function (req, res, next) {
       message: "watching",
     });
   } else {
-    listenWatch(isWatching)
+    listenWatch(isWatching);
     res.json({
       code: 200,
       watchingStatus: false,
@@ -232,9 +231,9 @@ router.post("/check-status", authenticateToken, async (req, res) => {
 
 router.post("/push-code", authenticateToken, async (req, res) => {
   const { localPaths } = getConf(req.uname, res);
-  const { lan, commit, status } = req.body;
+  const { lan, commit, status, type } = req.body;
   try {
-    const result = await pushCode({ lan, commit, localPaths, status });
+    const result = await pushCode({ lan, commit, localPaths, status, type });
     res.json({
       code: 200,
       message: "push-success",

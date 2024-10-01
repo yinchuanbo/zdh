@@ -31,14 +31,22 @@ async function pullCode({ lan, localPaths }) {
       if (error.message.includes("冲突")) {
         throw error;
       }
-      if (error.message.includes("There is no tracking information for the current branch")) {
+      if (
+        error.message.includes(
+          "There is no tracking information for the current branch"
+        )
+      ) {
         console.warn("没有跟踪分支，跳过 git pull 操作，继续执行下一步。");
         return;
       }
       try {
         const { stdout, stderr } = await executeGitCommand("git pull");
         if (stderr) {
-          if (stderr.includes("There is no tracking information for the current branch")) {
+          if (
+            stderr.includes(
+              "There is no tracking information for the current branch"
+            )
+          ) {
             console.warn("没有跟踪分支，跳过 git pull 操作，继续执行下一步。");
             return;
           }
@@ -46,7 +54,9 @@ async function pullCode({ lan, localPaths }) {
         }
         console.log("git pull 成功");
       } catch (pullError) {
-        throw new Error(`git pull 和 git pull --rebase 都失败: ${pullError.message}`);
+        throw new Error(
+          `git pull 和 git pull --rebase 都失败: ${pullError.message}`
+        );
       }
     }
   }
@@ -60,7 +70,13 @@ async function pullCode({ lan, localPaths }) {
   }
 }
 
-async function pushCode({ lan, commit = "提交", localPaths, status = false }) {
+async function pushCode({
+  lan,
+  commit = "提交",
+  localPaths,
+  status: resStatus = false,
+  type,
+}) {
   const curP = localPaths[lan];
 
   function executeGitCommand(command) {
@@ -75,28 +91,32 @@ async function pushCode({ lan, commit = "提交", localPaths, status = false }) 
   }
 
   try {
-    if (!status) {
-      const { stdout: status } = await executeGitCommand(
-        "git status --porcelain"
-      );
-      if (!status) {
-        throw new Error("没有文件需要推送");
-      }
+    if (!resStatus) {
       await executeGitCommand("git add .");
-      console.log("已添加所有更改");
       const { stdout: commitResult } = await executeGitCommand(
         `git commit -m "${commit}"`
       );
-      console.log("提交结果:", commitResult);
+      if (type === "commit") {
+        return Promise.resolve(commitResult || "commit 提交成功");
+      }
+    } else {
+      // 无文件修改
+      if (type === "commit") {
+        return Promise.resolve("无修改可用来 commit");
+      }
     }
 
     await pullCode({ lan, localPaths });
     console.log("成功拉取并rebase最新代码");
 
-    // 检查并设置上游分支  
-    const { stdout: currentBranch } = await executeGitCommand("git rev-parse --abbrev-ref HEAD");
+    // 检查并设置上游分支
+    const { stdout: currentBranch } = await executeGitCommand(
+      "git rev-parse --abbrev-ref HEAD"
+    );
     try {
-      await executeGitCommand(`git push --set-upstream origin ${currentBranch}`);
+      await executeGitCommand(
+        `git push --set-upstream origin ${currentBranch}`
+      );
       console.log(`已设置上游分支为 origin/${currentBranch}`);
     } catch (error) {
       if (error.message.includes("fatal: The current branch")) {

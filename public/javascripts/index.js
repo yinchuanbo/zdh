@@ -95,6 +95,7 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
     <div class="content-item-btns">
       <a href="javascript:" class="ui-button ui-button-primary publish" role="button" data-lan="${lan}">Publish</a>
       <a href="javascript:" class="ui-button ui-button-primary pull-code" role="button" data-lan="${lan}">Pull</a>
+      <a href="javascript:" class="ui-button ui-button-primary commit-code" role="button" data-lan="${lan}">Push</a>
       <a href="javascript:" class="ui-button ui-button-primary merge-code" role="button" data-lan="${lan}">Merge</a>
       <a href="javascript:" class="ui-button ui-button-primary push-code" role="button" data-lan="${lan}">Push</a>
       <a href="javascript:" class="ui-button ui-button-primary dey-to-test" role="button" data-lan="${lan}" style="display: none">上传至 ${lan} Test Ftp</a>
@@ -103,11 +104,11 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
     </div>
     <ul>
       ${data
-      .map((info) => {
-        const str = generateRandomString(20);
-        let lujing = curDatas2?.[info] || "unknown";
-        if (selectLan === lan) lujing = info;
-        return `<li data-path="${info}" data-path2="${lujing}" data-lan="${lan}">
+        .map((info) => {
+          const str = generateRandomString(20);
+          let lujing = curDatas2?.[info] || "unknown";
+          if (selectLan === lan) lujing = info;
+          return `<li data-path="${info}" data-path2="${lujing}" data-lan="${lan}">
           <div class="check-handle" title="已完成可选中">
             <input type="checkbox" id="${str}" name="${str}">
             <label for="${str}" class="ui-checkbox"></label>
@@ -115,15 +116,15 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
           <div class="filename">
             <div class="tpl__ele_origin" title="[${initLan}] ${info}">[${initLan}] ${info}</div>
             <!--<div class="tpl__ele_arrow">↓</div>-->
-            <div class="tpl__ele" title="[${lan}] ${lujing}" data-es="${info.endsWith(".tpl") && selectLan !== lan ? 'tpl' : ''}">[${lan}] ${lujing}</div>
+            <div class="tpl__ele" title="[${lan}] ${lujing}" data-es="${info.endsWith(".tpl") && selectLan !== lan ? "tpl" : ""}">[${lan}] ${lujing}</div>
           </div>
           <div class="btns">
            <a href="javascript:" class="ui-button ui-button-primary async-res" style="display: ${selectLan === lan ? "none" : ""}" role="button">Diff</a>
            <a href="javascript:" class="ui-button ui-button-primary one-deploy" role="button" style="display: ${info.endsWith(".json") ? "none" : ""}">To Test</a>          
           </div>
         </li>`;
-      })
-      .join("")}
+        })
+        .join("")}
     </ul>
   </div>`;
 
@@ -151,24 +152,25 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
 
   const pullCodes = document.querySelectorAll(".pull-code");
   const pushCodes = document.querySelectorAll(".push-code");
+  const commitCode = document.querySelectorAll(".commit-code");
   const mergeCodes = document.querySelectorAll(".merge-code");
 
   tplEles.forEach((item) => {
     item.onclick = () => {
       const { es } = item.dataset;
-      if (es === 'tpl') {
-        item.setAttribute("contentEditable", true)
+      if (es === "tpl") {
+        item.setAttribute("contentEditable", true);
       }
-    }
+    };
     item.oninput = () => {
       let path = item.innerText.split("]")[1] || "";
       path = path.trim();
       const p = item.parentNode.parentNode;
       p.setAttribute("data-path2", path);
-    }
+    };
     item.onblur = () => {
-      item.removeAttribute("contentEditable")
-    }
+      item.removeAttribute("contentEditable");
+    };
   });
 
   allHeaderItem.forEach((item, idx) => {
@@ -324,14 +326,22 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
     item.onclick = () => {
       const { path2, path, lan } = item.parentNode.parentNode.dataset;
       if (path.startsWith("tpl/")) {
-        if (!path2.startsWith("tpl/") || !path2.endsWith(".tpl") || path2.trim() === "tpl/.tpl") {
+        if (
+          !path2.startsWith("tpl/") ||
+          !path2.endsWith(".tpl") ||
+          path2.trim() === "tpl/.tpl"
+        ) {
           new LightTip().error(`Tpl 文件名不合法`);
           return;
         }
       }
       let urlPath = path2.includes("tpl/") ? convertTplToHtml(path2) : path2;
-      urlPath = urlPath.startsWith("Dev/") ? urlPath.replace("Dev/", "") : urlPath;
-      urlPath = urlPath.startsWith("scss/") ? urlPath.replaceAll("scss", "css") : urlPath;
+      urlPath = urlPath.startsWith("Dev/")
+        ? urlPath.replace("Dev/", "")
+        : urlPath;
+      urlPath = urlPath.startsWith("scss/")
+        ? urlPath.replaceAll("scss", "css")
+        : urlPath;
       item.classList.add("loading");
       fetch("/deploy-to-ftp", {
         method: "POST",
@@ -389,6 +399,35 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
     };
   });
 
+  commitCode.forEach((item) => {
+    item.onclick = () => {
+      if (isWatching) {
+        new LightTip().error("请先关闭 Watching，其他操作需要开启");
+        return;
+      }
+      item.classList.add("loading");
+      const { lan } = item.dataset;
+      fetch("/check-status", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          lan,
+        }),
+      })
+        .then((res) => {
+          return res.json();
+        })
+        .then((res) => {
+          if (res?.code === 200 && res?.message === "check-status-success") {
+            setCommit(item, lan, res?.data || false, "commit");
+          } else {
+            new LightTip().error("无修改可用来 commit");
+          }
+        });
+    };
+  });
   pushCodes.forEach((item) => {
     item.onclick = () => {
       if (isWatching) {
@@ -403,18 +442,19 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          lan
+          lan,
         }),
       })
         .then((res) => {
           return res.json();
-        }).then(res => {
-          if (res?.code === 200 && res?.message === 'check-status-success') {
+        })
+        .then((res) => {
+          if (res?.code === 200 && res?.message === "check-status-success") {
             setCommit(item, lan, res?.data || false);
           } else {
             setCommit(item, lan);
           }
-        })
+        });
     };
   });
 
@@ -431,7 +471,7 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
   });
 };
 
-const setCommit = (item, lan, status = false) => {
+const setCommit = (item, lan, status = false, type = "") => {
   if (status) {
     fetch("/push-code", {
       method: "POST",
@@ -440,7 +480,8 @@ const setCommit = (item, lan, status = false) => {
       },
       body: JSON.stringify({
         lan,
-        status
+        status,
+        type,
       }),
     })
       .then((res) => {
@@ -535,32 +576,31 @@ const setMerge = (item, lan) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      lan
+      lan,
     }),
   })
     .then((res) => {
       return res.json();
-    }).then(res => {
+    })
+    .then((res) => {
       if (res?.code === 200 && res.message === "get-branchs-success") {
         renderHtml(res?.data || []);
       }
-    })
+    });
   function renderHtml(data = []) {
     const html = `
       <div class="setCommit setMerge">
         <div class="setCommit_left">
           <select name="from">
               ${data.map((h) => {
-      return `<option class="feat" value="${h}" title="${h}">${h}</option>`
-    })
-      }
+                return `<option class="feat" value="${h}" title="${h}">${h}</option>`;
+              })}
           </select>
           <p>Mergr To</p>
           <select name="to">
           ${data.map((h) => {
-        return `<option class="feat" value="${h}" title="${h}">${h}</option>`
-      })
-      }
+            return `<option class="feat" value="${h}" title="${h}">${h}</option>`;
+          })}
           </select>
         </div>
         <div class="setCommit_btns">
@@ -591,7 +631,7 @@ const setMerge = (item, lan) => {
         body: JSON.stringify({
           lan,
           from: selectFrom.value.trim(),
-          to: selectTo.value.trim()
+          to: selectTo.value.trim(),
         }),
       })
         .then((res) => {
@@ -640,8 +680,14 @@ function setEditor(path = "", originalText = "", modifiedText = "") {
     Object.keys(extensionToLanguageMap).find((ext) => path.endsWith(ext)) ||
     "text/plain";
   require(["vs/editor/editor.main"], function () {
-    originalModel = monaco.editor.createModel(originalText, extensionToLanguageMap[lan]);
-    modifiedModel = monaco.editor.createModel(modifiedText, extensionToLanguageMap[lan]);
+    originalModel = monaco.editor.createModel(
+      originalText,
+      extensionToLanguageMap[lan]
+    );
+    modifiedModel = monaco.editor.createModel(
+      modifiedText,
+      extensionToLanguageMap[lan]
+    );
     diffEditor = monaco.editor.createDiffEditor(
       document.querySelector("#compare"),
       {
@@ -740,16 +786,16 @@ const handleNoData = () => {
   const noData = `<div class="no-data"><p>No Data</p></div>`;
   contentDom.innerHTML = "";
   contentDom.insertAdjacentHTML("beforeend", noData);
-}
+};
 
 const handleGetFile = () => {
-  handleNoData()
+  handleNoData();
   handleBtn.onclick = () => {
     if (!isWatching) {
       new LightTip().error("请点击开启 Watch 监听");
       return;
     }
-    handleBtn.classList.add('loading')
+    handleBtn.classList.add("loading");
     const select = document.querySelector(".wrappper__sider_01 select");
     const checkboxes = document.querySelectorAll("[name='checkbox']:checked");
     var selectedValues = [];
@@ -757,7 +803,7 @@ const handleGetFile = () => {
       selectedValues.push(checkbox.value);
     });
     if (!selectedValues?.length) {
-      handleBtn.classList.remove('loading')
+      handleBtn.classList.remove("loading");
       new LightTip().error("请选择需要同步的语言");
       return;
     }
@@ -779,9 +825,9 @@ const handleGetFile = () => {
       .then((res) => {
         if (res.code === 200 && res?.message === "handle-files-success") {
           if (!res?.data?.length) {
-            handleNoData()
+            handleNoData();
             new LightTip().error("No Modified Files");
-            handleBtn.classList.remove('loading')
+            handleBtn.classList.remove("loading");
             return;
           }
           res?.data.forEach((item) => {
@@ -797,13 +843,13 @@ const handleGetFile = () => {
             createContent(lan, res?.data, res?.data2, select.value);
           });
         } else {
-          handleNoData()
+          handleNoData();
           new LightTip().error(`${res?.message || "获取文件失败"}`);
         }
-        handleBtn.classList.remove('loading')
+        handleBtn.classList.remove("loading");
       })
       .catch((err) => {
-        handleBtn.classList.remove('loading')
+        handleBtn.classList.remove("loading");
         console.log("err", err);
       });
   };
@@ -818,7 +864,7 @@ const selectOnChange = () => {
     const content = document.querySelector(".wrappper__content-content");
     header.innerHTML = "";
     content.innerHTML = "";
-    handleNoData()
+    handleNoData();
     // const divLanActive = document.querySelector(".div-lan.disabled");
     // if (divLanActive) divLanActive.classList.remove("disabled");
     // const divLan = document.querySelector(`.div-${selectedValue}`);
