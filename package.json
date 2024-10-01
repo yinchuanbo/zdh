@@ -1,6 +1,6 @@
 {
   "name": "zdh",
-  "version": "0.0.0",
+  "version": "1.0.2",
   "private": true,
   "main": "main.js",
   "scripts": {
@@ -12,7 +12,8 @@
     "appId": "com.yourcompany.lanasync",
     "productName": "LanAsync",
     "win": {
-      "target": "portable"
+      "target": "portable",
+      "icon": "favicon.ico"
     },
     "files": [
       "**/*",
