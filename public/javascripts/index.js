@@ -95,7 +95,7 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
     <div class="content-item-btns">
       <a href="javascript:" class="ui-button ui-button-primary publish" role="button" data-lan="${lan}">Publish</a>
       <a href="javascript:" class="ui-button ui-button-primary pull-code" role="button" data-lan="${lan}">Pull</a>
-      <a href="javascript:" class="ui-button ui-button-primary commit-code" role="button" data-lan="${lan}">Push</a>
+      <a href="javascript:" class="ui-button ui-button-primary commit-code" role="button" data-lan="${lan}">Commit</a>
       <a href="javascript:" class="ui-button ui-button-primary merge-code" role="button" data-lan="${lan}">Merge</a>
       <a href="javascript:" class="ui-button ui-button-primary push-code" role="button" data-lan="${lan}">Push</a>
       <a href="javascript:" class="ui-button ui-button-primary dey-to-test" role="button" data-lan="${lan}" style="display: none">上传至 ${lan} Test Ftp</a>
@@ -421,10 +421,15 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
         })
         .then((res) => {
           if (res?.code === 200 && res?.message === "check-status-success") {
-            setCommit(item, lan, res?.data || false, "commit");
+            if(res?.data) {
+              new LightTip().error("无修改可用来 commit");
+            } else {
+              setCommit(item, lan, res?.data || false, "commit");
+            }
           } else {
             new LightTip().error("无修改可用来 commit");
           }
+          item.classList.remove("loading");
         });
     };
   });
@@ -472,7 +477,7 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
 };
 
 const setCommit = (item, lan, status = false, type = "") => {
-  if (status) {
+  if (status && type !== "commit") {
     fetch("/push-code", {
       method: "POST",
       headers: {
@@ -480,8 +485,7 @@ const setCommit = (item, lan, status = false, type = "") => {
       },
       body: JSON.stringify({
         lan,
-        status,
-        type,
+        status
       }),
     })
       .then((res) => {
@@ -543,6 +547,7 @@ const setCommit = (item, lan, status = false, type = "") => {
       body: JSON.stringify({
         lan,
         commit: content,
+        type
       }),
     })
       .then((res) => {
