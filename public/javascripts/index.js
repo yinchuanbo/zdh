@@ -753,7 +753,11 @@ const diffHTML = function (data = {}, lan = "", path = "") {
   //   });
   // });
   Save.onclick = () => {
-    const content = doc.get("lhs");
+    const content = modifiedModel?.getValue?.();
+    if(!content) {
+      new LightTip().error("修改失败");
+      return;
+    }
     const { lan } = Save.dataset;
     Save.classList.add("loading");
     fetch("/set-file", {
