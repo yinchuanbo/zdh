@@ -401,41 +401,6 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
     };
   });
 
-  commitCode.forEach((item) => {
-    item.onclick = () => {
-      if (isWatching) {
-        new LightTip().error("请先关闭 Watching，其他操作需要开启");
-        return;
-      }
-      item.classList.add("loading");
-      const { lan } = item.dataset;
-      fetch("/check-status", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          lan,
-        }),
-      })
-        .then((res) => {
-          return res.json();
-        })
-        .then((res) => {
-          if (res?.code === 200 && res?.message === "check-status-success") {
-            if (res?.data) {
-              new LightTip().error("无修改可用来 commit");
-            } else {
-              setCommit(item, lan, res?.data || false, "commit");
-            }
-          } else {
-            new LightTip().error("无修改可用来 commit");
-          }
-          item.classList.remove("loading");
-        });
-    };
-  });
-
   discardCode.forEach((item) => {
     item.onclick = () => {
       if (isWatching) {
@@ -469,12 +434,29 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
 
 
   pushCodes.forEach((item) => {
-    item.onclick = () => {
+    item.onclick = async () => {
       if (isWatching) {
         new LightTip().error("请先关闭 Watching，其他操作需要开启");
         return;
       }
-      setCommit(item, lan);
+      item.classList.add("loading")
+      const { code, message, data } = await fetch("/check-status", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          lan,
+        }),
+      })
+        .then((res) => {
+          return res.json();
+        })
+      if (!(code === 200 && message === 'check-status-success')) {
+        removeLoading("操作失败");
+        return;
+      }
+      setCommit(item, lan, data, { code, message, data });
     };
   });
 
@@ -491,23 +473,23 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
   });
 };
 
-const setCommit = (item, lan, status = false) => {
+const setCommit = (item, lan, hasCommit = false, result = {}) => {
   let type = "";
   const html = `
     <div class="setCommit">
       <div class="setCommit_left">
         <div class="select-type">
           <div class="select-type-item">
-            <input type="radio" id="radio1" name="handle-type" value="commit" checked="checked">
+            <input type="radio" id="radio1" name="handle-type" value="commit" ${hasCommit ? `disabled` : ''} ${!hasCommit ? `checked="checked"` : ''}>
             <label for="radio1" class="ui-radio"></label><label for="radio1" style="padding-left: 5px;">Commit</label>
           </div>
           <div class="select-type-item">
-            <input type="radio" id="radio2"  value="push" name="handle-type">
+            <input type="radio" id="radio2"  value="push" name="handle-type" ${hasCommit ? `checked="checked"` : ''}>
             <label for="radio2" class="ui-radio"></label><label for="radio2" style="padding-left: 5px;">Push</label>
           </div>
         </div>
         <div class="set-commit-comtent">
-          <select name="commit__style">
+          <select name="commit__style"  ${hasCommit ? `disabled` : ''}>
             <option class="feat" title="新功能 feature">feat</option>
             <option class="fix" title="修复 bug">fix</option>
             <option class="docs" title="文档注释">docs</option>
@@ -519,7 +501,7 @@ const setCommit = (item, lan, status = false) => {
             <option class="revert" title="回退">revert</option>
             <option class="build" title="打包">build</option>
           </select>
-          <input class="ui-input commit-input" placeholder="输入 commit 内容">
+          <input class="ui-input commit-input"  ${hasCommit ? `disabled` : ''} placeholder="输入 commit 内容">
         </div>
       </div>
       <div class="setCommit_btns">
@@ -545,25 +527,14 @@ const setCommit = (item, lan, status = false) => {
   }
   saveBtn.onclick = async () => {
     const radio = document.querySelector("input[name='handle-type']:checked")
-    if (!input.value) {
+    if (!input.value && !hasCommit) {
       removeLoading("必须填写 commit 内容")
       return;
     }
     saveBtn.classList.add("loading");
     cancelBtn.classList.add("disabled");
 
-    const { code, message, data } = await fetch("/check-status", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        lan,
-      }),
-    })
-      .then((res) => {
-        return res.json();
-      })
+    const { code, message, data } = result;
     if (!(code === 200 && message === 'check-status-success')) {
       removeLoading("操作失败");
       return;
@@ -577,6 +548,7 @@ const setCommit = (item, lan, status = false) => {
       }
     } else if (radio.value === 'push') {
       if (data) {
+        console.log('111-1')
         fetch("/push-code", {
           method: "POST",
           headers: {
@@ -601,6 +573,7 @@ const setCommit = (item, lan, status = false) => {
         return;
       }
     }
+    console.log('111-2')
     const content = `${select.value}:${input.value}`;
     fetch("/push-code", {
       method: "POST",
