@@ -435,7 +435,7 @@ body {
 }
 
 .setMerge .setCommit_left {
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: space-between;
 }
