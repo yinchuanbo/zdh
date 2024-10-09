@@ -9,8 +9,8 @@
     "build": "electron-builder --win portable"
   },
   "build": {
-    "appId": "com.yourcompany.lanasync",
-    "productName": "LanAsync",
+    "appId": "com.yourcompany.vidnozasync",
+    "productName": "VidnozAsync",
     "win": {
       "target": "portable",
       "icon": "favicon.ico"

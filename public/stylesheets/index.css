@@ -492,14 +492,15 @@ select,
 .nav_a::before {
   content: "";
   position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
+  left: 50%;
+  bottom: 10px;
+  width: 20px;
   height: 2px;
   background-color: #fff;
   transition: all 0.5s;
   display: none;
   transition: 0.5s;
+  transform: translateX(-50%);
 }
 
 .nav_a:hover,

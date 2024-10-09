@@ -94,7 +94,7 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
   const html02 = `<div class="content-item active">
     <div class="content-item-btns">
       <a href="javascript:" class="ui-button ui-button-warning pull-code" role="button" data-lan="${lan}">*Pull</a>
-      <a href="javascript:" class="ui-button ui-button-primary discard-code" role="button" data-lan="${lan}">Discard</a>
+      <a href="javascript:" class="ui-button ui-button-primary discard-code" role="button" data-lan="${lan}"  style="display: ${selectLan === lan ? "none" : ""}">Discard</a>
       <a href="javascript:" class="ui-button ui-button-primary commit-code" role="button" data-lan="${lan}" style="display: none">Commit</a>
       <a href="javascript:" class="ui-button ui-button-primary merge-code" role="button" data-lan="${lan}">Merge</a>
       <a href="javascript:" class="ui-button ui-button-primary push-code" role="button" data-lan="${lan}">Commit + Push</a>
@@ -728,6 +728,9 @@ function setEditor(path = "", originalText = "", modifiedText = "") {
   if (originalModel) originalModel.dispose();
   if (modifiedModel) modifiedModel.dispose();
   if (diffEditor) diffEditor.dispose();
+  modifiedModel = null;
+  originalModel = null;
+  diffEditor = null;
   require.config({
     paths: {
       vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs",
@@ -796,23 +799,22 @@ const diffHTML = function (data = {}, lan = "", path = "", initLan = "") {
   };
   // setEditor(path, data.initC.content, data.nowC.content);
   if (!data.initC.path.endsWith(".json")) {
-    doc = new Mergely("#compare", {
-      sidebar: true,
-      ignorews: false,
-      license: "lgpl-separate-notice",
-      lhs: data.nowC.content,
-      rhs: data.initC.content,
-      cmsettings: {
-        readOnly: false,
-      },
-      theme: "dark",
-      lineHeight: 40,
-    });
-    doc.once('updated', () => {
-      doc.once('updated', () => {
-        doc.scrollToDiff('next');
-      });
-    });
+    setEditor(path, data.nowC.content, data.initC.content);
+    // doc = new Mergely("#compare", {
+    //   sidebar: true,
+    //   ignorews: false,
+    //   license: "lgpl-separate-notice",
+    //   lhs: data.nowC.content,
+    //   rhs: data.initC.content,
+    //   cmsettings: {
+    //     readOnly: false,
+    //   }
+    // });
+    // doc.once('updated', () => {
+    //   doc.once('updated', () => {
+    //     doc.scrollToDiff('next');
+    //   });
+    // });
   } else {
     if (jsonEditor) jsonEditor.dispose();
     jsonEditor = null;
@@ -837,7 +839,7 @@ const diffHTML = function (data = {}, lan = "", path = "", initLan = "") {
   }
 
   Save.onclick = () => {
-    const content = jsonEditor?.getValue?.() || doc?.get?.("lhs");
+    const content = jsonEditor?.getValue?.() || doc?.get?.("lhs") || originalModel?.getValue?.();;
     if (!content) {
       new LightTip().error("修改失败");
       return;
