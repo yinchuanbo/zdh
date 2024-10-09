@@ -2,7 +2,7 @@ const socket = io("http://localhost:3000");
 let imgs = [];
 let isWatching = false;
 
-let editor = null;
+let editor = null, jsonEditor = null;
 
 const watchBtn = document.querySelector(".watch-btn");
 const handleBtn = document.querySelector(".handle-btn");
@@ -93,22 +93,22 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
   const html01 = `<div class="header-item active">${lan.toUpperCase()}<div>`;
   const html02 = `<div class="content-item active">
     <div class="content-item-btns">
-      <a href="javascript:" class="ui-button ui-button-primary publish" role="button" data-lan="${lan}">Publish</a>
-      <a href="javascript:" class="ui-button ui-button-primary pull-code" role="button" data-lan="${lan}">Pull</a>
-      <a href="javascript:" class="ui-button ui-button-primary commit-code" role="button" data-lan="${lan}">Commit</a>
+      <a href="javascript:" class="ui-button ui-button-warning pull-code" role="button" data-lan="${lan}">*Pull</a>
+      <a href="javascript:" class="ui-button ui-button-primary commit-code" role="button" data-lan="${lan}" style="display: none">Commit</a>
       <a href="javascript:" class="ui-button ui-button-primary merge-code" role="button" data-lan="${lan}">Merge</a>
-      <a href="javascript:" class="ui-button ui-button-primary push-code" role="button" data-lan="${lan}">Push</a>
+      <a href="javascript:" class="ui-button ui-button-primary push-code" role="button" data-lan="${lan}">Commit + Push</a>
       <a href="javascript:" class="ui-button ui-button-primary dey-to-test" role="button" data-lan="${lan}" style="display: none">上传至 ${lan} Test Ftp</a>
       <a href="javascript:" class="ui-button ui-button-primary dey-to-pro" role="button" data-lan="${lan}" style="display: none">上传至 ${lan} Pro Ftp</a>
       <a href="javascript:" class="ui-button ui-button-primary all-img" style="display: ${selectLan === lan ? "none" : ""}" role="button" data-lan="${lan}">Resource Batching</a>
+      <a href="javascript:" class="ui-button ui-button-success publish" role="button" data-lan="${lan}">Publish</a>
     </div>
     <ul>
       ${data
-        .map((info) => {
-          const str = generateRandomString(20);
-          let lujing = curDatas2?.[info] || "unknown";
-          if (selectLan === lan) lujing = info;
-          return `<li data-path="${info}" data-path2="${lujing}" data-lan="${lan}">
+      .map((info) => {
+        const str = generateRandomString(20);
+        let lujing = curDatas2?.[info] || "unknown";
+        if (selectLan === lan) lujing = info;
+        return `<li data-path="${info}" data-path2="${lujing}" data-lan="${lan}">
           <div class="check-handle" title="已完成可选中">
             <input type="checkbox" id="${str}" name="${str}">
             <label for="${str}" class="ui-checkbox"></label>
@@ -120,11 +120,11 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
           </div>
           <div class="btns">
            <a href="javascript:" class="ui-button ui-button-primary async-res" style="display: ${selectLan === lan ? "none" : ""}" role="button">Diff</a>
-           <a href="javascript:" class="ui-button ui-button-primary one-deploy" role="button" style="display: ${info.endsWith(".json") ? "none" : ""}">To Test</a>          
+           <a href="javascript:" class="ui-button ui-button-primary one-deploy" role="button" style="display: ${info.endsWith(".json") ? "none" : ""}">To Test</a>
           </div>
         </li>`;
-        })
-        .join("")}
+      })
+      .join("")}
     </ul>
   </div>`;
 
@@ -210,7 +210,7 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
             p.querySelector(".check-handle input").checked = true;
             new LightTip().success("同步成功");
           } else if (res.code === 200 && res.message === "processing") {
-            diffHTML(res.data, lan, path);
+            diffHTML(res.data, lan, path, initLan);
           }
           item.classList.remove("loading");
         })
@@ -421,7 +421,7 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
         })
         .then((res) => {
           if (res?.code === 200 && res?.message === "check-status-success") {
-            if(res?.data) {
+            if (res?.data) {
               new LightTip().error("无修改可用来 commit");
             } else {
               setCommit(item, lan, res?.data || false, "commit");
@@ -439,27 +439,7 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
         new LightTip().error("请先关闭 Watching，其他操作需要开启");
         return;
       }
-      item.classList.add("loading");
-      const { lan } = item.dataset;
-      fetch("/check-status", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          lan,
-        }),
-      })
-        .then((res) => {
-          return res.json();
-        })
-        .then((res) => {
-          if (res?.code === 200 && res?.message === "check-status-success") {
-            setCommit(item, lan, res?.data || false);
-          } else {
-            setCommit(item, lan);
-          }
-        });
+      setCommit(item, lan);
     };
   });
 
@@ -476,35 +456,23 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
   });
 };
 
-const setCommit = (item, lan, status = false, type = "") => {
-  if (status && type !== "commit") {
-    fetch("/push-code", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        lan,
-        status
-      }),
-    })
-      .then((res) => {
-        return res.json();
-      })
-      .then((res) => {
-        if (res?.code === 200 && res?.message === "push-success") {
-          new LightTip().success(res?.data || lan + " Push 成功");
-        } else {
-          new LightTip().error(res?.data || lan + " Push 失败");
-        }
-        item.classList.remove("loading");
-      });
-    return;
-  }
+const setCommit = (item, lan, status = false) => {
+  let type = "";
   const html = `
     <div class="setCommit">
       <div class="setCommit_left">
-        <select name="commit__style">
+        <div class="select-type">
+          <div class="select-type-item">
+            <input type="radio" id="radio1" name="handle-type" value="commit" checked="checked">
+            <label for="radio1" class="ui-radio"></label><label for="radio1" style="padding-left: 5px;">Commit</label>
+          </div>
+          <div class="select-type-item">
+            <input type="radio" id="radio2"  value="push" name="handle-type">
+            <label for="radio2" class="ui-radio"></label><label for="radio2" style="padding-left: 5px;">Push</label>
+          </div>
+        </div>
+        <div class="set-commit-comtent">
+          <select name="commit__style">
             <option class="feat" title="新功能 feature">feat</option>
             <option class="fix" title="修复 bug">fix</option>
             <option class="docs" title="文档注释">docs</option>
@@ -515,8 +483,9 @@ const setCommit = (item, lan, status = false, type = "") => {
             <option class="chore" title="构建过程或辅助工具的变动">chore</option>
             <option class="revert" title="回退">revert</option>
             <option class="build" title="打包">build</option>
-        </select>
-        <input class="ui-input" placeholder="输入 commit 内容">
+          </select>
+          <input class="ui-input commit-input" placeholder="输入 commit 内容">
+        </div>
       </div>
       <div class="setCommit_btns">
         <a href="javascript:" class="ui-button ui-button-primary" role="button">Send</a>
@@ -529,15 +498,74 @@ const setCommit = (item, lan, status = false, type = "") => {
   const saveBtn = document.querySelector(".setCommit .ui-button-primary");
   const cancelBtn = document.querySelector(".setCommit .ui-button-warning");
   const select = document.querySelector('[name="commit__style"]');
-  const input = setCommit.querySelector("input");
-
-  saveBtn.onclick = () => {
+  const input = setCommit.querySelector(".commit-input");
+  function removeLoading(str = '', bool = false) {
+    if(bool) {
+      new LightTip().success(str);
+    } else {
+      new LightTip().error(str);
+    }
+    saveBtn.classList.remove("loading");
+    cancelBtn.classList.remove("disabled");
+  }
+  saveBtn.onclick = async () => {
+    const radio = document.querySelector("input[name='handle-type']:checked")
     if (!input.value) {
-      new LightTip().error("必须填写 commit 内容");
+      removeLoading("必须填写 commit 内容")
       return;
     }
     saveBtn.classList.add("loading");
     cancelBtn.classList.add("disabled");
+
+    const { code, message, data } = await fetch("/check-status", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        lan,
+      }),
+    })
+      .then((res) => {
+        return res.json();
+      })
+    if (!(code === 200 && message === 'check-status-success')) {
+      removeLoading("操作失败");
+      return;
+    }
+    if (radio.value === 'commit') {
+      if (data) {
+        removeLoading("无修改可用来 commit");
+        return;
+      } else {
+        type = "commit"
+      }
+    } else if (radio.value === 'push') {
+      if (data) {
+        fetch("/push-code", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            lan,
+            status: true
+          }),
+        })
+          .then((res) => {
+            return res.json();
+          })
+          .then((res) => {
+            if (res?.code === 200 && res?.message === "push-success") {
+              removeLoading(res?.data || lan + " Push 成功", true)
+            } else {
+              removeLoading(res?.data || lan + " Push 失败")
+            }
+            item.classList.remove("loading");
+          });
+        return;
+      }
+    }
     const content = `${select.value}:${input.value}`;
     fetch("/push-code", {
       method: "POST",
@@ -555,15 +583,11 @@ const setCommit = (item, lan, status = false, type = "") => {
       })
       .then((res) => {
         if (res?.code === 200 && res?.message === "push-success") {
-          new LightTip().success(res?.data || lan + " Push 成功");
-          saveBtn.classList.remove("loading");
+          removeLoading(res?.data || lan + " Push 成功", true)
           item.classList.remove("loading");
-          cancelBtn.classList.remove("disabled");
           setCommit.remove();
         } else {
-          new LightTip().error(res?.data || lan + " Push 失败");
-          saveBtn.classList.remove("loading");
-          cancelBtn.classList.remove("disabled");
+          removeLoading(res?.data || lan + " Push 失败")
         }
       });
   };
@@ -598,14 +622,14 @@ const setMerge = (item, lan) => {
         <div class="setCommit_left">
           <select name="from">
               ${data.map((h) => {
-                return `<option class="feat" value="${h}" title="${h}">${h}</option>`;
-              })}
+      return `<option class="feat" value="${h}" title="${h}">${h}</option>`;
+    })}
           </select>
           <p>Mergr To</p>
           <select name="to">
           ${data.map((h) => {
-            return `<option class="feat" value="${h}" title="${h}">${h}</option>`;
-          })}
+      return `<option class="feat" value="${h}" title="${h}">${h}</option>`;
+    })}
           </select>
         </div>
         <div class="setCommit_btns">
@@ -713,7 +737,8 @@ function setEditor(path = "", originalText = "", modifiedText = "") {
   });
 }
 
-const diffHTML = function (data = {}, lan = "", path = "") {
+const diffHTML = function (data = {}, lan = "", path = "", initLan = "") {
+  let doc = null;
   const html = `
     <div class="diffHTML">
       <div class="diffHTML-header">
@@ -721,8 +746,7 @@ const diffHTML = function (data = {}, lan = "", path = "") {
         <a href="javascript:" class="ui-button ui-button-warning red_button" id="Cancel" role="button">Cancel</a>
       </div>
       <div class="diffHTML__path">
-        <span class="diffHTML__path-title">${data.initC.path}</span>
-        <span class="diffHTML__path-title">${data.nowC.path}</span>
+        ${path.endsWith('.json') ? `<span class="diffHTML__path-title">${lan}</span>` : `<span class="diffHTML__path-title">${lan}</span><span class="diffHTML__path-title">${initLan}</span>`}
       </div>
       <div class="diffHTML-content" id="compare">
       </div>
@@ -735,26 +759,51 @@ const diffHTML = function (data = {}, lan = "", path = "") {
   Cancel.onclick = () => {
     diffHTML.remove();
   };
-  setEditor(path, data.initC.content, data.nowC.content);
-  // const doc = new Mergely("#compare", {
-  //   sidebar: true,
-  //   ignorews: false,
-  //   license: "lgpl-separate-notice",
-  //   lhs: data.nowC.content,
-  //   rhs: data.initC.content,
-  //   cmsettings: {
-  //     readOnly: false,
-  //   },
-  //   theme: "dark",
-  // });
-  // doc.once('updated', () => {
-  //   doc.once('updated', () => {
-  //     doc.scrollToDiff('next');
-  //   });
-  // });
+  // setEditor(path, data.initC.content, data.nowC.content);
+  if (!data.initC.path.endsWith(".json")) {
+    doc = new Mergely("#compare", {
+      sidebar: true,
+      ignorews: false,
+      license: "lgpl-separate-notice",
+      lhs: data.nowC.content,
+      rhs: data.initC.content,
+      cmsettings: {
+        readOnly: false,
+      },
+      theme: "dark",
+      lineHeight: 40,
+    });
+    doc.once('updated', () => {
+      doc.once('updated', () => {
+        doc.scrollToDiff('next');
+      });
+    });
+  } else {
+    if (jsonEditor) jsonEditor.dispose();
+    jsonEditor = null;
+    require.config({
+      paths: {
+        vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs",
+      },
+    });
+    require(["vs/editor/editor.main"], function () {
+      jsonEditor = monaco.editor.create(document.querySelector("#compare"), {
+        value: data.nowC.content,
+        language: "json",
+        automaticLayout: true,
+        theme: "vs-dark",
+        fontSize: 16,
+        fontFamily: "JetBrains Mono",
+        wordWrap: "on",
+        lineNumbers: true,
+        lineHeight: 40,
+      });
+    });
+  }
+
   Save.onclick = () => {
-    const content = modifiedModel?.getValue?.();
-    if(!content) {
+    const content = jsonEditor?.getValue?.() || doc?.get?.("lhs");
+    if (!content) {
       new LightTip().error("修改失败");
       return;
     }

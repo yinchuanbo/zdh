@@ -126,6 +126,12 @@ async function pushCode({
       throw error;
     }
 
+    // 检查是否有未推送的 commit 需要推送到远程，没有就报错提示
+    const { stdout: unpushedCommits } = await executeGitCommand("git log @{u}..HEAD");
+    if (!unpushedCommits.trim()) {
+      throw new Error("没有需要推送的提交");
+    }
+
     const { stdout: pushResult } = await executeGitCommand("git push");
     console.log("推送结果:", pushResult);
     return Promise.resolve("代码成功推送到远程仓库");
