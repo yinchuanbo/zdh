@@ -94,6 +94,7 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
   const html02 = `<div class="content-item active">
     <div class="content-item-btns">
       <a href="javascript:" class="ui-button ui-button-warning pull-code" role="button" data-lan="${lan}">*Pull</a>
+      <a href="javascript:" class="ui-button ui-button-primary discard-code" role="button" data-lan="${lan}">Discard</a>
       <a href="javascript:" class="ui-button ui-button-primary commit-code" role="button" data-lan="${lan}" style="display: none">Commit</a>
       <a href="javascript:" class="ui-button ui-button-primary merge-code" role="button" data-lan="${lan}">Merge</a>
       <a href="javascript:" class="ui-button ui-button-primary push-code" role="button" data-lan="${lan}">Commit + Push</a>
@@ -153,6 +154,7 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
   const pullCodes = document.querySelectorAll(".pull-code");
   const pushCodes = document.querySelectorAll(".push-code");
   const commitCode = document.querySelectorAll(".commit-code");
+  const discardCode = document.querySelectorAll(".discard-code");
   const mergeCodes = document.querySelectorAll(".merge-code");
 
   tplEles.forEach((item) => {
@@ -433,6 +435,39 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
         });
     };
   });
+
+  discardCode.forEach((item) => {
+    item.onclick = () => {
+      if (isWatching) {
+        new LightTip().error("请先关闭 Watching，其他操作需要开启");
+        return;
+      }
+      item.classList.add("loading");
+      const { lan } = item.dataset;
+      fetch("/discard-code", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          lan,
+        }),
+      })
+        .then((res) => {
+          return res.json();
+        })
+        .then((res) => {
+          if (res?.code === 200 && res?.message === "discard-success") {
+            new LightTip().success(res?.data || "代码撤销成功");
+          } else {
+            new LightTip().error(res?.data || "代码撤销失败");
+          }
+          item.classList.remove("loading");
+        });
+    };
+  });
+
+
   pushCodes.forEach((item) => {
     item.onclick = () => {
       if (isWatching) {
@@ -500,7 +535,7 @@ const setCommit = (item, lan, status = false) => {
   const select = document.querySelector('[name="commit__style"]');
   const input = setCommit.querySelector(".commit-input");
   function removeLoading(str = '', bool = false) {
-    if(bool) {
+    if (bool) {
       new LightTip().success(str);
     } else {
       new LightTip().error(str);

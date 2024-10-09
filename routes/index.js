@@ -8,6 +8,7 @@ const handlePublish = require("../utils/publish");
 const pullCode = require("../utils/pull-code");
 const checkStaus = require("../utils/check-status");
 const pushCode = require("../utils/push-code");
+const discardCode = require("../utils/discard-code");
 const mergeCode = require("../utils/merge-code");
 const getBranchs = require("../utils/get-branchs");
 
@@ -243,6 +244,25 @@ router.post("/push-code", authenticateToken, async (req, res) => {
     res.json({
       code: 200,
       message: "push-error",
+      data: error?.message || error,
+    });
+  }
+});
+
+router.post("/discard-code", authenticateToken, async (req, res) => {
+  const { localPaths } = getConf(req.uname, res);
+  const { lan } = req.body;
+  try {
+    const result = await discardCode({ lan, localPaths });
+    res.json({
+      code: 200,
+      message: "discard-success",
+      data: result,
+    });
+  } catch (error) {
+    res.json({
+      code: 200,
+      message: "discard-error",
       data: error?.message || error,
     });
   }
