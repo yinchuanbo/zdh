@@ -58,6 +58,9 @@ setDom.onclick = () => {
     .then((res) => {
       if (res?.code === 200 && res?.message === "settings-success") {
         new LightTip().success("设置成功");
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 1500)
       } else {
         new LightTip().error("设置失败");
       }

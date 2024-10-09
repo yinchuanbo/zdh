@@ -200,6 +200,7 @@ body {
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
   place-content: flex-start;
+  overflow-x: hidden;
 }
 
 .content-item ul li {
@@ -545,4 +546,8 @@ select,
 
 .set-commit-comtent {
   display: flex;
+}
+
+.ui-dialog-container {
+  z-index: 10000000;
 }

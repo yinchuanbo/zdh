@@ -212,6 +212,14 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
             p.querySelector(".check-handle input").checked = true;
             new LightTip().success("同步成功");
           } else if (res.code === 200 && res.message === "processing") {
+            if (jsonEditor) jsonEditor.dispose();
+            if (originalModel) originalModel.dispose();
+            if (modifiedModel) modifiedModel.dispose();
+            if (diffEditor) diffEditor.dispose();
+            modifiedModel = null;
+            originalModel = null;
+            diffEditor = null;
+            jsonEditor = null;
             diffHTML(res.data, lan, path, initLan);
           }
           item.classList.remove("loading");
@@ -696,19 +704,23 @@ const setMerge = (item, lan) => {
   }
 };
 
-let modifiedModel, originalModel, diffEditor;
+let originalModel, modifiedModel, diffEditor;
+
 function setEditor(path = "", originalText = "", modifiedText = "") {
   if (originalModel) originalModel.dispose();
   if (modifiedModel) modifiedModel.dispose();
   if (diffEditor) diffEditor.dispose();
+
   modifiedModel = null;
   originalModel = null;
   diffEditor = null;
+
   require.config({
     paths: {
       vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs",
     },
   });
+
   const extensionToLanguageMap = {
     ".js": "javascript",
     ".css": "css",
@@ -716,9 +728,11 @@ function setEditor(path = "", originalText = "", modifiedText = "") {
     ".json": "json",
     ".tpl": "html",
   };
+
   const lan =
     Object.keys(extensionToLanguageMap).find((ext) => path.endsWith(ext)) ||
     "text/plain";
+
   require(["vs/editor/editor.main"], function () {
     originalModel = monaco.editor.createModel(
       originalText,
@@ -728,6 +742,7 @@ function setEditor(path = "", originalText = "", modifiedText = "") {
       modifiedText,
       extensionToLanguageMap[lan]
     );
+
     diffEditor = monaco.editor.createDiffEditor(
       document.querySelector("#compare"),
       {
@@ -741,6 +756,7 @@ function setEditor(path = "", originalText = "", modifiedText = "") {
         fontSize: 16,
       }
     );
+
     diffEditor.setModel({
       original: originalModel,
       modified: modifiedModel,
