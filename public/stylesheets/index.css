@@ -592,3 +592,20 @@ select,
 .ui-tips-after {
   border-top-color: #f28c48;
 }
+
+.mergely-editor .CodeMirror {
+  border: 0!important;
+}
+
+.CodeMirror {
+  background-color: #212121!important;
+}
+
+.CodeMirror-gutters {
+  border: 0!important;
+  background-color: #555!important;
+}
+
+/* .CodeMirror pre.CodeMirror-line {
+  background-color: #000!important;
+} */

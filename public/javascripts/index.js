@@ -124,7 +124,7 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
             <div class="tpl__ele" title="[${lan}] ${lujing}" data-es="${info.endsWith(".tpl") && selectLan !== lan ? "tpl" : ""}">[${lan}] ${lujing}</div>
           </div>
           <div class="btns">
-           <a href="javascript:" class="ui-button ui-button-primary async-res" style="display: ${selectLan === lan ? "none" : ""}" role="button">Diff</a>
+           <a href="javascript:" class="ui-button ui-button-primary async-res" style="display: ${selectLan === lan ? "none" : ""}" role="button">${info.startsWith("img/") ? "Async" : "Diff"}</a>
            <a href="javascript:" class="ui-button ui-button-primary one-deploy" role="button" style="display: ${info.endsWith(".json") ? "none" : ""}">To Test</a>
           </div>
         </li>`;
@@ -800,7 +800,7 @@ const diffHTML = function (data = {}, lan = "", path = "", initLan = "") {
         <a href="javascript:" class="ui-button ui-button-warning red_button" id="Cancel" role="button">Cancel</a>
       </div>
       <div class="diffHTML__path">
-        ${path.endsWith('.json') ? `<span class="diffHTML__path-title">${lan}</span>` : `<span class="diffHTML__path-title left">${lan}</span><span class="diffHTML__path-title right">${initLan}</span>`}
+        ${path.endsWith('.json') ? `<span class="diffHTML__path-title right">${lan}</span>` : `<span class="diffHTML__path-title left">${lan}</span><span class="diffHTML__path-title right">${initLan}</span>`}
       </div>
       <div class="diffHTML-content" id="compare">
       </div>
