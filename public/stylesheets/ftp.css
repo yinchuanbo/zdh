@@ -28,13 +28,21 @@ body {
 .wrappper__env {
   display: flex;
   gap: 20px;
-  width: 400px;
+  width: 480px;
 }
 
 .wrappper__lans {
   display: flex;
   gap: 20px;
-  width: 400px;
+  width: 480px;
+}
+
+.ui-button-success {
+  height: 30px;
+  margin-left: 10px;
+  line-height: 30px;
+  padding: 0;
+  width: 80px;
 }
 
 .ui-input {

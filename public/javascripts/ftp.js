@@ -153,3 +153,32 @@ const wrapperBack = document.querySelector(".wrapper__back")
 wrapperBack.onclick = () => {
   window.close()
 }
+
+const pullNewCodes = document.querySelectorAll(".pull-new-code")
+
+pullNewCodes.forEach(item => {
+  item.onclick = () => {
+    const { lan } = item.dataset;
+    item.classList.add("loading");
+    fetch("/pull-code", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        lan,
+      }),
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((res) => {
+        if (res?.code === 200 && res?.message === "pull-success") {
+          new LightTip().success(res?.data || lan + " Pull 成功");
+        } else {
+          new LightTip().error(res?.data || lan + " Pull 失败");
+        }
+        item.classList.remove("loading");
+      });
+  }
+})

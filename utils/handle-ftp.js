@@ -223,8 +223,8 @@ function handleFtp({ env, data, configs }) {
                       sftp.end();
                       console.log(
                         "文件上传成功，但内容不一致，须重传" +
-                          " - " +
-                          localFilePath
+                        " - " +
+                        localFilePath
                       );
                       reject();
                     }
