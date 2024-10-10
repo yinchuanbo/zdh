@@ -16,12 +16,7 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.3);
-  transition: 0.5s;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.2);
+  background: #555;
   transition: 0.5s;
 }
 
@@ -594,18 +589,22 @@ select,
 }
 
 .mergely-editor .CodeMirror {
-  border: 0!important;
+  border: 0 !important;
 }
 
 .CodeMirror {
-  background-color: #212121!important;
+  background-color: #212121 !important;
 }
 
 .CodeMirror-gutters {
-  border: 0!important;
-  background-color: #555!important;
+  border: 0 !important;
+  background-color: #555 !important;
 }
 
 /* .CodeMirror pre.CodeMirror-line {
   background-color: #000!important;
 } */
+
+.mergely-editor .mergely.CodeMirror-gutter-background.current {
+  background-color: #000 !important;
+}
