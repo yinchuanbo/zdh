@@ -51,7 +51,11 @@ const handleSocket = () => {
     } else if (type === "publish success") {
       new LightTip().success("publish 成功");
     } else if (type === "publish error") {
-      new LightTip().error(message || "publish 失败");
+      // new LightTip().error(message || "publish 失败");
+      new Dialog({
+        title: "Publish Error Info",
+        content: message || "publish 失败",
+      });
     }
   });
 };
@@ -325,7 +329,11 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
           if (res?.code === 200 && res?.message === "publish-success") {
             new LightTip().success(lan + " Publish 成功");
           } else {
-            new LightTip().error(res?.data || lan + " Publish 失败");
+            // new LightTip().error(res?.data || lan + " Publish 失败");
+            new Dialog({
+              title: "Publish Error Info",
+              content: res?.data || lan + " Publish 失败",
+            });
           }
           publish.classList.remove("loading");
         });
@@ -419,7 +427,7 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
         new LightTip().error("请先关闭 Watching，其他操作需要开启");
         return;
       }
-      item.classList.add("loading");
+      // item.classList.add("loading");
       const { lan } = item.dataset;
       new Dialog().confirm('\
         <h6>是否一并取消暂存区文件？</h6>\
@@ -448,7 +456,7 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
                   } else {
                     new LightTip().error(res?.data || "代码撤销失败");
                   }
-                  item.classList.remove("loading");
+                  // item.classList.remove("loading");
                   event.data.dialog.remove();;
                 });
             }
