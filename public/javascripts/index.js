@@ -417,25 +417,38 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
       }
       item.classList.add("loading");
       const { lan } = item.dataset;
-      fetch("/discard-code", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          lan,
-        }),
-      })
-        .then((res) => {
-          return res.json();
-        })
-        .then((res) => {
-          if (res?.code === 200 && res?.message === "discard-success") {
-            new LightTip().success(res?.data || "代码撤销成功");
-          } else {
-            new LightTip().error(res?.data || "代码撤销失败");
-          }
-          item.classList.remove("loading");
+      new Dialog().confirm('\
+        <h6>是否一并取消暂存区文件？</h6>\
+        <input type="checkbox" id="switchS"><label class="ui-switch" for="switchS"></label>'
+        , {
+          buttons: [{
+            events: function (event) {
+              const switchDom = document.querySelector('#switchS')
+              const isChecked = switchDom.checked;
+              fetch("/discard-code", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  lan,
+                  isChecked
+                }),
+              })
+                .then((res) => {
+                  return res.json();
+                })
+                .then((res) => {
+                  if (res?.code === 200 && res?.message === "discard-success") {
+                    new LightTip().success(res?.data || "代码撤销成功");
+                  } else {
+                    new LightTip().error(res?.data || "代码撤销失败");
+                  }
+                  item.classList.remove("loading");
+                  event.data.dialog.remove();;
+                });
+            }
+          }, {}]
         });
     };
   });

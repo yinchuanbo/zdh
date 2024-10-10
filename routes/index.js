@@ -262,9 +262,9 @@ router.post("/push-code", authenticateToken, async (req, res) => {
 
 router.post("/discard-code", authenticateToken, async (req, res) => {
   const { localPaths } = getConf(req.uname, res);
-  const { lan } = req.body;
+  const { lan, isChecked } = req.body;
   try {
-    const result = await discardCode({ lan, localPaths });
+    const result = await discardCode({ lan, localPaths, isChecked });
     res.json({
       code: 200,
       message: "discard-success",

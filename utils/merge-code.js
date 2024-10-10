@@ -65,6 +65,8 @@ async function mergeCode({ lan, localPaths, from, to }) {
   }
   try {
     await checkGitStatus();
+    await gitCheckout(from);
+    await gitPullRebase();
     await gitCheckout(to);
     await gitPullRebase();
     await gitMerge(from);
