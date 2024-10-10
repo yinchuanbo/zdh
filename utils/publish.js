@@ -15,11 +15,11 @@ function handlePublish(lan = "en", ports, domain) {
         if (res.data.code == 200) {
           resolve();
         } else {
-          reject();
+          reject(res.data.message)
         }
       })
-      .catch(() => {
-        reject();
+      .catch((err) => {
+        reject(err.message);
       });
   });
 }

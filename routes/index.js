@@ -89,6 +89,7 @@ router.post("/publish", authenticateToken, async (req, res) => {
     res.json({
       code: 200,
       message: "publish-fail",
+      data: error || error?.message || "Publish 失败"
     });
   }
 });
@@ -195,7 +196,7 @@ router.post("/deploy-to-ftp", authenticateToken, async (req, res) => {
 });
 
 router.post("/pull-code", authenticateToken, async (req, res) => {
-  if(res.app.locals.isW) {
+  if (res.app.locals.isW) {
     res.json({
       code: 200,
       message: "pull-error",

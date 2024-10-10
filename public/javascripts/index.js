@@ -51,7 +51,7 @@ const handleSocket = () => {
     } else if (type === "publish success") {
       new LightTip().success("publish 成功");
     } else if (type === "publish error") {
-      new LightTip().error("publish 失败");
+      new LightTip().error(message || "publish 失败");
     }
   });
 };
@@ -321,7 +321,7 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
           if (res?.code === 200 && res?.message === "publish-success") {
             new LightTip().success(lan + " Publish 成功");
           } else {
-            new LightTip().error(lan + " Publish 失败");
+            new LightTip().error(res?.data || lan + " Publish 失败");
           }
           publish.classList.remove("loading");
         });

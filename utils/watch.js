@@ -125,12 +125,16 @@ function listenWatch(isWatching, pathname, lans, ports, domain) {
           } else {
             socket.emit("chat message", {
               type: "publish error",
+              message: res.data.message
             });
           }
         }
       })
-      .catch(() => {
-        console.log("publish失败");
+      .catch((err) => {
+        socket.emit("chat message", {
+          type: "publish error",
+          message: err?.message || "Publish 失败"
+        });
       });
   };
 
