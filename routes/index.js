@@ -29,6 +29,8 @@ router.get("/watching", authenticateToken, function (req, res, next) {
   const { pathname, lans, ports, domain } = getConf(req.uname, res);
   const isWatching = req.query.bool === "true";
 
+  res.app.locals.isW = isWatching;
+
   if (isWatching) {
     listenWatch(
       isWatching,
@@ -193,6 +195,14 @@ router.post("/deploy-to-ftp", authenticateToken, async (req, res) => {
 });
 
 router.post("/pull-code", authenticateToken, async (req, res) => {
+  if(res.app.locals.isW) {
+    res.json({
+      code: 200,
+      message: "pull-error",
+      data: "请先关闭 Watching",
+    });
+    return;
+  }
   const { localPaths } = getConf(req.uname, res);
   const { lan } = req.body;
   try {
