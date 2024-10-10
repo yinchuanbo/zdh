@@ -98,7 +98,7 @@ function createWindow() {
   //   }
   // });
 
-  const port = 3000;
+  const port = 4000;
 
   const expressApp = express();
   const server = require('http').createServer(expressApp);

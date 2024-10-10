@@ -4,7 +4,7 @@ let deployInfo;
 let successArr = [],
   errorArr = [];
 
-const socket = io("http://localhost:3000");
+const socket = io("http://localhost:4000");
 
 async function waitForDeploymentCompletion(page, timeout) {
   const startTime = Date.now();

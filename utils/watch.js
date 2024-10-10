@@ -23,7 +23,7 @@ function listenWatch(isWatching, pathname, lans, ports, domain) {
   if (!curWatching) return;
   lans = JSON.parse(lans);
   ports = JSON.parse(ports);
-  const socket = io("http://localhost:3000");
+  const socket = io("http://localhost:4000");
   let allDirs = {};
 
   function handleError(err, file = "") {
