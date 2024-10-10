@@ -30,6 +30,8 @@ Login.onclick = () => {
     })
     .then((res) => {
       if (res?.code === 200) {
+        localStorage.setItem('usr', usernameVal.trim())
+        localStorage.setItem('pwd', passwordVal.trim())
         new LightTip().success("登录成功");
         location.href = "/";
       } else {
@@ -76,4 +78,11 @@ Register.onclick = () => {
         new LightTip().error(res?.message || "注册失败");
       }
     });
+};
+
+window.onload = function () {
+  const usernameInput = document.querySelector('.ui-input.username');
+  usernameInput.value = localStorage.getItem('usr') || '';
+  const pwdInput = document.querySelector('.ui-input.password');
+  pwdInput.value = localStorage.getItem('pwd') || '';
 };

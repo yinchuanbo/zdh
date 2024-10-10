@@ -9,72 +9,94 @@ function createWindow() {
     width: 1300,
     height: 800,
     icon: path.join(__dirname, 'favicon.ico'),
-    // frame: false,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
+      enableRemoteModule: true,
       sandbox: true,
-      preload: path.join(__dirname, 'preload.js')
+      // preload: path.join(__dirname, 'preload.js'),
+      webSecurity: false,
     }
   });
-  Menu.setApplicationMenu(null);
-  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
-    callback({
-      responseHeaders: {
-        ...details.responseHeaders,
-        'Content-Security-Policy': [
-          "default-src 'self'; " +
-          "script-src 'self' https: http: 'unsafe-inline' 'unsafe-eval'; " +
-          "style-src 'self' https: http: 'unsafe-inline'; " +
-          "font-src 'self' https: http: data:; " +
-          "img-src 'self' https: http: data:; " +
-          "connect-src 'self' https: http:; " +
-          "media-src 'self' https: http:;"
-        ]
-      }
-    });
-  });
-  mainWindow.webContents.session.webRequest.onBeforeRequest((details, callback) => {
-    let resourceUrl;
-    try {
-      resourceUrl = new URL(details.url);
-    } catch (error) {
-      // 处理无效的 URL
-      console.error('Invalid URL:', details.url);
-      callback({ cancel: true });
-      return;
-    }
+  const isMac = process.platform === 'darwin';
 
-    // 处理协议相对 URL
-    if (details.url.startsWith('//')) {
-      resourceUrl = new URL(`https:${details.url}`);
+  const template = [
+    ...(isMac ? [{
+      label: app.name,
+      submenu: [
+        { role: 'about' },
+        { type: 'separator' },
+        { role: 'quit' }
+      ]
+    }] : []),
+    {
+      label: '查看',
+      submenu: [
+        { role: 'reload' },
+        { role: 'toggledevtools' }
+      ]
     }
+  ];
 
-    switch (resourceUrl.protocol) {
-      case 'https:':
-      case 'http:':
-        // 允许加载 HTTP 和 HTTPS 资源
-        callback({});
-        break;
-      case 'file:':
-        // 允许加载本地文件，但要小心处理
-        if (resourceUrl.pathname.startsWith(app.getAppPath())) {
-          callback({});
-        } else {
-          console.warn('Blocked access to unauthorized local file:', details.url);
-          callback({ cancel: true });
-        }
-        break;
-      case 'data:':
-        // 允许 data URLs（常用于小图片或字体）
-        callback({});
-        break;
-      default:
-        // 阻止其他协议
-        console.warn('Blocked request with unauthorized protocol:', details.url);
-        callback({ cancel: true });
-    }
-  });
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
+  // session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+  //   callback({
+  //     responseHeaders: {
+  //       ...details.responseHeaders,
+  //       'Content-Security-Policy': [
+  //         "default-src 'self'; " +
+  //         "script-src 'self' https: http: 'unsafe-inline' 'unsafe-eval'; " +
+  //         "style-src 'self' https: http: 'unsafe-inline'; " +
+  //         "font-src 'self' https: http: data:; " +
+  //         "img-src 'self' https: http: data:; " +
+  //         "connect-src 'self' https: http:; " +
+  //         "media-src 'self' https: http:;"
+  //       ]
+  //     }
+  //   });
+  // });
+  // mainWindow.webContents.session.webRequest.onBeforeRequest((details, callback) => {
+  //   let resourceUrl;
+  //   try {
+  //     resourceUrl = new URL(details.url);
+  //   } catch (error) {
+  //     // 处理无效的 URL
+  //     console.error('Invalid URL:', details.url);
+  //     callback({ cancel: true });
+  //     return;
+  //   }
+
+  //   // 处理协议相对 URL
+  //   if (details.url.startsWith('//')) {
+  //     resourceUrl = new URL(`https:${details.url}`);
+  //   }
+
+  //   switch (resourceUrl.protocol) {
+  //     case 'https:':
+  //     case 'http:':
+  //       // 允许加载 HTTP 和 HTTPS 资源
+  //       callback({});
+  //       break;
+  //     case 'file:':
+  //       // 允许加载本地文件，但要小心处理
+  //       if (resourceUrl.pathname.startsWith(app.getAppPath())) {
+  //         callback({});
+  //       } else {
+  //         console.warn('Blocked access to unauthorized local file:', details.url);
+  //         callback({ cancel: true });
+  //       }
+  //       break;
+  //     case 'data:':
+  //       // 允许 data URLs（常用于小图片或字体）
+  //       callback({});
+  //       break;
+  //     default:
+  //       // 阻止其他协议
+  //       console.warn('Blocked request with unauthorized protocol:', details.url);
+  //       callback({ cancel: true });
+  //   }
+  // });
 
   const port = 3000;
 

@@ -769,6 +769,8 @@ const diffHTML = function (data = {}, lan = "", path = "", initLan = "") {
   const html = `
     <div class="diffHTML">
       <div class="diffHTML-header">
+        <a href="javascript:" class="ui-button ui-button-success" id="Prev" role="button">Prev</a>
+        <a href="javascript:" class="ui-button ui-button-success" id="Next" role="button">Next</a>
         <a href="javascript:" data-lan="${lan}" class="ui-button ui-button-primary" id="Save" role="button">Save</a>
         <a href="javascript:" class="ui-button ui-button-warning red_button" id="Cancel" role="button">Cancel</a>
       </div>
@@ -788,22 +790,29 @@ const diffHTML = function (data = {}, lan = "", path = "", initLan = "") {
   };
   // setEditor(path, data.initC.content, data.nowC.content);
   if (!data.initC.path.endsWith(".json")) {
-    setEditor(path, data.nowC.content, data.initC.content);
-    // doc = new Mergely("#compare", {
-    //   sidebar: true,
-    //   ignorews: false,
-    //   license: "lgpl-separate-notice",
-    //   lhs: data.nowC.content,
-    //   rhs: data.initC.content,
-    //   cmsettings: {
-    //     readOnly: false,
-    //   }
-    // });
-    // doc.once('updated', () => {
-    //   doc.once('updated', () => {
-    //     doc.scrollToDiff('next');
-    //   });
-    // });
+    // setEditor(path, data.nowC.content, data.initC.content);
+    doc = new Mergely("#compare", {
+      sidebar: true,
+      ignorews: false,
+      license: "lgpl-separate-notice",
+      lhs: data.nowC.content,
+      rhs: data.initC.content,
+      bgcolor: "#3c3c3c",
+      cmsettings: {
+        readOnly: false,
+      }
+    });
+    doc.once('updated', () => {
+      doc.once('updated', () => {
+        doc.scrollToDiff('next');
+      });
+    });
+    Prev.onclick = () => {
+      doc.scrollToDiff('prev');
+    }
+    Next.onclick = () => {
+      doc.scrollToDiff('next');
+    }
   } else {
     if (jsonEditor) jsonEditor.dispose();
     jsonEditor = null;
