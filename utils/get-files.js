@@ -14,7 +14,6 @@ async function getFileFunc(onlyLan = "en", asyncLans = [], commitIds = "", confi
 
   // 将 getAllCommitName 移到外部
   const getAllCommitName = async (commitList, lanPath) => {
-    console.log("lanPath", lanPath);
     let fileNameArr = [];
     for (const commit of commitList) {
       try {
@@ -54,6 +53,7 @@ async function getFileFunc(onlyLan = "en", asyncLans = [], commitIds = "", confi
     }
 
     try {
+      // execSync(`git -C ${lanPath} add .`);
       let stdout = await execSync(`git -C ${lanPath} diff --cached --name-only`);
       if (!stdout?.length) {
         stdout = await execSync(`git -C ${lanPath} log ${last} --name-only --pretty=format:`);

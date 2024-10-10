@@ -792,7 +792,7 @@ const diffHTML = function (data = {}, lan = "", path = "", initLan = "") {
         <a href="javascript:" class="ui-button ui-button-warning red_button" id="Cancel" role="button">Cancel</a>
       </div>
       <div class="diffHTML__path">
-        ${path.endsWith('.json') ? `<span class="diffHTML__path-title">${lan}</span>` : `<span class="diffHTML__path-title">${lan}</span><span class="diffHTML__path-title">${initLan}</span>`}
+        ${path.endsWith('.json') ? `<span class="diffHTML__path-title">${lan}</span>` : `<span class="diffHTML__path-title left">${lan}</span><span class="diffHTML__path-title right">${initLan}</span>`}
       </div>
       <div class="diffHTML-content" id="compare">
       </div>

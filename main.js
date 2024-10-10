@@ -18,28 +18,7 @@ function createWindow() {
       webSecurity: false,
     }
   });
-  const isMac = process.platform === 'darwin';
-
-  const template = [
-    ...(isMac ? [{
-      label: app.name,
-      submenu: [
-        { role: 'about' },
-        { type: 'separator' },
-        { role: 'quit' }
-      ]
-    }] : []),
-    {
-      label: '查看',
-      submenu: [
-        { role: 'reload' },
-        { role: 'toggledevtools' }
-      ]
-    }
-  ];
-
-  const menu = Menu.buildFromTemplate(template);
-  Menu.setApplicationMenu(menu);
+  // Menu.setApplicationMenu(null);
   // session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
   //   callback({
   //     responseHeaders: {
