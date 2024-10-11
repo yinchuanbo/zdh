@@ -1,6 +1,6 @@
 const chokidar = require("chokidar");
 const { minify } = require("terser");
-const csso = require('csso');
+// const csso = require('csso');
 const https = require("https");
 const axios = require("axios");
 const fs = require("fs").promises;
@@ -65,9 +65,9 @@ function listenWatch(isWatching, pathname, lans, ports, domain) {
         path.basename(filePath).replace(".scss", ".css")
       );
       try {
-        const result = await sass.compileAsync(filePath);
-        const minifiedCss = csso.minify(result.css).css;
-        await fs.writeFile(outputFilePath, minifiedCss);
+        const result = await sass.compileAsync(filePath, { style: 'compressed' });
+        // const minifiedCss = csso.minify(result.css).css;
+        await fs.writeFile(outputFilePath, result.css);
         resolve(); // 处理成功
       } catch (writeError) {
         reject(writeError); // 写入文件错误
