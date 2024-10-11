@@ -42,9 +42,9 @@ body {
   display: flex;
   align-items: center;
   gap: 20px;
-  background-color: #3c3c3c;
+  background-color: #333;
   padding: 0 20px;
-  border-bottom: 1px solid rgb(68, 71, 70);
+  /* border-bottom: 1px solid rgb(68, 71, 70); */
 }
 
 .wrappper__main {
@@ -58,9 +58,9 @@ body {
   width: 320px;
   height: calc(100% + 60px);
   padding: 20px;
-  background-color: #3c3c3c;
+  background-color: #333;
   margin-top: -60px;
-  border-right: 1px solid rgb(68, 71, 70);
+  /* border-right: 1px solid rgb(68, 71, 70); */
 }
 
 .wrappper__sider2 {
@@ -94,7 +94,6 @@ body {
   opacity: 1;
   outline: none;
   font-family: "JetBrains Mono";
-  border-right-width: 1px;
 }
 
 .wrappper__sider_02,
@@ -105,6 +104,7 @@ body {
 .ui-input {
   width: 100%;
   height: 40px !important;
+  border: 0!important;
   border-radius: 0px !important;
 }
 
@@ -132,9 +132,9 @@ body {
   height: 40px;
 }
 
-.wrappper__content-header:has(.header-item) {
+/* .wrappper__content-header:has(.header-item) {
   border-bottom: 1px solid rgb(68, 71, 70);
-}
+} */
 
 .wrappper__content-content {
   width: 100%;
@@ -162,7 +162,7 @@ body {
   position: absolute;
   left: 50%;
   bottom: 0;
-  width: 20px;
+  width: 100%;
   height: 2px;
   background-color: #2486ff;
   transition: all 0.5s;
@@ -172,14 +172,14 @@ body {
 .content-item {
   position: absolute;
   inset: 0;
-  padding-top: 10px;
+  padding-top: 20px;
   display: none;
   flex-direction: column;
 }
 
 .content-item-btns {
   width: 100%;
-  padding-bottom: 10px;
+  padding-bottom: 20px;
 }
 
 .content-item.active {
@@ -213,6 +213,8 @@ body {
   font-size: 13px;
   background-color: #333;
   gap: 10px;
+  position: relative;
+  padding-top: 30px;
 }
 
 .content-item ul li:hover {
@@ -351,7 +353,10 @@ body {
 }
 
 .check-handle {
-  margin-right: 10px;
+  /* margin-right: 10px; */
+  position: absolute;
+  top: 10px;
+  right: 10px
 }
 
 .setCommit {
@@ -448,12 +453,18 @@ body {
   width: 150px;
 }
 
-select,
 .ui-input {
   color: #4c5161;
-  border-radius: 0;
   border: 0 !important;
   outline: none;
+}
+
+select {
+  color: #4c5161;
+  outline: none;
+  padding: 0 5px;
+  border-right-width: 5px;
+  border-color: transparent;
 }
 
 .ui-checkbox {
