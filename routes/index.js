@@ -108,7 +108,7 @@ router.post("/receive-files", authenticateToken, async (req, res) => {
     } catch (error) {
       res.json({
         code: 200,
-        message: "fail",
+        message: error || error?.message || "fail",
       });
     }
   } else {

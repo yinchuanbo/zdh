@@ -20,6 +20,10 @@
   transition: 0.5s;
 }
 
+.CodeMirror-scrollbar-filler, .CodeMirror-gutter-filler {
+  background-color: transparent;
+}
+
 html,
 body {
   height: 100%;
