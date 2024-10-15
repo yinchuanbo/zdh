@@ -97,7 +97,7 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
   const html01 = `<div class="header-item active">${lan.toUpperCase()}<div>`;
   const html02 = `<div class="content-item active">
     <div class="content-item-btns">
-      <a href="javascript:" class="ui-button ui-button-warning pull-code jsRTips" title="请注意操作前获取最新代码" role="button" data-lan="${lan}">Pull*</a>
+      <a href="javascript:" class="ui-button ui-button-warning pull-code jsRTips" title="请注意操作前获取最新代码" role="button" data-lan="${lan}">Pull</a>
       <a href="javascript:" class="ui-button ui-button-primary discard-code" role="button" data-lan="${lan}"  style="display: ${selectLan === lan ? "none" : ""}">Discard</a>
       <a href="javascript:" class="ui-button ui-button-primary commit-code" role="button" data-lan="${lan}" style="display: none">Commit</a>
       <a href="javascript:" class="ui-button ui-button-primary merge-code" role="button" data-lan="${lan}">Merge</a>
@@ -168,9 +168,7 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
   tplEles.forEach((item) => {
     item.onclick = () => {
       const { es } = item.dataset;
-      if (es === "tpl") {
-        item.setAttribute("contentEditable", true);
-      }
+      item.setAttribute("contentEditable", true);
     };
     item.oninput = () => {
       let path = item.innerText.split("]")[1] || "";
@@ -465,9 +463,10 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
     };
   });
 
-
   pushCodes.forEach((item) => {
     item.onclick = async () => {
+      const { lan } = item.dataset;
+      console.log('push', item)
       if (isWatching) {
         new LightTip().error("请先关闭 Watching，其他操作需要开启");
         return;

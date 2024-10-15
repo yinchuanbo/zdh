@@ -2,7 +2,6 @@ const { exec } = require("child_process");
 
 async function pullCode({ lan, localPaths }) {
   const curP = localPaths[lan];
-
   function executeGitCommand(command) {
     return new Promise((resolve, reject) => {
       exec(command, { cwd: curP }, (error, stdout, stderr) => {
@@ -13,7 +12,6 @@ async function pullCode({ lan, localPaths }) {
       });
     });
   }
-
   async function checkGitStatus() {
     const { stdout: status } = await executeGitCommand(
       "git status --porcelain"
@@ -23,7 +21,6 @@ async function pullCode({ lan, localPaths }) {
       throw new Error("工作目录不干净，有未提交的更改");
     }
   }
-
   async function gitPullRebase() {
     try {
       const { stdout, stderr } = await executeGitCommand("git pull --rebase");
@@ -53,7 +50,6 @@ async function pullCode({ lan, localPaths }) {
       }
     }
   }
-
   try {
     await checkGitStatus();
     await gitPullRebase();
@@ -62,5 +58,4 @@ async function pullCode({ lan, localPaths }) {
     return Promise.reject(error.message);
   }
 }
-
 module.exports = pullCode;
