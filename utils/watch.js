@@ -8,17 +8,18 @@ const fs2 = require("fs");
 const path = require("path");
 const sass = require("sass");
 const io = require("socket.io-client");
+const babel = require("@babel/core");
 
-const watcherList = []
+const watcherList = [];
 
 let curWatching = false;
 
 function listenWatch(isWatching, pathname, lans, ports, domain) {
   curWatching = isWatching;
   if (watcherList?.length) {
-    watcherList.forEach(async item => {
-      await item.close()
-    })
+    watcherList.forEach(async (item) => {
+      await item.close();
+    });
   }
   if (!curWatching) return;
   lans = JSON.parse(lans);
@@ -27,11 +28,11 @@ function listenWatch(isWatching, pathname, lans, ports, domain) {
   let allDirs = {};
 
   function handleError(err, file = "") {
-    curWatching = false
+    curWatching = false;
     if (watcherList?.length) {
-      watcherList.forEach(async item => {
-        await item.close()
-      })
+      watcherList.forEach(async (item) => {
+        await item.close();
+      });
     }
     socket.emit("chat message", {
       type: "watch error",
@@ -47,7 +48,11 @@ function listenWatch(isWatching, pathname, lans, ports, domain) {
   const compressAndObfuscate = async (filePath, jsOutputDir) => {
     try {
       const fileContent = await fs.readFile(filePath, "utf-8");
-      const minified = await minify(fileContent);
+      const presetEnvPath = require.resolve("@babel/preset-env");
+      let es5Content = await babel.transformAsync(fileContent, {
+        presets: [[presetEnvPath]],
+      });
+      const minified = await minify(es5Content.code);
       await fs.writeFile(
         path.join(jsOutputDir, path.basename(filePath)),
         minified.code
@@ -65,7 +70,9 @@ function listenWatch(isWatching, pathname, lans, ports, domain) {
         path.basename(filePath).replace(".scss", ".css")
       );
       try {
-        const result = await sass.compileAsync(filePath, { style: 'compressed' });
+        const result = await sass.compileAsync(filePath, {
+          style: "compressed",
+        });
         // const minifiedCss = csso.minify(result.css).css;
         await fs.writeFile(outputFilePath, result.css);
         resolve(); // 处理成功
@@ -78,7 +85,9 @@ function listenWatch(isWatching, pathname, lans, ports, domain) {
   function getAllSubfolders(folderPath) {
     return fs2
       .readdirSync(folderPath)
-      .filter((file) => fs2.statSync(path.join(folderPath, file)).isDirectory());
+      .filter((file) =>
+        fs2.statSync(path.join(folderPath, file)).isDirectory()
+      );
   }
 
   for (const key in lans) {
@@ -125,7 +134,7 @@ function listenWatch(isWatching, pathname, lans, ports, domain) {
           } else {
             socket.emit("chat message", {
               type: "publish error",
-              message: res.data.message
+              message: res.data.message,
             });
           }
         }
@@ -133,7 +142,7 @@ function listenWatch(isWatching, pathname, lans, ports, domain) {
       .catch((err) => {
         socket.emit("chat message", {
           type: "publish error",
-          message: err?.message || "Publish 失败"
+          message: err?.message || "Publish 失败",
         });
       });
   };
@@ -160,7 +169,7 @@ function listenWatch(isWatching, pathname, lans, ports, domain) {
         }
         publish(dir.publish);
       });
-      watcherList.push(watcher)
+      watcherList.push(watcher);
     }
   }
 

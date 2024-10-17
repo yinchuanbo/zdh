@@ -1,12 +1,13 @@
 {
   "name": "zdh",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "private": true,
   "main": "main.js",
   "scripts": {
     "dev": "nodemon node ./bin/www",
     "start": "electron .",
-    "build": "electron-builder --win portable"
+    "build": "electron-builder --win portable",
+    "dir": "electron-builder --dir"
   },
   "build": {
     "appId": "com.yourcompany.vidnozasync",
@@ -17,7 +18,8 @@
     },
     "files": [
       "**/*",
-      "!**/*.map"
+      "!**/*.map",
+      "node_modules/@babel/preset-env/**/*"
     ],
     "directories": {
       "buildResources": "resources",
@@ -25,6 +27,8 @@
     }
   },
   "dependencies": {
+    "@babel/core": "^7.25.8",
+    "@babel/preset-env": "^7.25.8",
     "axios": "^1.7.7",
     "bcrypt": "^5.1.1",
     "chokidar": "^4.0.1",
@@ -46,7 +50,6 @@
   },
   "devDependencies": {
     "electron": "^32.1.2",
-    "electron-builder": "^25.0.5",
-    "node-sass": "^9.0.0"
+    "electron-builder": "^25.0.5"
   }
 }

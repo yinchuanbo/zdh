@@ -26,14 +26,14 @@
           <div class="lan_boxs lan_all">
             <input type="checkbox" id="all" name="all">
             <label for="all" class="ui-checkbox"></label>
-            <label for="all" style="padding-left: 5px;">ALL</label>
+            <label for="all" style="padding-left: 5px;">all</label>
           </div>
           <hr>
           <% lans.forEach(function(lan, idx){ %>
             <div class="lan_boxs">
               <input type="checkbox" id="checkbox<%=idx%>" value="<%=lan%>" name="checkbox">
               <label for="checkbox<%=idx%>" class="ui-checkbox"></label>
-              <label for="checkbox<%=idx%>" style="padding-left: 5px;"><%=lan.toUpperCase()%></label>
+              <label for="checkbox<%=idx%>" style="padding-left: 5px;"><%=lan%></label>
             </div>
           <% }); %>
         </div>
