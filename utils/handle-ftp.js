@@ -201,10 +201,7 @@ function handleFtp({ env, data, configs }) {
                 const localFileSize = fs.statSync(localFilePath).size;
                 if (remoteFileSize !== localFileSize) {
                   sftp.end();
-                  console.log(
-                    "文件上传成功，但大小不一致，须重传" + " - " + localFilePath
-                  );
-                  reject();
+                  reject("文件上传成功，但大小不一致，须重传" + " - " + localFilePath);
                 } else {
                   if (
                     localFilePath.endsWith(".js") ||
@@ -221,18 +218,15 @@ function handleFtp({ env, data, configs }) {
                     const hash2 = await fileHash(bufferToStream(remoteStream));
                     if (hash1 !== hash2) {
                       sftp.end();
-                      console.log(
-                        "文件上传成功，但内容不一致，须重传" +
+                      reject("文件上传成功，但内容不一致，须重传" +
                         " - " +
-                        localFilePath
-                      );
-                      reject();
+                        localFilePath);
                     }
                   }
                 }
               } catch (error) {
                 errorOccurred1 = true;
-                reject();
+                reject(error?.message);
               }
             }
           }
@@ -242,7 +236,7 @@ function handleFtp({ env, data, configs }) {
       })
       .catch((err) => {
         sftp.end();
-        reject();
+        reject(err.message);
       });
   });
 }

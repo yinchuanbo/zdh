@@ -11,10 +11,13 @@ const pushCode = require("../utils/push-code");
 const discardCode = require("../utils/discard-code");
 const mergeCode = require("../utils/merge-code");
 const getBranchs = require("../utils/get-branchs");
+const io = require("socket.io-client");
 
 const { copyAndMoveImg, getFileContent } = require("../utils/handle-file");
 const { authenticateToken } = require("../permissions");
 var router = express.Router();
+
+const socket = io("http://localhost:4000");
 
 router.get("/", authenticateToken, function (req, res, next) {
   const { lans } = getConf(req.uname, res);
@@ -94,6 +97,52 @@ router.post("/publish", authenticateToken, async (req, res) => {
   }
 });
 
+router.post("/all-publish", authenticateToken, async (req, res) => {
+  const { lans } = req.body;
+  const { ports, domain } = getConf(req.uname, res);
+  let s = [];
+  let f = []
+  let errorObj = {}
+  let portsObj = {};
+  for (let i = 0; i < lans.length; i++) {
+    const lan = lans[i];
+    portsObj[lan] = ports[lan]
+  }
+  if (!Object.keys(portsObj)?.length) portsObj = ports;
+  async function setPub() {
+    for (const key in portsObj) {
+      try {
+        await handlePublish(key, portsObj, domain);
+        s.push(key)
+      } catch (error) {
+        f.push(key);
+        errorObj[key] = error?.message || error
+      }
+    }
+    return Promise.resolve();
+  }
+  setPub().then(() => {
+    let str = ''
+    if (s?.length) {
+      str += `${s.join(',')} publish success`;
+    }
+    if (f?.length) {
+      str += `, ${f.join(',')} publish failed`
+    }
+    if (Object.keys(errorObj)?.length) {
+      str += `\n` + JSON.stringify(errorObj)
+    }
+    socket.emit("chat message", {
+      type: "all-publish",
+      message: str
+    });
+  })
+  res.json({
+    code: 200,
+    message: "publish-success",
+  });
+});
+
 router.post("/receive-files", authenticateToken, async (req, res) => {
   const { LocalListPro, ports, domain } = getConf(req.uname, res);
   const { path, path2, lan, initLan } = req.body;
@@ -153,19 +202,19 @@ router.post("/set-file", authenticateToken, async (req, res) => {
   const { path, content, lan } = req.body;
   try {
     await setFile({ path, content });
-    try {
-      if (
-        !(
-          path.endsWith(".scss") ||
-          path.endsWith(".css") ||
-          path.endsWith(".js")
-        )
-      ) {
-        await handlePublish(lan, ports, domain);
-      }
-    } catch (error) {
-      throw new Error("Publish 失败");
-    }
+    // try {
+    //   if (
+    //     !(
+    //       path.endsWith(".scss") ||
+    //       path.endsWith(".css") ||
+    //       path.endsWith(".js")
+    //     )
+    //   ) {
+    //     await handlePublish(lan, ports, domain);
+    //   }
+    // } catch (error) {
+    //   throw new Error("Publish 失败");
+    // }
     res.json({
       code: 200,
       message: "complete",
@@ -220,6 +269,71 @@ router.post("/pull-code", authenticateToken, async (req, res) => {
       data: error?.message || error,
     });
   }
+});
+
+router.post("/all-pull", authenticateToken, async (req, res) => {
+  if (res.app.locals.isW) {
+    res.json({
+      code: 200,
+      message: "pull-error",
+      data: "请先关闭 Watching",
+    });
+    return;
+  }
+  const { localPaths, ports } = getConf(req.uname, res);
+  let { lans } = req.body;
+  if (!lans?.length) {
+    lans = Object.keys(ports)
+  }
+  let s = [], f = [], errorObj = {};
+  async function getAllPush() {
+    for (let i = 0; i < lans.length; i++) {
+      const lan = lans[i];
+      try {
+        await pullCode({ lan, localPaths });
+        s.push(lan)
+      } catch (error) {
+        f.push(lan)
+        errorObj[lan] = error?.message || error
+      }
+    }
+    return Promise.resolve();
+  }
+
+  getAllPush().then(() => {
+    let str = '';
+    if (s?.length) {
+      str += `${s.join(",")} Pull Success, `
+    }
+    if (f?.length) {
+      str += `${f.join(",")} Pull Fail, ${JSON.stringify(errorObj)}`
+    }
+    socket.emit("chat message", {
+      type: "all-pull",
+      message: str
+    });
+  })
+  res.json({
+    code: 200
+  });
+
+  // try {
+
+
+
+  //   const result = await pullCode({ lan, localPaths });
+  //   res.json({
+  //     code: 200,
+  //     message: "pull-success",
+  //     data: result,
+  //   });
+  // } catch (error) {
+  //   res.json({
+  //     code: 200,
+  //     message: "pull-error",
+  //     data: error?.message || error,
+  //   });
+  // }
 });
 
 router.post("/check-status", authenticateToken, async (req, res) => {

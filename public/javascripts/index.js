@@ -2,10 +2,13 @@ const socket = io("http://localhost:4000");
 let imgs = [];
 let isWatching = false;
 
-let editor = null, jsonEditor = null;
+let editor = null,
+  jsonEditor = null;
 
 const watchBtn = document.querySelector(".watch-btn");
 const handleBtn = document.querySelector(".handle-btn");
+const allPublish = document.querySelector(".all-publish");
+const allPull = document.querySelector(".all-pull");
 
 let selectLan = document.querySelector(".wrappper__sider_01 select").value;
 
@@ -23,9 +26,9 @@ const watchBtnListen = () => {
   watchBtn.onclick = () => {
     isWatching = !isWatching;
     if (isWatching) {
-      watchBtn.innerHTML = "Watching";
+      watchBtn.classList.add("watching");
     } else {
-      watchBtn.innerHTML = "Watch";
+      watchBtn.classList.remove("watching");
     }
     setWatch();
   };
@@ -40,9 +43,9 @@ const handleSocket = () => {
     if (type === "watch error") {
       isWatching = !isWatching;
       if (isWatching) {
-        watchBtn.innerHTML = "Watching";
+        watchBtn.classList.add("watching");
       } else {
-        watchBtn.innerHTML = "Watch";
+        watchBtn.classList.remove("watching");
       }
       new Dialog({
         title: "Error Info",
@@ -51,11 +54,22 @@ const handleSocket = () => {
     } else if (type === "publish success") {
       new LightTip().success("publish 成功");
     } else if (type === "publish error") {
-      // new LightTip().error(message || "publish 失败");
       new Dialog({
         title: "Publish Error Info",
         content: message || "publish 失败",
       });
+    } else if (type === "all-publish") {
+      new Dialog({
+        title: "Publish Info",
+        content: message,
+      });
+      allPublish.classList.remove("loading");
+    } else if (type === "all-pull") {
+      new Dialog({
+        title: "Pull Info",
+        content: message,
+      });
+      allPull.classList.remove("loading");
     }
   });
 };
@@ -109,11 +123,11 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
     </div>
     <ul>
       ${data
-      .map((info) => {
-        const str = generateRandomString(20);
-        let lujing = curDatas2?.[info] || "unknown";
-        if (selectLan === lan) lujing = info;
-        return `<li data-path="${info}" data-path2="${lujing}" data-lan="${lan}">
+        .map((info) => {
+          const str = generateRandomString(20);
+          let lujing = curDatas2?.[info] || "unknown";
+          if (selectLan === lan) lujing = info;
+          return `<li data-path="${info}" data-path2="${lujing}" data-lan="${lan}">
           <div class="check-handle" title="已完成可选中">
             <input type="checkbox" id="${str}" name="${str}">
             <label for="${str}" class="ui-checkbox"></label>
@@ -128,8 +142,8 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
            <a href="javascript:" class="ui-button ui-button-primary one-deploy" role="button" style="display: ${info.endsWith(".json") ? "none" : ""}">To Test</a>
           </div>
         </li>`;
-      })
-      .join("")}
+        })
+        .join("")}
     </ul>
   </div>`;
 
@@ -161,8 +175,8 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
   const discardCode = document.querySelectorAll(".discard-code");
   const mergeCodes = document.querySelectorAll(".merge-code");
 
-  new Tips($('.jsRTips'), {
-    align: 'top'
+  new Tips($(".jsRTips"), {
+    align: "top",
   });
 
   tplEles.forEach((item) => {
@@ -194,6 +208,10 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
 
   asyncRes.forEach((item) => {
     item.onclick = () => {
+      if (!isWatching) {
+        new LightTip().error("请点击开启 Watch 监听");
+        return;
+      }
       item.classList.add("loading");
       const p = item.parentNode.parentNode;
       curP = p;
@@ -427,51 +445,59 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
       }
       // item.classList.add("loading");
       const { lan } = item.dataset;
-      new Dialog().confirm('\
+      new Dialog().confirm(
+        '\
         <h6>是否一并取消暂存区文件？</h6>\
-        <input type="checkbox" id="switchS"><label class="ui-switch" for="switchS"></label>'
-        , {
-          buttons: [{
-            events: function (event) {
-              const switchDom = document.querySelector('#switchS')
-              const isChecked = switchDom.checked;
-              fetch("/discard-code", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  lan,
-                  isChecked
-                }),
-              })
-                .then((res) => {
-                  return res.json();
+        <input type="checkbox" id="switchS"><label class="ui-switch" for="switchS"></label>',
+        {
+          buttons: [
+            {
+              events: function (event) {
+                const switchDom = document.querySelector("#switchS");
+                const isChecked = switchDom.checked;
+                fetch("/discard-code", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    lan,
+                    isChecked,
+                  }),
                 })
-                .then((res) => {
-                  if (res?.code === 200 && res?.message === "discard-success") {
-                    new LightTip().success(res?.data || "代码撤销成功");
-                  } else {
-                    new LightTip().error(res?.data || "代码撤销失败");
-                  }
-                  // item.classList.remove("loading");
-                  event.data.dialog.remove();;
-                });
-            }
-          }, {}]
-        });
+                  .then((res) => {
+                    return res.json();
+                  })
+                  .then((res) => {
+                    if (
+                      res?.code === 200 &&
+                      res?.message === "discard-success"
+                    ) {
+                      new LightTip().success(res?.data || "代码撤销成功");
+                    } else {
+                      new LightTip().error(res?.data || "代码撤销失败");
+                    }
+                    // item.classList.remove("loading");
+                    event.data.dialog.remove();
+                  });
+              },
+            },
+            {},
+          ],
+        }
+      );
     };
   });
 
   pushCodes.forEach((item) => {
     item.onclick = async () => {
       const { lan } = item.dataset;
-      console.log('push', item)
+      console.log("push", item);
       if (isWatching) {
         new LightTip().error("请先关闭 Watching，其他操作需要开启");
         return;
       }
-      item.classList.add("loading")
+      item.classList.add("loading");
       const { code, message, data } = await fetch("/check-status", {
         method: "POST",
         headers: {
@@ -480,11 +506,10 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
         body: JSON.stringify({
           lan,
         }),
-      })
-        .then((res) => {
-          return res.json();
-        })
-      if (!(code === 200 && message === 'check-status-success')) {
+      }).then((res) => {
+        return res.json();
+      });
+      if (!(code === 200 && message === "check-status-success")) {
         removeLoading("操作失败");
         return;
       }
@@ -512,16 +537,16 @@ const setCommit = (item, lan, hasCommit = false, result = {}) => {
       <div class="setCommit_left">
         <div class="select-type">
           <div class="select-type-item">
-            <input type="radio" id="radio1" name="handle-type" value="commit" ${hasCommit ? `disabled` : ''} ${!hasCommit ? `checked="checked"` : ''}>
+            <input type="radio" id="radio1" name="handle-type" value="commit" ${hasCommit ? `disabled` : ""} ${!hasCommit ? `checked="checked"` : ""}>
             <label for="radio1" class="ui-radio"></label><label for="radio1" style="padding-left: 5px;">Commit</label>
           </div>
           <div class="select-type-item">
-            <input type="radio" id="radio2"  value="push" name="handle-type" ${hasCommit ? `checked="checked"` : ''}>
+            <input type="radio" id="radio2"  value="push" name="handle-type" ${hasCommit ? `checked="checked"` : ""}>
             <label for="radio2" class="ui-radio"></label><label for="radio2" style="padding-left: 5px;">Push</label>
           </div>
         </div>
         <div class="set-commit-comtent">
-          <select name="commit__style"  ${hasCommit ? `disabled` : ''}>
+          <select name="commit__style"  ${hasCommit ? `disabled` : ""}>
             <option class="feat" title="新功能 feature">feat</option>
             <option class="fix" title="修复 bug">fix</option>
             <option class="docs" title="文档注释">docs</option>
@@ -533,7 +558,7 @@ const setCommit = (item, lan, hasCommit = false, result = {}) => {
             <option class="revert" title="回退">revert</option>
             <option class="build" title="打包">build</option>
           </select>
-          <input class="ui-input commit-input"  ${hasCommit ? `disabled` : ''} placeholder="输入 commit 内容">
+          <input class="ui-input commit-input"  ${hasCommit ? `disabled` : ""} placeholder="输入 commit 内容">
         </div>
       </div>
       <div class="setCommit_btns">
@@ -548,7 +573,7 @@ const setCommit = (item, lan, hasCommit = false, result = {}) => {
   const cancelBtn = document.querySelector(".setCommit .ui-button-warning");
   const select = document.querySelector('[name="commit__style"]');
   const input = setCommit.querySelector(".commit-input");
-  function removeLoading(str = '', bool = false) {
+  function removeLoading(str = "", bool = false) {
     if (bool) {
       new LightTip().success(str);
     } else {
@@ -558,29 +583,29 @@ const setCommit = (item, lan, hasCommit = false, result = {}) => {
     cancelBtn.classList.remove("disabled");
   }
   saveBtn.onclick = async () => {
-    const radio = document.querySelector("input[name='handle-type']:checked")
+    const radio = document.querySelector("input[name='handle-type']:checked");
     if (!input.value && !hasCommit) {
-      removeLoading("必须填写 commit 内容")
+      removeLoading("必须填写 commit 内容");
       return;
     }
     saveBtn.classList.add("loading");
     cancelBtn.classList.add("disabled");
 
     const { code, message, data } = result;
-    if (!(code === 200 && message === 'check-status-success')) {
+    if (!(code === 200 && message === "check-status-success")) {
       removeLoading("操作失败");
       return;
     }
-    if (radio.value === 'commit') {
+    if (radio.value === "commit") {
       if (data) {
         removeLoading("无修改可用来 commit");
         return;
       } else {
-        type = "commit"
+        type = "commit";
       }
-    } else if (radio.value === 'push') {
+    } else if (radio.value === "push") {
       if (data) {
-        console.log('111-1')
+        console.log("111-1");
         fetch("/push-code", {
           method: "POST",
           headers: {
@@ -588,7 +613,7 @@ const setCommit = (item, lan, hasCommit = false, result = {}) => {
           },
           body: JSON.stringify({
             lan,
-            status: true
+            status: true,
           }),
         })
           .then((res) => {
@@ -596,16 +621,16 @@ const setCommit = (item, lan, hasCommit = false, result = {}) => {
           })
           .then((res) => {
             if (res?.code === 200 && res?.message === "push-success") {
-              removeLoading(res?.data || lan + " Push 成功", true)
+              removeLoading(res?.data || lan + " Push 成功", true);
             } else {
-              removeLoading(res?.data || lan + " Push 失败")
+              removeLoading(res?.data || lan + " Push 失败");
             }
             item.classList.remove("loading");
           });
         return;
       }
     }
-    console.log('111-2')
+    console.log("111-2");
     const content = `${select.value}:${input.value}`;
     fetch("/push-code", {
       method: "POST",
@@ -615,7 +640,7 @@ const setCommit = (item, lan, hasCommit = false, result = {}) => {
       body: JSON.stringify({
         lan,
         commit: content,
-        type
+        type,
       }),
     })
       .then((res) => {
@@ -623,11 +648,11 @@ const setCommit = (item, lan, hasCommit = false, result = {}) => {
       })
       .then((res) => {
         if (res?.code === 200 && res?.message === "push-success") {
-          removeLoading(res?.data || lan + " Push 成功", true)
+          removeLoading(res?.data || lan + " Push 成功", true);
           item.classList.remove("loading");
           setCommit.remove();
         } else {
-          removeLoading(res?.data || lan + " Push 失败")
+          removeLoading(res?.data || lan + " Push 失败");
         }
       });
   };
@@ -662,14 +687,14 @@ const setMerge = (item, lan) => {
         <div class="setCommit_left">
           <select name="from">
               ${data.map((h) => {
-      return `<option class="feat" value="${h}" title="${h}">${h}</option>`;
-    })}
+                return `<option class="feat" value="${h}" title="${h}">${h}</option>`;
+              })}
           </select>
           <p>Mergr To</p>
           <select name="to">
           ${data.map((h) => {
-      return `<option class="feat" value="${h}" title="${h}">${h}</option>`;
-    })}
+            return `<option class="feat" value="${h}" title="${h}">${h}</option>`;
+          })}
           </select>
         </div>
         <div class="setCommit_btns">
@@ -799,7 +824,7 @@ const diffHTML = function (data = {}, lan = "", path = "", initLan = "") {
         <a href="javascript:" class="ui-button ui-button-warning red_button" id="Cancel" role="button">Cancel</a>
       </div>
       <div class="diffHTML__path">
-        ${path.endsWith('.json') ? `<span class="diffHTML__path-title right">${lan}</span>` : `<span class="diffHTML__path-title left">${lan}</span><span class="diffHTML__path-title right">${initLan}</span>`}
+        ${path.endsWith(".json") ? `<span class="diffHTML__path-title right">${lan}</span>` : `<span class="diffHTML__path-title left">${lan}</span><span class="diffHTML__path-title right">${initLan}</span>`}
       </div>
       <div class="diffHTML-content" id="compare">
       </div>
@@ -824,19 +849,19 @@ const diffHTML = function (data = {}, lan = "", path = "", initLan = "") {
       bgcolor: "#3c3c3c",
       cmsettings: {
         readOnly: false,
-      }
+      },
     });
-    doc.once('updated', () => {
-      doc.once('updated', () => {
-        doc.scrollToDiff('next');
+    doc.once("updated", () => {
+      doc.once("updated", () => {
+        doc.scrollToDiff("next");
       });
     });
     Prev.onclick = () => {
-      doc.scrollToDiff('prev');
-    }
+      doc.scrollToDiff("prev");
+    };
     Next.onclick = () => {
-      doc.scrollToDiff('next');
-    }
+      doc.scrollToDiff("next");
+    };
   } else {
     if (jsonEditor) jsonEditor.dispose();
     jsonEditor = null;
@@ -861,7 +886,10 @@ const diffHTML = function (data = {}, lan = "", path = "", initLan = "") {
   }
 
   Save.onclick = () => {
-    const content = jsonEditor?.getValue?.() || doc?.get?.("lhs") || originalModel?.getValue?.();;
+    const content =
+      jsonEditor?.getValue?.() ||
+      doc?.get?.("lhs") ||
+      originalModel?.getValue?.();
     if (!content) {
       new LightTip().error("修改失败");
       return;
@@ -908,10 +936,10 @@ const handleNoData = () => {
 const handleGetFile = () => {
   handleNoData();
   handleBtn.onclick = () => {
-    if (!isWatching) {
-      new LightTip().error("请点击开启 Watch 监听");
-      return;
-    }
+    // if (!isWatching) {
+    //   new LightTip().error("请点击开启 Watch 监听");
+    //   return;
+    // }
     handleBtn.classList.add("loading");
     const select = document.querySelector(".wrappper__sider_01 select");
     const checkboxes = document.querySelectorAll("[name='checkbox']:checked");
@@ -1001,6 +1029,48 @@ function logOut() {
     });
   };
 }
+
+allPublish.onclick = () => {
+  allPublish.classList.add("loading");
+  const checkboxes = document.querySelectorAll("[name='checkbox']:checked");
+  var selectedValues = [];
+  checkboxes.forEach(function (checkbox) {
+    selectedValues.push(checkbox.value);
+  });
+  fetch("/all-publish", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      lans: selectedValues,
+    }),
+  }).then((res) => {
+    return res.json();
+  });
+};
+
+allPull.onclick = () => {
+  if (isWatching) {
+    new LightTip().error("请先关闭 Watching，其他操作需要开启");
+    return;
+  }
+  allPull.classList.add("loading");
+  const checkboxes = document.querySelectorAll("[name='checkbox']:checked");
+  var selectedValues = [];
+  checkboxes.forEach(function (checkbox) {
+    selectedValues.push(checkbox.value);
+  });
+  fetch("/all-pull", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      lans: selectedValues,
+    }),
+  });
+};
 
 window.addEventListener("load", () => {
   watchBtnListen();

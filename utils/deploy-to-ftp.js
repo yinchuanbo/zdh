@@ -1,135 +1,59 @@
-const Client = require("ssh2-sftp-client");
-const fs = require("fs");
-const crypto = require("crypto");
-const { Readable } = require("stream");
-
-let errorOccurred1,
-  errorOccurred2,
-  testConn = null,
-  LocalList = null,
-  devList = null;
+const { Worker } = require('worker_threads');
+const os = require('os');
+const path = require('path');
 
 async function deployToFtp({ lan = "", data = [], env = "test", configs }) {
   const outputs = {
     [lan]: data,
   };
-  if (env === "test") {
-    testConn = configs.testConn;
-    LocalList = configs.LocalListTest;
-    devList = configs.testFoldList;
-  } else {
-    testConn = configs.proConn;
-    LocalList = configs.LocalListPro;
-    devList = configs.proFoldList;
-  }
-  const dirs = outputs;
-  function bufferToStream(buffer) {
-    const stream = new Readable();
-    stream.push(buffer);
-    stream.push(null);
-    return stream;
-  }
-  async function getRemoteFileSize(sftp, remoteFilePath) {
-    const remoteFileInfo = await sftp.stat(remoteFilePath);
-    return remoteFileInfo.size;
-  }
-  function fileHash(readStream) {
-    return new Promise((resolve, reject) => {
-      const hash = crypto.createHash("sha256");
-      readStream.on("data", (chunk) => {
-        hash.update(chunk);
-      });
-      readStream.on("end", () => {
-        resolve(hash.digest("hex"));
-      });
-      readStream.on("error", (err) => {
-        reject(err);
-      });
-    });
-  }
+
+  const cpuCount = os.cpus().length;
+  const workerCount = Math.min(cpuCount, Object.keys(outputs).length);
+
   return new Promise((resolve, reject) => {
-    const sftp = new Client();
-    let imgHasPath = [];
-    sftp
-      .connect(testConn)
-      .then(async () => {
-        errorOccurred1 = false;
-        errorOccurred2 = false;
-        if (dirs && Object.keys(dirs)?.length) {
-          for (const key in dirs) {
-            if (errorOccurred1) break;
-            let vals = dirs[key];
-            for (let i = 0; i < vals.length; i++) {
-              if (errorOccurred1) break;
-              const dir = vals[i];
-              try {
-                let localFilePath = `${LocalList[key]}${dir.replace(
-                  /\//g,
-                  "\\"
-                )}`;
-                let remoteFilePath = `${devList[key]}${dir}`;
-                const lastIndex = remoteFilePath.lastIndexOf("/");
-                const prefix = remoteFilePath.substring(0, lastIndex);
-                if (!imgHasPath.includes(prefix)) {
-                  const exists = await sftp.exists(prefix).catch((e) => {
-                    console.log(e);
-                  });
-                  if (!exists) {
-                    await sftp.mkdir(prefix, true);
-                  }
-                  imgHasPath.push(prefix);
-                }
-                await sftp.fastPut(localFilePath, remoteFilePath);
-                const remoteFileSize = await getRemoteFileSize(
-                  sftp,
-                  remoteFilePath
-                );
-                const localFileSize = fs.statSync(localFilePath).size;
-                if (remoteFileSize !== localFileSize) {
-                  sftp.end();
-                  console.log(
-                    "文件上传成功，但大小不一致，须重传" + " - " + localFilePath
-                  );
-                  reject();
-                } else {
-                  if (
-                    localFilePath.endsWith(".js") ||
-                    localFilePath.endsWith(".css") ||
-                    localFilePath.endsWith(".scss") ||
-                    localFilePath.endsWith(".tpl") ||
-                    localFilePath.endsWith(".html") ||
-                    localFilePath.endsWith(".json")
-                  ) {
-                    const localFileSizeStream =
-                      fs.createReadStream(localFilePath);
-                    const remoteStream = await sftp.get(remoteFilePath);
-                    const hash1 = await fileHash(localFileSizeStream);
-                    const hash2 = await fileHash(bufferToStream(remoteStream));
-                    if (hash1 !== hash2) {
-                      sftp.end();
-                      console.log(
-                        "文件上传成功，但内容不一致，须重传" +
-                          " - " +
-                          localFilePath
-                      );
-                      reject();
-                    }
-                  }
-                }
-              } catch (error) {
-                errorOccurred1 = true;
-                reject();
-              }
-            }
+    let completedWorkers = 0;
+    let errorOccurred = false;
+
+    const workerPool = new Array(workerCount).fill().map(() =>
+      new Worker(path.join(__dirname, 'ftpWorker.js'))
+    );
+
+    let currentKeyIndex = 0;
+    const keys = Object.keys(outputs);
+
+    function assignTaskToWorker(worker) {
+      if (currentKeyIndex < keys.length) {
+        const key = keys[currentKeyIndex];
+        worker.postMessage({ key, values: outputs[key], env, configs });
+        currentKeyIndex++;
+      } else {
+        worker.terminate();
+      }
+    }
+
+    for (const worker of workerPool) {
+      worker.on('message', (result) => {
+        if (result.success) {
+          completedWorkers++;
+          if (completedWorkers === keys.length) {
+            resolve();
+          } else {
+            assignTaskToWorker(worker);
           }
+        } else {
+          errorOccurred = true;
+          reject(new Error(`Error in worker for language ${result.key}`));
         }
-        sftp.end();
-        resolve();
-      })
-      .catch(() => {
-        sftp.end();
-        reject();
       });
+
+      worker.on('error', (error) => {
+        errorOccurred = true;
+        console.error(`Worker error:`, error);
+        reject(error);
+      });
+
+      assignTaskToWorker(worker);
+    }
   });
 }
 

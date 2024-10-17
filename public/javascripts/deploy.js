@@ -1,8 +1,6 @@
 const allDeploy = document.querySelector(".all-deploy");
-// const selectVal = document.querySelector('[name="lans"]');
 const pre = document.querySelector("pre");
 let { lans } = pre.dataset;
-console.log('这里1')
 lans = JSON.parse(lans);
 let selectVals = [];
 
@@ -58,7 +56,7 @@ lanBox.forEach((item) => {
 });
 
 allDeploy.onclick = () => {
-  if(!selectVals?.length) {
+  if (!selectVals?.length) {
     new LightTip().error("请选择语言");
     return;
   }

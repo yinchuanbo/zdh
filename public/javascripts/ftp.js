@@ -1,3 +1,5 @@
+const socket = io("http://localhost:4000");
+
 const getFiles = document.querySelector(".getFiles");
 const preview = document.querySelector(".preview");
 const upload = document.querySelector(".upload");
@@ -140,12 +142,12 @@ upload.onclick = () => {
       return res.json();
     })
     .then((res) => {
-      if (res?.code === 200 && res?.message === "ftp-upload-success") {
-        new LightTip().success(`${getEnv} 上传 ftp 成功`);
-      } else {
-        new LightTip().error(`${getEnv} 上传 ftp 失败`);
-      }
-      upload.classList.remove("loading");
+      // if (res?.code === 200 && res?.message === "ftp-upload-success") {
+      //   new LightTip().success(`${getEnv} 上传 ftp 成功`);
+      // } else {
+      //   new LightTip().error(`${getEnv} 上传 ftp 失败`);
+      // }
+      // upload.classList.remove("loading");
     });
 };
 
@@ -182,3 +184,29 @@ pullNewCodes.forEach(item => {
       });
   }
 })
+
+const handleSocket = () => {
+  socket.on("connect", () => {
+    console.log("Connected to server");
+  });
+  socket.on("chat message", (msg) => {
+    const { type, message } = msg;
+    if (type === "upload-ftp-success") {
+      new Dialog({
+        title: "Ftp Success Info",
+        content: message,
+      });
+      upload.classList.remove("loading");
+    } else if (type === "upload-ftp-fail") {
+      new Dialog({
+        title: "Ftp Error Info",
+        content: message,
+      });
+      upload.classList.remove("loading");
+    }
+  });
+};
+
+window.addEventListener("load", () => {
+  handleSocket();
+});
