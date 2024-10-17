@@ -9,6 +9,8 @@ const path = require("path");
 const sass = require("sass");
 const io = require("socket.io-client");
 const babel = require("@babel/core");
+const postcss = require("postcss")
+const autoprefixer = require("autoprefixer")
 
 const watcherList = [];
 
@@ -73,8 +75,11 @@ function listenWatch(isWatching, pathname, lans, ports, domain) {
         const result = await sass.compileAsync(filePath, {
           style: "compressed",
         });
-        // const minifiedCss = csso.minify(result.css).css;
-        await fs.writeFile(outputFilePath, result.css);
+
+        const res = await postcss([autoprefixer]).process(result.css, { from: undefined });
+
+
+        await fs.writeFile(outputFilePath, res.css);
         resolve(); // 处理成功
       } catch (writeError) {
         reject(writeError); // 写入文件错误
