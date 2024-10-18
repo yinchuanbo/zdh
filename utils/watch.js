@@ -52,7 +52,7 @@ function listenWatch(isWatching, pathname, lans, ports, domain) {
       const fileContent = await fs.readFile(filePath, "utf-8");
       const presetEnvPath = require.resolve("@babel/preset-env");
       let es5Content = await babel.transformAsync(fileContent, {
-        presets: [[presetEnvPath]],
+        presets: [[presetEnvPath]]
       });
       const minified = await minify(es5Content.code);
       await fs.writeFile(
