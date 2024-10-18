@@ -21,12 +21,10 @@ parentPort.on("message", async ({ key, values, env, configs }) => {
     stream.push(null);
     return stream;
   }
-
   async function getRemoteFileSize(sftp, remoteFilePath) {
     const remoteFileInfo = await sftp.stat(remoteFilePath);
     return remoteFileInfo.size;
   }
-
   function fileHash(readStream) {
     return new Promise((resolve, reject) => {
       const hash = crypto.createHash("sha256");
@@ -41,13 +39,11 @@ parentPort.on("message", async ({ key, values, env, configs }) => {
       });
     });
   }
-
   const sftp = new Client();
   let imgHasPath = [];
-
   try {
+    console.log('尝试链接')
     await sftp.connect(testConn);
-
     for (let i = 0; i < values.length; i++) {
       const dir = values[i];
       let localFilePath = `${LocalList[key]}${dir.replace(/\//g, "\\")}`;
