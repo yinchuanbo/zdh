@@ -1,0 +1,154 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: "JetBrains Mono";
+  font-style: italic;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #555;
+  transition: 0.5s;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  user-select: none;
+  color: #fff;
+}
+
+.wrappper {
+  width: 100%;
+  height: 100vh;
+  background-color: #3c3c3c;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 10px;
+}
+
+.ui-button {
+  border: 0 !important;
+  box-shadow:
+    rgba(0, 0, 0, 0.4) 0px 2px 4px,
+    rgba(0, 0, 0, 0.3) 0px 7px 13px -3px,
+    rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
+}
+
+.ui-input {
+  height: 40px !important;
+  border: 0 !important;
+}
+
+.wrappper__body {
+  width: 100%;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.code-list {
+  width: 100%;
+  height: 100%;
+}
+
+.code-item {
+  width: 100%;
+  height: 60px;
+  background-color: #212121;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 0 20px;
+  justify-content: space-between;
+}
+
+.code-item + .code-item {
+  margin-top: 10px;
+}
+
+.wrappper__header {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+.ui-lightip {
+  height: 50px;
+  top: 30px;
+  z-index: 1000000;
+  border-radius: 0;
+}
+
+.compare-html {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  background: rgb(60, 60, 60);
+}
+
+.compare-header {
+  width: 100%;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  padding: 0 10px;
+}
+
+.compare-body {
+  width: 100%;
+  flex: 1;
+  overflow: auto;
+}
+
+.mergely-editor .CodeMirror {
+  border: 0 !important;
+}
+
+.CodeMirror {
+  background-color: #212121 !important;
+}
+
+.CodeMirror-gutters {
+  border: 0 !important;
+  background-color: #555 !important;
+}
+
+/* .CodeMirror pre.CodeMirror-line {
+    background-color: #000!important;
+  } */
+
+.mergely-editor .mergely.CodeMirror-gutter-background.current {
+  background-color: #000 !important;
+}
+
+.mergely-editor .mergely.c.CodeMirror-linebackground {
+  background-color: #e8e8e8;
+}
+
+.mergely-editor .CodeMirror {
+  border: 0 !important;
+}
+
+.CodeMirror-scrollbar-filler,
+.CodeMirror-gutter-filler {
+  background-color: transparent;
+}

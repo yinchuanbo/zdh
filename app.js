@@ -11,6 +11,7 @@ const deployRouter = require("./routes/deploy");
 const ftpRouter = require("./routes/ftp");
 const loginRouter = require("./routes/login");
 const settingsRouter = require("./routes/settings");
+const coderestorationRouter = require("./routes/code-restoration");
 
 function createApp() {
   const app = express();
@@ -35,6 +36,7 @@ function createApp() {
   app.use("/", indexRouter);
   app.use("/", loginRouter);
   app.use("/", settingsRouter);
+  app.use("/code-restoration", coderestorationRouter);
   app.use("/users", usersRouter);
   app.use("/deploy", deployRouter);
   app.use("/ftp", ftpRouter);
