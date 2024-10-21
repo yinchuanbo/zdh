@@ -708,3 +708,34 @@ select {
 .mergely-editor .mergely.c.CodeMirror-linebackground {
   background-color: #e8e8e8;
 }
+
+.select-text {
+  height: 35px !important;
+  width: 200px !important;
+  margin-left: 10px !important;
+}
+
+.ui-dialog {
+  max-width: 900px;
+  max-height: 500px;
+  overflow: auto;
+  overflow-x: hidden;
+}
+
+.js-error + .js-error {
+  margin-top: 10px;
+}
+
+.js-error span:nth-child(1) {
+  font-weight: 600;
+  color: red;
+}
+
+.js-error span:nth-child(2) {
+  color: #2486ff;
+}
+
+.js-error span:nth-child(3) {
+  color: blueviolet;
+  font-weight: 600;
+}

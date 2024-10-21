@@ -11,6 +11,8 @@ const io = require("socket.io-client");
 const babel = require("@babel/core");
 const postcss = require("postcss")
 const autoprefixer = require("autoprefixer")
+const acorn = require('acorn');
+const { lintFiles } = require("../eslint-integration")
 
 const watcherList = [];
 
@@ -36,9 +38,10 @@ function listenWatch(isWatching, pathname, lans, ports, domain) {
         await item.close();
       });
     }
+    const m = typeof err === "string" ? err : err?.message || "未知错误";
     socket.emit("chat message", {
       type: "watch error",
-      message: err?.message || "未知错误",
+      message: m,
       file,
     });
   }
@@ -47,10 +50,41 @@ function listenWatch(isWatching, pathname, lans, ports, domain) {
     handleError(err);
   });
 
+  function checkSyntax(code) {
+    try {
+      acorn.parse(code, { ecmaVersion: "latest" });
+      return true;
+    } catch (err) {
+      return 'Syntax error:' + err.message;
+    }
+  }
+
+  function checkRuntimeError(code) {
+    try {
+      eval(code);
+      return true;
+    } catch (err) {
+      return 'Runtime error:' + err.message;
+    }
+  }
+
   const compressAndObfuscate = async (filePath, jsOutputDir) => {
     try {
+      try {
+        await lintFiles(filePath)
+      } catch (error) {
+        throw new Error(error)
+      }
       const fileContent = await fs.readFile(filePath, "utf-8");
+
+      const res1 = checkSyntax(fileContent)
+      if (res1 !== true) throw new Error(res1)
+
       const presetEnvPath = require.resolve("@babel/preset-env");
+      // const res1 = checkSyntax(fileContent)
+      // if (res1 !== true) throw new Error(res1)
+      // const res2 = checkRuntimeError(fileContent)
+      // if(res2 !== true) throw new Error(res2)
       let es5Content = await babel.transformAsync(fileContent, {
         presets: [[presetEnvPath]]
       });
@@ -75,10 +109,7 @@ function listenWatch(isWatching, pathname, lans, ports, domain) {
         const result = await sass.compileAsync(filePath, {
           style: "compressed",
         });
-
         const res = await postcss([autoprefixer]).process(result.css, { from: undefined });
-
-
         await fs.writeFile(outputFilePath, res.css);
         resolve(); // 处理成功
       } catch (writeError) {
@@ -180,5 +211,4 @@ function listenWatch(isWatching, pathname, lans, ports, domain) {
 
   return watcherList;
 }
-
 module.exports = listenWatch;

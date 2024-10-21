@@ -123,11 +123,11 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
     </div>
     <ul>
       ${data
-        .map((info) => {
-          const str = generateRandomString(20);
-          let lujing = curDatas2?.[info] || "unknown";
-          if (selectLan === lan) lujing = info;
-          return `<li data-path="${info}" data-path2="${lujing}" data-lan="${lan}">
+      .map((info) => {
+        const str = generateRandomString(20);
+        let lujing = curDatas2?.[info] || "unknown";
+        if (selectLan === lan) lujing = info;
+        return `<li data-path="${info}" data-path2="${lujing}" data-lan="${lan}">
           <div class="check-handle" title="已完成可选中">
             <input type="checkbox" id="${str}" name="${str}">
             <label for="${str}" class="ui-checkbox"></label>
@@ -142,8 +142,8 @@ const createContent = (lan = "en", data = [], data2 = {}, initLan = "en") => {
            <a href="javascript:" class="ui-button ui-button-primary one-deploy" role="button" style="display: ${info.endsWith(".json") ? "none" : ""}">To Test</a>
           </div>
         </li>`;
-        })
-        .join("")}
+      })
+      .join("")}
     </ul>
   </div>`;
 
@@ -687,14 +687,14 @@ const setMerge = (item, lan) => {
         <div class="setCommit_left">
           <select name="from">
               ${data.map((h) => {
-                return `<option class="feat" value="${h}" title="${h}">${h}</option>`;
-              })}
+      return `<option class="feat" value="${h}" title="${h}">${h}</option>`;
+    })}
           </select>
           <p>Mergr To</p>
           <select name="to">
           ${data.map((h) => {
-            return `<option class="feat" value="${h}" title="${h}">${h}</option>`;
-          })}
+      return `<option class="feat" value="${h}" title="${h}">${h}</option>`;
+    })}
           </select>
         </div>
         <div class="setCommit_btns">
@@ -820,6 +820,9 @@ const diffHTML = function (data = {}, lan = "", path = "", initLan = "") {
       <div class="diffHTML-header">
         <a href="javascript:" class="ui-button ui-button-success" id="Prev" role="button">Prev</a>
         <a href="javascript:" class="ui-button ui-button-success" id="Next" role="button">Next</a>
+
+        <input class="ui-input select-text" placeholder="Search...">
+
         <a href="javascript:" data-lan="${lan}" class="ui-button ui-button-primary" id="Save" role="button">Save</a>
         <a href="javascript:" class="ui-button ui-button-warning red_button" id="Cancel" role="button">Cancel</a>
       </div>
@@ -924,6 +927,14 @@ const diffHTML = function (data = {}, lan = "", path = "", initLan = "") {
         Save.classList.remove("loading");
       });
   };
+
+  const selectText = document.querySelector(".select-text")
+  if (selectText) {
+    selectText.onchange = () => {
+      const val = (selectText.value || '').trim()
+      doc.search('rhs', val);
+    }
+  }
 };
 
 const handleNoData = () => {
