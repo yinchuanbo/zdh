@@ -109,7 +109,7 @@ const createContent = (lan = "en", data = [], data2 = {}, data3 = {}, initLan = 
   const html01 = `<div class="header-item active">${lan.toUpperCase()}<div>`;
   const html02 = `<div class="content-item active">
     <div class="content-item-btns">
-    <a href="javascript:" class="ui-button" role="button" disabled style="box-shadow: none;background: transparent;color: #fff;padding-left: 0;padding-right: 0;cursor:default">Branch：${data3[lan]}</a>
+    <a href="javascript:" class="ui-button" role="button" disabled style="box-shadow: none;background: transparent;color: #fff;padding-left: 0;padding-right: 0;cursor:default">${lan}-Branch：${data3[lan]}</a>
       <a href="javascript:" class="ui-button ui-button-warning pull-code" role="button" data-lan="${lan}">Pull</a>
       <a href="javascript:" class="ui-button ui-button-primary discard-code" role="button" data-lan="${lan}"  style="display: ${selectLan === lan ? "none" : ""}">Discard</a>
       <a href="javascript:" class="ui-button ui-button-primary commit-code" role="button" data-lan="${lan}" style="display: none">Commit</a>
