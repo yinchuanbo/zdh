@@ -3,8 +3,20 @@ const { execSync } = require("child_process");
 const fs = require("fs").promises;
 const path = require("path");
 
+function getCurrentBranchName(folderPath) {
+  try {
+    const branchName = execSync('git rev-parse --abbrev-ref HEAD', {
+      cwd: folderPath,
+      encoding: 'utf-8'
+    });
+    return branchName.trim();
+  } catch (error) {
+    console.error(`无法获取分支名: ${error.message}`);
+    return null;
+  }
+}
+
 async function getFileFunc(onlyLan = "en", asyncLans = [], commitIds = "", configs) {
-  // 验证配置
   if (!configs || !configs.localPaths || !configs.LocalListPro) {
     throw new Error("Invalid configuration");
   }
@@ -12,7 +24,6 @@ async function getFileFunc(onlyLan = "en", asyncLans = [], commitIds = "", confi
   const folderList = configs.localPaths;
   let allData = {};
 
-  // 将 getAllCommitName 移到外部
   const getAllCommitName = async (commitList, lanPath) => {
     let fileNameArr = [];
     for (const commit of commitList) {
@@ -70,12 +81,22 @@ async function getFileFunc(onlyLan = "en", asyncLans = [], commitIds = "", confi
     } catch (error) {
       console.error(`执行Git命令时出错: ${error.message}`);
     }
+    // console.log('configs.localPaths', configs.localPaths[lanName])
+  }
+  const cbObj = {};
+  for (let i = 0; i < asyncLans.length; i++) {
+    const asyncLan = asyncLans[i];
+    const lanP = configs.localPaths[asyncLan]
+    const cB = getCurrentBranchName(lanP)
+    cbObj[asyncLan] = cB;
+    // 获取 lanP 文件夹下当前分支名
   }
   await handleAsyncLans(allData[onlyLan], asyncLans, onlyLan, configs);
   const jsContent = `module.exports = ${JSON.stringify(allData, null, 2)};`;
   const outputPath = getDynamicFilePath('output.js');
   await fs.mkdir(path.dirname(outputPath), { recursive: true });
   await fs.writeFile(outputPath, jsContent);
+  return cbObj
 }
 
 async function findTplFiles(dirPath) {
@@ -114,6 +135,7 @@ async function handleAsyncLans(oLan, aLan, onlyLan, configs) {
   const obj = {};
   for (const al of aLan) {
     const alP = configs.LocalListPro[al];
+    console.log('alP', alP)
     obj[al] = {};
     for (const ol of oLan) {
       if (ol.endsWith(".tpl") && ol.split("/").length === 2) {
