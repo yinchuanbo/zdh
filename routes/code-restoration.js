@@ -39,6 +39,13 @@ router.post("/get-code-restoration", authenticateToken, async function (req, res
 });
 
 router.post("/get-code-content", authenticateToken, async function (req, res, next) {
+  if (!res.app.locals.isW) {
+    res.json({
+      code: 200,
+      message: "请先开启 Watching",
+    });
+    return;
+  }
   const { pathVal, commitVal, fileP } = req.body;
   try {
     const ress = await getFileContentsForCommit({
@@ -60,13 +67,6 @@ router.post("/get-code-content", authenticateToken, async function (req, res, ne
   }
 });
 router.post("/save-code", authenticateToken, async function (req, res, next) {
-  if (!res.app.locals.isW) {
-    res.json({
-      code: 200,
-      message: "请先开启 Watching",
-    });
-    return;
-  }
   const { pathVal, filename, content } = req.body;
   try {
     await setFile({
@@ -81,8 +81,8 @@ router.post("/save-code", authenticateToken, async function (req, res, next) {
   } catch (error) {
     res.json({
       code: 200,
-      data: [],
-      message: error?.message || error,
+      data: error?.message || error,
+      message: "code-save-fail",
     });
   }
 });

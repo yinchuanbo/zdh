@@ -41,7 +41,7 @@ const handleSocket = () => {
   socket.on("chat message", (msg) => {
     const { type, message, file } = msg;
     if (type === "watch error") {
-      isWatching = !isWatching;
+      isWatching = false;
       if (isWatching) {
         watchBtn.classList.add("watching");
       } else {

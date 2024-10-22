@@ -45,8 +45,8 @@ const renderList = ({ data = [] }) => {
         return res.json();
       }).then(res => {
         if (res?.message === 'code-content-success') {
-          const { filename, beforeContent, afterContent } = res?.data;
-          renderCompareHTML({ filename, beforeContent, afterContent, pathVal })
+          const { filename, beforeContent, afterContent, changedLines } = res?.data;
+          renderCompareHTML({ filename, beforeContent, afterContent, pathVal, backBtn: item, changedLines })
         } else {
           new LightTip().error(res?.message);
         }
@@ -55,10 +55,20 @@ const renderList = ({ data = [] }) => {
   })
 }
 
-function renderCompareHTML({ filename, beforeContent, afterContent, pathVal }) {
+function renderCompareHTML({ filename, beforeContent, afterContent, pathVal, backBtn, changedLines = [] }) {
   const html = `
     <div class="compare-html">
       <div class="compare-header">
+        <a href="javascript:"class="ui-button ui-button-primary" id="PrevCode" role="button">Prev</a>
+        <a href="javascript:"class="ui-button ui-button-primary" id="NextCode" role="button">Next</a>
+        <input class="ui-input" id="SearchCode" placeholder="Search..." />
+        <select id="SelectCode">
+          <option value="">选择差异行数</option>
+          ${changedLines.map(item => {
+    return `<option value="${item}">${item}</option>`
+  })
+    }
+      </select>
         <a href="javascript:"class="ui-button ui-button-primary" id="SaveCode" role="button">Save</a>
         <a href="javascript:" class="ui-button ui-button-warning red_button" id="CancelCode" role="button">Cancel</a>
       </div>
@@ -98,9 +108,13 @@ function renderCompareHTML({ filename, beforeContent, afterContent, pathVal }) {
       return res.json();
     }).then(res => {
       if (res?.message !== 'code-save-success') {
-        new LightTip().error(res?.message);
+        new Dialog({
+          title: "Error Info",
+          content: res?.data,
+        });
       } else {
         doc = null;
+        if (backBtn) backBtn.parentNode.classList.add('b')
         compareHtml.remove();
       }
     })
@@ -109,12 +123,20 @@ function renderCompareHTML({ filename, beforeContent, afterContent, pathVal }) {
     doc = null;
     compareHtml.remove();
   }
-  // Prev.onclick = () => {
-  //   doc.scrollToDiff("prev");
-  // };
-  // Next.onclick = () => {
-  //   doc.scrollToDiff("next");
-  // };
+  PrevCode.onclick = () => {
+    doc.scrollToDiff("prev");
+  };
+  NextCode.onclick = () => {
+    doc.scrollToDiff("next");
+  };
+  SearchCode.onchange = () => {
+    const val = SearchCode.value.trim()
+    doc.search('rhs', val);
+  }
+  SelectCode.onchange = () => {
+    const val = SelectCode.value.trim()
+    doc.scrollTo('rhs', Number(val || 0));
+  }
 }
 
 okBtn.onclick = () => {

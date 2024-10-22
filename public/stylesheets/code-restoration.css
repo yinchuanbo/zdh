@@ -76,6 +76,11 @@ body {
   justify-content: space-between;
 }
 
+.code-item.b {
+  border: 1px dashed #000;
+  opacity: 0.5;
+}
+
 .code-item + .code-item {
   margin-top: 10px;
 }
@@ -151,4 +156,54 @@ body {
 .CodeMirror-scrollbar-filler,
 .CodeMirror-gutter-filler {
   background-color: transparent;
+}
+
+#SaveCode {
+  margin-left: auto;
+}
+
+.ui-dialog {
+  max-width: 900px;
+  max-height: 500px;
+  overflow: auto;
+  overflow-x: hidden;
+}
+
+.js-error + .js-error {
+  margin-top: 10px;
+}
+
+.js-error span:nth-child(1) {
+  font-weight: 600;
+  color: red;
+}
+
+.js-error span:nth-child(2) {
+  color: #2486ff;
+}
+
+.js-error span:nth-child(3) {
+  color: blueviolet;
+  font-weight: 600;
+}
+
+.ui-dialog-container {
+  z-index: 100000;
+}
+
+select {
+  opacity: 1;
+  outline: none;
+  font-family: "JetBrains Mono";
+  border-right-width: 1px;
+  color: #4c5161;
+  outline: none;
+  padding: 0 5px;
+  border-right-width: 5px;
+  border-color: transparent;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 500;
+  font-weight: 500;
+  width: 140px;
 }

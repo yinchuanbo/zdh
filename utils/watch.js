@@ -59,32 +59,17 @@ function listenWatch(isWatching, pathname, lans, ports, domain) {
     }
   }
 
-  function checkRuntimeError(code) {
-    try {
-      eval(code);
-      return true;
-    } catch (err) {
-      return 'Runtime error:' + err.message;
-    }
-  }
-
   const compressAndObfuscate = async (filePath, jsOutputDir) => {
     try {
       try {
-        await lintFiles(filePath)
+        await lintFiles({ filePath })
       } catch (error) {
         throw new Error(error)
       }
       const fileContent = await fs.readFile(filePath, "utf-8");
-
       const res1 = checkSyntax(fileContent)
       if (res1 !== true) throw new Error(res1)
-
       const presetEnvPath = require.resolve("@babel/preset-env");
-      // const res1 = checkSyntax(fileContent)
-      // if (res1 !== true) throw new Error(res1)
-      // const res2 = checkRuntimeError(fileContent)
-      // if(res2 !== true) throw new Error(res2)
       let es5Content = await babel.transformAsync(fileContent, {
         presets: [[presetEnvPath]]
       });
