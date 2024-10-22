@@ -19,11 +19,20 @@ let curP = null;
 let data2Info = {};
 
 function openFullScreenWindow(url) {
-  const newWindow = window.open(url, '_blank', 'width=' + window.screen.width + ',height=' + window.screen.height + ',left=0,top=0');
-  if (newWindow) {
-    newWindow.focus();
+  const isWeb = navigator.userAgent.includes("Electron");
+  if (!isWeb) {
+    window.open(url, '_blank');
   } else {
-    alert('请允许弹出窗口');
+    const newWindow = window.open(
+      url,
+      '_blank',
+      'width=' + window.screen.width + ',height=' + window.screen.height + ',left=0,top=0'
+    );
+    if (newWindow) {
+      newWindow.focus();
+    } else {
+      alert('请允许弹出窗口');
+    }
   }
 }
 
