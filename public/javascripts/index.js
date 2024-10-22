@@ -124,7 +124,7 @@ const createContent = (lan = "en", data = [], data2 = {}, data3 = {}, initLan = 
   const header = document.querySelector(".wrappper__content-header");
   const content = document.querySelector(".wrappper__content-content");
   const curDatas2 = data2[lan];
-  const html01 = `<div class="header-item active">${lan.toUpperCase()}<span title="${data3[lan]}">&nbsp;${data3[lan]}</span><div>`;
+  const html01 = `<div class="header-item active">${lan.toUpperCase()}<span title="${data3[lan]}">${data3[lan]}</span><div>`;
   const html02 = `<div class="content-item active">
     <div class="content-item-btns">
       <a href="javascript:" class="ui-button ui-button-warning pull-code" role="button" data-lan="${lan}">Pull</a>

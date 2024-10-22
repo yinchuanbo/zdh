@@ -78,7 +78,7 @@ body {
   height: 100%;
   padding: 20px;
   padding-right: 15px;
-  padding-top: 10px;
+  padding-top: 15px;
   background-color: #3c3c3c;
 }
 
@@ -171,6 +171,17 @@ body {
 }
 
 .header-item span {
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  background-color: #2486ff;
+  border-radius: 10px;
+  font-size: 10px;
+  height: 16px;
+  line-height: 16px;
+  color: #fff;
+  padding: 0 5px;
+  margin: 0;
   display: none;
 }
 
@@ -180,7 +191,10 @@ body {
 
 .header-item.active span {
   display: initial;
-  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 90px;
 }
 
 .header-item.active::before {
