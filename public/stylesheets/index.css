@@ -524,6 +524,23 @@ select {
   justify-content: center;
 }
 
+.pull-code sup {
+  position: absolute;
+  top: 11px;
+  left: -26px;
+  background: blueviolet;
+  padding: 0 5px;
+  border-radius: 10px;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pull-code.loading sup {
+  display: none;
+}
+
 .no-data p {
   transform: translateY(50px);
   color: #ddd;
