@@ -1,6 +1,7 @@
 const settings = require("./settings");
 const prettier = require("prettier");
 const pathModule = require("path");
+const { execSync } = require("child_process");
 const fs = require("fs");
 const fs2 = require('fs').promises;
 
@@ -86,8 +87,19 @@ async function deleteFile({ lan, path2, LocalListPro }) {
   }
 }
 
+async function openVsCode({ lan, localPaths }) {
+  const dPath = localPaths[lan];
+  try {
+    const stdout = execSync(`code ${dPath}`, { stdio: "inherit" });
+    return Promise.resolve()
+  } catch (err) {
+    return Promise.reject(err)
+  }
+}
+
 module.exports = {
   copyAndMoveImg,
   getFileContent,
-  deleteFile
+  deleteFile,
+  openVsCode
 };

@@ -137,6 +137,7 @@ const createContent = (lan = "en", data = [], data2 = {}, data3 = {}, initLan = 
       <a href="javascript:" class="ui-button ui-button-primary dey-to-pro" role="button" data-lan="${lan}" style="display: none">上传至 ${lan} Pro Ftp</a>
       <a href="javascript:" class="ui-button ui-button-primary all-img" style="display: ${selectLan === lan ? "none" : ""}" role="button" data-lan="${lan}">Resource Batching</a>
       <a href="javascript:" class="ui-button ui-button-success publish" role="button" data-lan="${lan}">Publish</a>
+      <a href="javascript:" class="ui-button ui-button-success vs-code" role="button" data-lan="${lan}">Vs Code</a>
     </div>
     <ul>
       ${data
@@ -193,6 +194,7 @@ const createContent = (lan = "en", data = [], data2 = {}, data3 = {}, initLan = 
   const discardCode = document.querySelectorAll(".discard-code");
   const mergeCodes = document.querySelectorAll(".merge-code");
   const deleteFiles = document.querySelectorAll(".delete");
+  const vsCodes = document.querySelectorAll(".vs-code");
 
   new Tips($(".jsRTips"), {
     align: "top",
@@ -572,6 +574,20 @@ const createContent = (lan = "en", data = [], data2 = {}, data3 = {}, initLan = 
             new LightTip().error(data);
           }
         })
+    }
+  })
+  vsCodes.forEach((item) => {
+    item.onclick = () => {
+      const { lan } = item.dataset;
+      fetch("/open-vscode", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          lan
+        }),
+      })
     }
   })
 };

@@ -13,7 +13,7 @@ const mergeCode = require("../utils/merge-code");
 const getBranchs = require("../utils/get-branchs");
 const io = require("socket.io-client");
 
-const { copyAndMoveImg, getFileContent, deleteFile } = require("../utils/handle-file");
+const { copyAndMoveImg, getFileContent, deleteFile, openVsCode } = require("../utils/handle-file");
 const { authenticateToken } = require("../permissions");
 var router = express.Router();
 
@@ -176,6 +176,7 @@ router.post("/receive-files", authenticateToken, async (req, res) => {
     });
   }
 });
+
 router.post("/delete-file", authenticateToken, async (req, res) => {
   const { LocalListPro } = getConf(req.uname, res);
   const { path2, lan } = req.body;
@@ -190,6 +191,27 @@ router.post("/delete-file", authenticateToken, async (req, res) => {
     res.json({
       code: 200,
       message: "delete-fail",
+      data: error?.message || error,
+    });
+  }
+
+});
+
+router.post("/open-vscode", authenticateToken, async (req, res) => {
+  const configs = getConf(req.uname, res);
+  console.log('configs', configs)
+  const { lan } = req.body;
+  try {
+    await openVsCode({ lan, localPaths: configs.localPaths })
+    res.json({
+      code: 200,
+      message: "open-vscode-success",
+      data: '',
+    });
+  } catch (error) {
+    res.json({
+      code: 200,
+      message: "open-vscode-fail",
       data: error?.message || error,
     });
   }
