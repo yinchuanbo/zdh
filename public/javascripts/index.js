@@ -18,6 +18,15 @@ let curP = null;
 
 let data2Info = {};
 
+function openFullScreenWindow(url) {
+  const newWindow = window.open(url, '_blank', 'width=' + window.screen.width + ',height=' + window.screen.height + ',left=0,top=0');
+  if (newWindow) {
+    newWindow.focus();
+  } else {
+    alert('请允许弹出窗口');
+  }
+}
+
 const setWatch = () => {
   fetch("/watching?bool=" + isWatching);
 };
@@ -139,6 +148,7 @@ const createContent = (lan = "en", data = [], data2 = {}, data3 = {}, initLan = 
           <div class="btns">
            <a href="javascript:" class="ui-button ui-button-primary async-res" style="display: ${selectLan === lan ? "none" : ""}" role="button">${info.startsWith("img/") ? "Async" : "Diff"}</a>
            <a href="javascript:" class="ui-button ui-button-primary one-deploy" role="button" style="display: ${info.endsWith(".json") ? "none" : ""}">To Test</a>
+           <a href="javascript:" class="ui-button ui-button-warning delete" role="button">Delete</a>
           </div>
         </li>`;
       })
@@ -173,6 +183,7 @@ const createContent = (lan = "en", data = [], data2 = {}, data3 = {}, initLan = 
   const commitCode = document.querySelectorAll(".commit-code");
   const discardCode = document.querySelectorAll(".discard-code");
   const mergeCodes = document.querySelectorAll(".merge-code");
+  const deleteFiles = document.querySelectorAll(".delete");
 
   new Tips($(".jsRTips"), {
     align: "top",
@@ -527,6 +538,33 @@ const createContent = (lan = "en", data = [], data2 = {}, data3 = {}, initLan = 
       setMerge(item, lan);
     };
   });
+
+  deleteFiles.forEach((item) => {
+    item.onclick = () => {
+      const { path2, lan } = item.parentNode.parentNode.dataset;
+      fetch("/delete-file", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          path2,
+          lan
+        }),
+      })
+        .then((res) => {
+          return res.json();
+        }).then(res => {
+          const { message, data } = res;
+          if (message === 'delete-success') {
+            new LightTip().success('删除成功');
+            item.parentNode.parentElement.remove()
+          } else {
+            new LightTip().error(data);
+          }
+        })
+    }
+  })
 };
 
 const setCommit = (item, lan, hasCommit = false, result = {}) => {

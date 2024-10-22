@@ -13,7 +13,7 @@ const mergeCode = require("../utils/merge-code");
 const getBranchs = require("../utils/get-branchs");
 const io = require("socket.io-client");
 
-const { copyAndMoveImg, getFileContent } = require("../utils/handle-file");
+const { copyAndMoveImg, getFileContent, deleteFile } = require("../utils/handle-file");
 const { authenticateToken } = require("../permissions");
 var router = express.Router();
 
@@ -175,6 +175,25 @@ router.post("/receive-files", authenticateToken, async (req, res) => {
       data: result,
     });
   }
+});
+router.post("/delete-file", authenticateToken, async (req, res) => {
+  const { LocalListPro } = getConf(req.uname, res);
+  const { path2, lan } = req.body;
+  try {
+    await deleteFile({ path2, lan, LocalListPro })
+    res.json({
+      code: 200,
+      message: "delete-success",
+      data: '',
+    });
+  } catch (error) {
+    res.json({
+      code: 200,
+      message: "delete-fail",
+      data: error?.message || error,
+    });
+  }
+
 });
 
 router.post("/receive-imgs", authenticateToken, async (req, res) => {

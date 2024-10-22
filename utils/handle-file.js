@@ -2,11 +2,12 @@ const settings = require("./settings");
 const prettier = require("prettier");
 const pathModule = require("path");
 const fs = require("fs");
+const fs2 = require('fs').promises;
 
 function copyAndMoveImg({ path, lan, initLan, LocalListPro }) {
   const initPath = LocalListPro[initLan] + path.replaceAll("/", "\\");
   const nowPath = LocalListPro[lan] + path.replaceAll("/", "\\");
-  
+
   try {
     fs.copyFileSync(initPath, nowPath);
     return Promise.resolve();
@@ -73,7 +74,20 @@ async function getFileContent({ path, lan, initLan, path2, LocalListPro }) {
   };
 }
 
+async function deleteFile({ lan, path2, LocalListPro }) {
+  const dPath = LocalListPro[lan] + path2.replaceAll("/", "\\");
+  console.log('dPath', dPath)
+  try {
+    await fs2.unlink(dPath);
+    return ''
+  } catch (err) {
+    console.log('skdjfskjdfsdf', err)
+    return Promise.reject(err)
+  }
+}
+
 module.exports = {
   copyAndMoveImg,
   getFileContent,
+  deleteFile
 };
