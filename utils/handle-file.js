@@ -1,9 +1,10 @@
 const settings = require("./settings");
 const prettier = require("prettier");
 const pathModule = require("path");
-const { execSync } = require("child_process");
+const { execSync, exec } = require("child_process");
 const fs = require("fs");
-const fs2 = require('fs').promises;
+const fs2 = require("fs").promises;
+const os = require("os");
 
 function copyAndMoveImg({ path, lan, initLan, LocalListPro }) {
   const initPath = LocalListPro[initLan] + path.replaceAll("/", "\\");
@@ -77,13 +78,13 @@ async function getFileContent({ path, lan, initLan, path2, LocalListPro }) {
 
 async function deleteFile({ lan, path2, LocalListPro }) {
   const dPath = LocalListPro[lan] + path2.replaceAll("/", "\\");
-  console.log('dPath', dPath)
+  console.log("dPath", dPath);
   try {
     await fs2.unlink(dPath);
-    return ''
+    return "";
   } catch (err) {
-    console.log('skdjfskjdfsdf', err)
-    return Promise.reject(err)
+    console.log("skdjfskjdfsdf", err);
+    return Promise.reject(err);
   }
 }
 
@@ -91,18 +92,46 @@ async function openVsCode({ lan, localPaths }) {
   const dPath = localPaths[lan];
   try {
     const stdout = execSync(`code ${dPath}`, { stdio: "inherit" });
-    return Promise.resolve()
+    return Promise.resolve();
   } catch (err) {
-    return Promise.reject(err)
+    return Promise.reject(err);
   }
+}
+
+function openUrl(url) {
+  const platform = os.platform();
+
+  let command;
+
+  if (platform === "win32") {
+    // Windows 使用 'start' 命令
+    command = `start ${url}`;
+  } else if (platform === "darwin") {
+    // macOS 使用 'open' 命令
+    command = `open ${url}`;
+  } else if (platform === "linux") {
+    // Linux 使用 'xdg-open' 命令
+    command = `xdg-open ${url}`;
+  } else {
+    console.error("Unsupported platform:", platform);
+    return;
+  }
+
+  exec(command, (error) => {
+    if (error) {
+      console.error("Failed to open URL:", error);
+    } else {
+      console.log(`Opened ${url} in the default browser`);
+    }
+  });
 }
 
 async function openSite({ lan, ports, domain }) {
   const port = ports[lan];
   try {
-    return Promise.resolve(`https://${domain}:${port}/preview`)
+    return Promise.resolve(`https://${domain}:${port}/preview`);
   } catch (err) {
-    return Promise.reject(err)
+    return Promise.reject(err);
   }
 }
 
@@ -111,5 +140,5 @@ module.exports = {
   getFileContent,
   deleteFile,
   openVsCode,
-  openSite
+  openSite,
 };

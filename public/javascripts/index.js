@@ -147,7 +147,7 @@ const createContent = (
       <a href="javascript:" class="ui-button ui-button-primary all-img" style="display: ${selectLan === lan ? "none" : ""}" role="button" data-lan="${lan}">Resource Batching</a>
       <a href="javascript:" class="ui-button ui-button-primary publish" role="button" data-lan="${lan}">Publish</a>
       <a href="javascript:" class="ui-button ui-button-primary vs-code" role="button" data-lan="${lan}">Vs Code</a>
-      <a href="javascript:" class="ui-button ui-button-primary open-site" role="button" data-lan="${lan}">Open Site</a>
+      <a href="javascript:" class="ui-button ui-button-primary open-site" role="button" data-lan="${lan}">Copy URL</a>
     </div>
     <ul>
       ${data
@@ -619,12 +619,25 @@ const createContent = (
         })
         .then((res) => {
           if (res?.data) {
-            window.open(res.data);
+            copyToClipboard(res.data);
           }
         });
     };
   });
 };
+
+function copyToClipboard(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        new LightTip().success("复制成功");
+      })
+      .catch((err) => {
+        new LightTip().error("复制失败");
+      });
+  }
+}
 
 const setCommit = (item, lan, hasCommit = false, result = {}) => {
   let type = "";
@@ -1202,6 +1215,27 @@ allPull.onclick = () => {
       lans: selectedValues,
     }),
   });
+};
+
+const iframeCover = (src = "") => {
+  const html = `
+    <div class="iframe-cover">
+        <iframe
+          src=${src}
+          frameborder="0"
+          scrolling="no"
+          width="100%"
+          height="100%">
+        </iframe>
+        <div class="iframe-cover-close">x</div>
+    </div>
+  `;
+  document.body.insertAdjacentHTML("beforeend", html);
+  const close = document.querySelector(".iframe-cover-close");
+  close.onclick = () => {
+    const iframeCover = document.querySelector(".iframe-cover");
+    iframeCover.remove();
+  };
 };
 
 window.addEventListener("load", () => {
