@@ -353,7 +353,7 @@ body {
 .diffHTML {
   position: fixed;
   inset: 0;
-  background-color: #3c3c3c;
+  background-color: #212121;
   z-index: 10000;
   display: flex;
   flex-direction: column;
@@ -778,4 +778,8 @@ select {
 .js-error span:nth-child(3) {
   color: blueviolet;
   font-weight: 600;
+}
+
+.monaco-editor {
+  position: relative;
 }

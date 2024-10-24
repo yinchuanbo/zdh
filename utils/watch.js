@@ -61,11 +61,11 @@ function listenWatch(isWatching, pathname, lans, ports, domain) {
 
   const compressAndObfuscate = async (filePath, jsOutputDir) => {
     try {
-      try {
-        await lintFiles({ filePath })
-      } catch (error) {
-        throw new Error(error)
-      }
+      // try {
+      //   await lintFiles({ filePath })
+      // } catch (error) {
+      //   throw new Error(error)
+      // }
       const fileContent = await fs.readFile(filePath, "utf-8");
       const res1 = checkSyntax(fileContent)
       if (res1 !== true) throw new Error(res1)

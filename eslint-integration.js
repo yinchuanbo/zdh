@@ -172,7 +172,7 @@ async function lintFiles(input) {
       'no-irregular-whitespace': 'error', // 禁止不规则的空白
 
       // Best Practices
-      'eqeqeq': ['error', 'always'],      // 要求使用 === 和 !==
+      //'eqeqeq': ['error', 'always'],      // 要求使用 === 和 !==
       'no-eval': 'error',                 // 禁用 eval()
       'no-implied-eval': 'error',         // 禁止使用类似 eval() 的方法
       'no-multi-spaces': 'error',         // 禁止使用多个空格

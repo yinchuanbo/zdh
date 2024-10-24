@@ -13,7 +13,7 @@ const mergeCode = require("../utils/merge-code");
 const getBranchs = require("../utils/get-branchs");
 const io = require("socket.io-client");
 
-const { copyAndMoveImg, getFileContent, deleteFile, openVsCode } = require("../utils/handle-file");
+const { copyAndMoveImg, getFileContent, deleteFile, openVsCode, openSite } = require("../utils/handle-file");
 const { authenticateToken } = require("../permissions");
 var router = express.Router();
 
@@ -199,7 +199,6 @@ router.post("/delete-file", authenticateToken, async (req, res) => {
 
 router.post("/open-vscode", authenticateToken, async (req, res) => {
   const configs = getConf(req.uname, res);
-  console.log('configs', configs)
   const { lan } = req.body;
   try {
     await openVsCode({ lan, localPaths: configs.localPaths })
@@ -213,6 +212,24 @@ router.post("/open-vscode", authenticateToken, async (req, res) => {
       code: 200,
       message: "open-vscode-fail",
       data: error?.message || error,
+    });
+  }
+
+});
+
+router.post("/open-site", authenticateToken, async (req, res) => {
+  const configs = getConf(req.uname, res);
+  const { lan } = req.body;
+  try {
+    const url = await openSite({ lan, ports: configs.ports, domain: configs.domain })
+    res.json({
+      code: 200,
+      data: url,
+    });
+  } catch (error) {
+    res.json({
+      code: 200,
+      data: ''
     });
   }
 

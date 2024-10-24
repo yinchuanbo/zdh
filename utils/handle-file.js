@@ -97,9 +97,19 @@ async function openVsCode({ lan, localPaths }) {
   }
 }
 
+async function openSite({ lan, ports, domain }) {
+  const port = ports[lan];
+  try {
+    return Promise.resolve(`https://${domain}:${port}/preview`)
+  } catch (err) {
+    return Promise.reject(err)
+  }
+}
+
 module.exports = {
   copyAndMoveImg,
   getFileContent,
   deleteFile,
-  openVsCode
+  openVsCode,
+  openSite
 };

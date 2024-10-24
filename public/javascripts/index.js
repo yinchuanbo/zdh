@@ -21,17 +21,21 @@ let data2Info = {};
 function openFullScreenWindow(url) {
   const isWeb = navigator.userAgent.includes("Electron");
   if (!isWeb) {
-    window.open(url, '_blank');
+    window.open(url, "_blank");
   } else {
     const newWindow = window.open(
       url,
-      '_blank',
-      'width=' + window.screen.width + ',height=' + window.screen.height + ',left=0,top=0'
+      "_blank",
+      "width=" +
+        window.screen.width +
+        ",height=" +
+        window.screen.height +
+        ",left=0,top=0"
     );
     if (newWindow) {
       newWindow.focus();
     } else {
-      alert('请允许弹出窗口');
+      alert("请允许弹出窗口");
     }
   }
 }
@@ -119,7 +123,13 @@ function getRandomHexColor() {
   return `#${randomColor}`;
 }
 
-const createContent = (lan = "en", data = [], data2 = {}, data3 = {}, initLan = "en") => {
+const createContent = (
+  lan = "en",
+  data = [],
+  data2 = {},
+  data3 = {},
+  initLan = "en"
+) => {
   data2Info = data2;
   const header = document.querySelector(".wrappper__content-header");
   const content = document.querySelector(".wrappper__content-content");
@@ -135,16 +145,17 @@ const createContent = (lan = "en", data = [], data2 = {}, data3 = {}, initLan = 
       <a href="javascript:" class="ui-button ui-button-primary dey-to-test" role="button" data-lan="${lan}" style="display: none">上传至 ${lan} Test Ftp</a>
       <a href="javascript:" class="ui-button ui-button-primary dey-to-pro" role="button" data-lan="${lan}" style="display: none">上传至 ${lan} Pro Ftp</a>
       <a href="javascript:" class="ui-button ui-button-primary all-img" style="display: ${selectLan === lan ? "none" : ""}" role="button" data-lan="${lan}">Resource Batching</a>
-      <a href="javascript:" class="ui-button ui-button-success publish" role="button" data-lan="${lan}">Publish</a>
-      <a href="javascript:" class="ui-button ui-button-success vs-code" role="button" data-lan="${lan}">Vs Code</a>
+      <a href="javascript:" class="ui-button ui-button-primary publish" role="button" data-lan="${lan}">Publish</a>
+      <a href="javascript:" class="ui-button ui-button-primary vs-code" role="button" data-lan="${lan}">Vs Code</a>
+      <a href="javascript:" class="ui-button ui-button-primary open-site" role="button" data-lan="${lan}">Open Site</a>
     </div>
     <ul>
       ${data
-      .map((info) => {
-        const str = generateRandomString(20);
-        let lujing = curDatas2?.[info] || "unknown";
-        if (selectLan === lan) lujing = info;
-        return `<li data-path="${info}" data-path2="${lujing}" data-lan="${lan}">
+        .map((info) => {
+          const str = generateRandomString(20);
+          let lujing = curDatas2?.[info] || "unknown";
+          if (selectLan === lan) lujing = info;
+          return `<li data-path="${info}" data-path2="${lujing}" data-lan="${lan}">
           <div class="check-handle" title="已完成可选中">
             <input type="checkbox" id="${str}" name="${str}">
             <label for="${str}" class="ui-checkbox"></label>
@@ -157,11 +168,11 @@ const createContent = (lan = "en", data = [], data2 = {}, data3 = {}, initLan = 
           <div class="btns">
            <a href="javascript:" class="ui-button ui-button-primary async-res" style="display: ${selectLan === lan ? "none" : ""}" role="button">${info.startsWith("img/") ? "Async" : "Diff"}</a>
            <a href="javascript:" class="ui-button ui-button-primary one-deploy" role="button" style="display: ${info.endsWith(".json") ? "none" : ""}">To Test</a>
-           <a href="javascript:" class="ui-button ui-button-warning delete" role="button">Delete</a>
+           <a href="javascript:" class="ui-button ui-button-warning delete" style="display: none" role="button">Delete</a>
           </div>
         </li>`;
-      })
-      .join("")}
+        })
+        .join("")}
     </ul>
   </div>`;
 
@@ -194,6 +205,7 @@ const createContent = (lan = "en", data = [], data2 = {}, data3 = {}, initLan = 
   const mergeCodes = document.querySelectorAll(".merge-code");
   const deleteFiles = document.querySelectorAll(".delete");
   const vsCodes = document.querySelectorAll(".vs-code");
+  const openSite = document.querySelectorAll(".open-site");
 
   new Tips($(".jsRTips"), {
     align: "top",
@@ -559,22 +571,23 @@ const createContent = (lan = "en", data = [], data2 = {}, data3 = {}, initLan = 
         },
         body: JSON.stringify({
           path2,
-          lan
+          lan,
         }),
       })
         .then((res) => {
           return res.json();
-        }).then(res => {
+        })
+        .then((res) => {
           const { message, data } = res;
-          if (message === 'delete-success') {
-            new LightTip().success('删除成功');
-            item.parentNode.parentElement.remove()
+          if (message === "delete-success") {
+            new LightTip().success("删除成功");
+            item.parentNode.parentElement.remove();
           } else {
             new LightTip().error(data);
           }
-        })
-    }
-  })
+        });
+    };
+  });
   vsCodes.forEach((item) => {
     item.onclick = () => {
       const { lan } = item.dataset;
@@ -584,11 +597,33 @@ const createContent = (lan = "en", data = [], data2 = {}, data3 = {}, initLan = 
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          lan
+          lan,
+        }),
+      });
+    };
+  });
+  openSite.forEach((item) => {
+    item.onclick = () => {
+      const { lan } = item.dataset;
+      fetch("/open-site", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          lan,
         }),
       })
-    }
-  })
+        .then((res) => {
+          return res.json();
+        })
+        .then((res) => {
+          if (res?.data) {
+            window.open(res.data);
+          }
+        });
+    };
+  });
 };
 
 const setCommit = (item, lan, hasCommit = false, result = {}) => {
@@ -748,14 +783,14 @@ const setMerge = (item, lan) => {
         <div class="setCommit_left">
           <select name="from">
               ${data.map((h) => {
-      return `<option class="feat" value="${h}" title="${h}">${h}</option>`;
-    })}
+                return `<option class="feat" value="${h}" title="${h}">${h}</option>`;
+              })}
           </select>
           <p>Mergr To</p>
           <select name="to">
           ${data.map((h) => {
-      return `<option class="feat" value="${h}" title="${h}">${h}</option>`;
-    })}
+            return `<option class="feat" value="${h}" title="${h}">${h}</option>`;
+          })}
           </select>
         </div>
         <div class="setCommit_btns">
@@ -814,9 +849,9 @@ const setMerge = (item, lan) => {
   }
 };
 
-let originalModel, modifiedModel, diffEditor;
+let originalModel, modifiedModel, diffEditor, diffNavigator;
 
-function setEditor(path = "", originalText = "", modifiedText = "") {
+function setEditor(path = "", modifiedText = "", originalText = "") {
   if (originalModel) originalModel.dispose();
   if (modifiedModel) modifiedModel.dispose();
   if (diffEditor) diffEditor.dispose();
@@ -824,6 +859,7 @@ function setEditor(path = "", originalText = "", modifiedText = "") {
   modifiedModel = null;
   originalModel = null;
   diffEditor = null;
+  diffNavigator = null;
 
   require.config({
     paths: {
@@ -871,6 +907,26 @@ function setEditor(path = "", originalText = "", modifiedText = "") {
       original: originalModel,
       modified: modifiedModel,
     });
+    // 创建差异导航器
+    diffNavigator = monaco.editor.createDiffNavigator(diffEditor, {
+      followsCaret: true, // 跟随光标
+      ignoreCharChanges: true, // 只关注行级别的变化
+      alwaysRevealFirst: true, // 初次打开时自动跳到第一个差异
+    });
+    // 启用代码收缩
+    enableCodeFolding(originalModel);
+    enableCodeFolding(modifiedModel);
+  });
+}
+
+// 启用代码收缩功能
+function enableCodeFolding(model) {
+  const foldingOptions = {
+    lineNumbers: "on",
+    foldingStrategy: "indentation", // 可选: "indentation" 或 "auto"
+  };
+  model.updateOptions({
+    folding: foldingOptions,
   });
 }
 
@@ -879,16 +935,14 @@ const diffHTML = function (data = {}, lan = "", path = "", initLan = "") {
   const html = `
     <div class="diffHTML">
       <div class="diffHTML-header">
-        <a href="javascript:" class="ui-button ui-button-success" id="Prev" role="button">Prev</a>
-        <a href="javascript:" class="ui-button ui-button-success" id="Next" role="button">Next</a>
-
-        <input class="ui-input select-text" placeholder="Search...">
-
+        <a href="javascript:" class="ui-button ui-button-primary" id="Prev" role="button">Prev</a>
+        <a href="javascript:" class="ui-button ui-button-primary" id="Next" role="button">Next</a>
+        <input class="ui-input select-text" style="display: none" placeholder="Search...">
         <a href="javascript:" data-lan="${lan}" class="ui-button ui-button-primary" id="Save" role="button">Save</a>
         <a href="javascript:" class="ui-button ui-button-warning red_button" id="Cancel" role="button">Cancel</a>
       </div>
       <div class="diffHTML__path">
-        ${path.endsWith(".json") ? `<span class="diffHTML__path-title right">${lan}</span>` : `<span class="diffHTML__path-title left">${lan}</span><span class="diffHTML__path-title right">${initLan}</span>`}
+        ${path.endsWith(".json") ? `<span class="diffHTML__path-title right">${lan}</span>` : `<span class="diffHTML__path-title left">${initLan}</span><span class="diffHTML__path-title right">${lan}</span>`}
       </div>
       <div class="diffHTML-content" id="compare">
       </div>
@@ -903,28 +957,34 @@ const diffHTML = function (data = {}, lan = "", path = "", initLan = "") {
   };
   // setEditor(path, data.initC.content, data.nowC.content);
   if (!data.initC.path.endsWith(".json")) {
-    // setEditor(path, data.nowC.content, data.initC.content);
-    doc = new Mergely("#compare", {
-      sidebar: true,
-      ignorews: false,
-      license: "lgpl-separate-notice",
-      lhs: data.nowC.content,
-      rhs: data.initC.content,
-      bgcolor: "#3c3c3c",
-      cmsettings: {
-        readOnly: false,
-      },
-    });
-    doc.once("updated", () => {
-      doc.once("updated", () => {
-        doc.scrollToDiff("next");
-      });
-    });
+    setEditor(path, data.nowC.content, data.initC.content);
+    // doc = new Mergely("#compare", {
+    //   sidebar: true,
+    //   ignorews: false,
+    //   license: "lgpl-separate-notice",
+    //   lhs: data.nowC.content,
+    //   rhs: data.initC.content,
+    //   bgcolor: "#3c3c3c",
+    //   cmsettings: {
+    //     readOnly: false,
+    //   },
+    // });
+    // doc.once("updated", () => {
+    //   doc.once("updated", () => {
+    //     doc.scrollToDiff("next");
+    //   });
+    // });
     Prev.onclick = () => {
-      doc.scrollToDiff("prev");
+      // doc.scrollToDiff("prev");
+      if (diffNavigator) {
+        diffNavigator.previous(); // 跳到下一个差异
+      }
     };
     Next.onclick = () => {
-      doc.scrollToDiff("next");
+      if (diffNavigator) {
+        diffNavigator.next(); // 跳到下一个差异
+      }
+      // doc.scrollToDiff("next");
     };
   } else {
     if (jsonEditor) jsonEditor.dispose();
@@ -953,7 +1013,7 @@ const diffHTML = function (data = {}, lan = "", path = "", initLan = "") {
     const content =
       jsonEditor?.getValue?.() ||
       doc?.get?.("lhs") ||
-      originalModel?.getValue?.();
+      modifiedModel?.getValue?.();
     if (!content) {
       new LightTip().error("修改失败");
       return;
@@ -989,12 +1049,12 @@ const diffHTML = function (data = {}, lan = "", path = "", initLan = "") {
       });
   };
 
-  const selectText = document.querySelector(".select-text")
+  const selectText = document.querySelector(".select-text");
   if (selectText) {
     selectText.onchange = () => {
-      const val = (selectText.value || '').trim()
-      doc.search('rhs', val);
-    }
+      const val = (selectText.value || "").trim();
+      doc.search("rhs", val);
+    };
   }
 };
 
