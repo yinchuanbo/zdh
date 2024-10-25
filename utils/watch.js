@@ -69,11 +69,11 @@ function listenWatch(isWatching, pathname, lans, ports, domain) {
       const fileContent = await fs.readFile(filePath, "utf-8");
       const res1 = checkSyntax(fileContent)
       if (res1 !== true) throw new Error(res1)
-      const presetEnvPath = require.resolve("@babel/preset-env");
-      let es5Content = await babel.transformAsync(fileContent, {
-        presets: [[presetEnvPath]]
-      });
-      const minified = await minify(es5Content.code);
+      // const presetEnvPath = require.resolve("@babel/preset-env");
+      // let es5Content = await babel.transformAsync(fileContent, {
+      //   presets: [[presetEnvPath]]
+      // });
+      const minified = await minify(fileContent);
       await fs.writeFile(
         path.join(jsOutputDir, path.basename(filePath)),
         minified.code

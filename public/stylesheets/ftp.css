@@ -28,32 +28,40 @@ body {
 .wrappper__env {
   display: flex;
   gap: 20px;
-  width: 480px;
+  width: 800px;
 }
 
 .wrappper__lans {
   display: flex;
   gap: 20px;
-  width: 480px;
+  width: 800px;
 }
 
-.ui-button-success {
-  height: 30px;
-  margin-left: 15px;
-  line-height: 30px;
+.pull-new-code {
+  height: 40px;
+  margin-left: 10px;
+  line-height: 40px;
   padding: 0;
-  width: 80px;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pull-new-code svg {
+  width: 20px;
+  height: 20px;
+  display: block;
 }
 
 .ui-input {
-  border-radius: 0 !important;
-  height: 30px !important;
+  height: 40px !important;
 }
 
 .wrappper__lans_list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px 20px;
 }
 
 .ui-lightip {
@@ -84,7 +92,7 @@ body {
 }
 
 .wrappper__lans_item .ui-input {
-  margin-left: 20px;
+  margin-left: 10px;
 }
 
 .ui-button-primary,
@@ -96,12 +104,11 @@ body {
 }
 
 .ui-button {
-  border-radius: 0 !important;
   box-shadow:
     rgba(0, 0, 0, 0.4) 0px 2px 4px,
     rgba(0, 0, 0, 0.3) 0px 7px 13px -3px,
     rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
-    border: 0;
+  border: 0;
 }
 
 .ui-checkbox {
@@ -137,4 +144,28 @@ input.ui-input {
 
 select {
   border: 0 !important;
+}
+
+.wrappper__lans_item .ui-checkbox {
+  display: none;
+}
+
+.wrappper__lans_item input + label + label {
+  background-color: #212121;
+  width: 40px;
+  height: 40px;
+  display: block;
+  text-align: center;
+  line-height: 40px;
+  padding: 0 !important;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.wrappper__lans_item input:checked + label + label {
+  background-color: #2486ff;
+}
+
+.ui-button.loading svg {
+  display: none;
 }

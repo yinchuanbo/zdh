@@ -37,7 +37,7 @@ body {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #3c3c3c;
+  background-color: #212121;
 }
 
 .wrappper__header {
@@ -47,7 +47,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  background-color: #333;
+  background-color: #171717;
   padding: 0 20px;
   padding-left: 0;
   flex-shrink: 0;
@@ -64,7 +64,7 @@ body {
   width: 350px;
   height: calc(100% + 60px);
   padding: 20px;
-  background-color: #333;
+  background-color: #171717;
   margin-top: -60px;
   /* border-right: 1px solid rgb(68, 71, 70); */
 }
@@ -79,7 +79,7 @@ body {
   padding: 20px;
   padding-right: 15px;
   padding-top: 15px;
-  background-color: #3c3c3c;
+  background-color: #212121;
 }
 
 .ui-dialog {
@@ -128,7 +128,7 @@ body {
 .wrappper__sider_02-label {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  row-gap: 10px;
+  gap: calc(70px / 5);
 }
 
 .wrappper__sider_02-label > * {
@@ -239,7 +239,7 @@ body {
   padding-right: 5px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  gap: 10px;
   place-content: flex-start;
   overflow-x: hidden;
 }
@@ -253,24 +253,16 @@ body {
   align-items: center;
   padding: 20px;
   font-size: 13px;
-  background-color: #333;
+  background-color: #171717;
   gap: 10px;
   position: relative;
   padding-top: 30px;
   border-radius: 5px;
 }
 
-.content-item ul li:hover {
-  background-color: #353535;
-}
-
 .content-item ul li span {
   color: #ff0000;
 }
-/* 
-.content-item ul li + li {
-  margin-top: 10px;
-} */
 
 .disabled {
   pointer-events: none;
@@ -303,7 +295,7 @@ body {
 }
 
 .watching {
-  background-color: #01cf97 !important;
+  background-color: #498205 !important;
 }
 
 .watching svg {
@@ -372,6 +364,7 @@ body {
   align-items: center;
   padding: 0 10px;
   flex-shrink: 0;
+  background-color: #171717;
 }
 
 #Save {
@@ -535,7 +528,7 @@ select {
 
 .ui-checkbox {
   border: 0;
-  background-color: #3c3c3c;
+  background-color: #212121;
   outline: none;
   box-shadow: none;
 }
@@ -632,7 +625,7 @@ select {
 
 .watch-btn,
 .log-out {
-  background-color: #f4615c;
+  background-color: #ff0000;
 }
 
 .ui-button > svg {
@@ -798,15 +791,15 @@ select {
 
 .iframe-cover-close {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  width: 50px;
-  height: 50px;
+  top: 10px;
+  right: 10px;
+  width: 40px;
+  height: 40px;
   background-color: #000;
   border-radius: 100%;
   color: #fff;
   text-align: center;
-  line-height: 50px;
+  line-height: 40px;
   font-size: 20px;
   font-style: normal;
   cursor: pointer;
@@ -814,4 +807,8 @@ select {
 
 .iframe-cover-close:hover {
   opacity: 0.8;
+}
+
+.ui-button.loading svg {
+  display: none;
 }

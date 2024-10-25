@@ -102,7 +102,7 @@
             <input id="commit-ids" class="ui-input" placeholder="OR, 多个 commit id 用 , 逗号分隔">
           </div>
           <div class="wrappper__sider_02">
-            <p>Select Languages:</p>
+            <!-- <p>Select Languages:</p> -->
             <div class="wrappper__sider_02-label">
               <% lans.forEach(function(lan, idx){ %>
               <div class="div-lan div-<%= lan %>">
@@ -113,7 +113,7 @@
                   name="checkbox"
                 />
                 <label for="checkbox<%=idx%>" class="ui-checkbox"></label
-                ><label for="checkbox<%=idx%>" style="padding-left: 5px;"><%= lan %></label>
+                ><label for="checkbox<%=idx%>" style="padding-left: 5px;"><%= lan.toUpperCase() %></label>
               </div>
               <% }); %>
             </div>

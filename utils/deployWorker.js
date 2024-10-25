@@ -5,10 +5,13 @@ async function waitForDeploymentCompletion(page, timeout) {
   const startTime = Date.now();
   while (Date.now() - startTime < timeout) {
     const content = await page.content();
+    if (!content.includes("view-content")) {
+      return false;
+    }
     if (content.includes("更新完成")) {
       return true;
     }
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 5000));
   }
   return false;
 }
