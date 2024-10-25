@@ -22,6 +22,7 @@ async function deployLanguage(language, url, username, password) {
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
     ignoreDefaultArgs: ["--enable-automation"],
   });
+
   let page = await browser.newPage();
 
   try {
@@ -50,11 +51,12 @@ async function deployLanguage(language, url, username, password) {
     if (res) {
       parentPort.postMessage({ success: true, language });
     } else {
-      throw new Error("Deployment timed out");
+      throw new Error("Deployment timed out or logged out");
     }
   } catch (error) {
     parentPort.postMessage({ success: false, language, error: error.message });
   } finally {
+    await page.close();
     await browser.close();
   }
 }
