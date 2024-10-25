@@ -220,6 +220,8 @@ body {
 .content-item-btns {
   width: 100%;
   padding-bottom: 20px;
+  display: flex;
+  gap: 10px;
 }
 
 .content-item.active {
@@ -324,7 +326,11 @@ body {
     rgba(0, 0, 0, 0.3) 0px 7px 13px -3px,
     rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
 }
-
+.push-code {
+  display: flex;
+  gap: 5px;
+  font-style: normal;
+}
 /* .ui-button {
   z-index: 1000;
   user-select: none;

@@ -27,10 +27,10 @@ function openFullScreenWindow(url) {
       url,
       "_blank",
       "width=" +
-        window.screen.width +
-        ",height=" +
-        window.screen.height +
-        ",left=0,top=0"
+      window.screen.width +
+      ",height=" +
+      window.screen.height +
+      ",left=0,top=0"
     );
     if (newWindow) {
       newWindow.focus();
@@ -137,25 +137,25 @@ const createContent = (
   const html01 = `<div class="header-item active">${lan.toUpperCase()}<span title="${data3[lan]}">${data3[lan]}</span><div>`;
   const html02 = `<div class="content-item active">
     <div class="content-item-btns">
-      <a href="javascript:" class="ui-button ui-button-warning pull-code" role="button" data-lan="${lan}">Pull</a>
-      <a href="javascript:" class="ui-button ui-button-primary discard-code" role="button" data-lan="${lan}" style="display: ${selectLan === lan ? "none" : ""}">Discard</a>
+      <a href="javascript:" class="ui-button ui-button-warning pull-code" title="Pull Code" role="button" data-lan="${lan}"><svg t="1729820206584" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4299" width="30" height="30"><path d="M512 960C264.96 960 64 759.04 64 512S264.96 64 512 64s448 200.96 448 448-200.96 448-448 448z m0-832c-211.744 0-384 172.256-384 384s172.256 384 384 384 384-172.256 384-384-172.256-384-384-384z m182.56 394.144c-12.544-12.608-33.376-12.64-45.952-0.064L544 625.984V319.328c0-17.76-14.208-32.16-32-32.16-17.76 0-32 14.4-32 32.16v308.32L374.784 520.96c-12.48-12.608-32.704-12.736-45.312-0.256-12.64 12.512-12.672 32.896-0.192 45.504l159.36 161.056a32.187 32.187 0 0 0 22.88 9.568c8.16 0 16.384-3.168 22.624-9.312l0.064-0.128c0.032 0 0.064 0 0.096-0.064l160.192-159.68c12.576-12.544 12.608-32.928 0.064-45.504z" fill="#ffffff" p-id="4300"></path></svg></a>
+      <a href="javascript:" class="ui-button ui-button-primary discard-code" title="Discard Code" role="button" data-lan="${lan}" style="display: ${selectLan === lan ? "none" : ""}"><svg t="1729820332473" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5389" width="30" height="30"><path d="M224 128v224L256 384h224V320H318.656l60.224-60.224a227.328 227.328 0 1 1 321.472 321.472L367.744 913.92l46.08 46.08 332.672-332.672A292.48 292.48 0 0 0 332.8 213.696l-44.8 44.8V128h-64z" fill="#ffffff" p-id="5390"></path></svg></a>
       <a href="javascript:" class="ui-button ui-button-primary commit-code" role="button" data-lan="${lan}" style="display: none">Commit</a>
-      <a href="javascript:" class="ui-button ui-button-primary merge-code" role="button" data-lan="${lan}">Merge</a>
-      <a href="javascript:" class="ui-button ui-button-primary push-code" role="button" data-lan="${lan}">Commit + Push</a>
+      <a href="javascript:" class="ui-button ui-button-primary merge-code" role="button" title="Merge" data-lan="${lan}"><svg t="1729820377101" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6462" width="30" height="30"><path d="M768 448c-47.274 0-88.614 25.78-110.782 64L638 512c-84.928 0-159.98-35.808-223.07-106.428-40.712-45.574-66.986-97.738-75.712-116.436C366.602 265.644 384 230.826 384 192c0-70.58-57.42-128-128-128S128 121.42 128 192c0 47.274 25.78 88.614 64 110.782l0 418.438C153.78 743.386 128 784.726 128 832c0 70.58 57.42 128 128 128s128-57.42 128-128c0-47.274-25.78-88.614-64-110.782L320 491.384C407.106 588.614 516.936 640 638 640l19.218 0c22.168 38.22 63.508 64 110.782 64 70.58 0 128-57.42 128-128S838.58 448 768 448zM256 128c35.346 0 64 28.654 64 64s-28.654 64-64 64-64-28.654-64-64S220.654 128 256 128zM256 896c-35.346 0-64-28.654-64-64s28.654-64 64-64 64 28.654 64 64S291.346 896 256 896zM768 640c-35.346 0-64-28.654-64-64s28.654-64 64-64 64 28.654 64 64S803.346 640 768 640z" p-id="6463" fill="#ffffff"></path></svg></a>
+      <a href="javascript:" class="ui-button ui-button-primary push-code" role="button" title="Commit + Push" data-lan="${lan}"><svg t="1729820568892" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="9872" width="30" height="30"><path d="M981.333333 469.333333h-260.266666c-21.333333-98.133333-106.666667-170.666667-209.066667-170.666666s-187.733333 72.533333-209.066667 170.666666H42.666667c-25.6 0-42.666667 17.066667-42.666667 42.666667s17.066667 42.666667 42.666667 42.666667h260.266666c21.333333 98.133333 106.666667 170.666667 209.066667 170.666666s187.733333-72.533333 209.066667-170.666666H981.333333c25.6 0 42.666667-17.066667 42.666667-42.666667s-21.333333-42.666667-42.666667-42.666667z m-469.333333 170.666667c-72.533333 0-128-55.466667-128-128s55.466667-128 128-128 128 55.466667 128 128-55.466667 128-128 128z" p-id="9873" fill="#ffffff"></path></svg> + <svg t="1729820615542" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="12670" width="30" height="30"><path d="M512 960C264.96 960 64 759.04 64 512S264.96 64 512 64s448 200.96 448 448S759.04 960 512 960zM512 128C300.256 128 128 300.256 128 512c0 211.744 172.256 384 384 384 211.744 0 384-172.256 384-384C896 300.256 723.744 128 512 128zM694.464 458.368l-158.496-160.256c-9.344-9.472-23.168-11.84-34.784-7.136-0.736 0.288-1.312 0.992-2.016 1.344-2.976 1.472-5.952 3.072-8.448 5.536-0.032 0.032-0.032 0.064-0.064 0.096s-0.064 0.032-0.096 0.064l-159.36 158.912c-12.512 12.48-12.544 32.736-0.064 45.248 6.24 6.272 14.464 9.408 22.656 9.408 8.16 0 16.352-3.104 22.592-9.344L480 398.944 480 704c0 17.696 14.336 32 32 32s32-14.304 32-32l0-306.752 104.96 106.112c6.24 6.336 14.496 9.504 22.752 9.504 8.128 0 16.256-3.072 22.496-9.248C706.784 491.2 706.912 470.944 694.464 458.368z" fill="#ffffff" p-id="12671"></path></svg></a>
       <a href="javascript:" class="ui-button ui-button-primary dey-to-test" role="button" data-lan="${lan}" style="display: none">上传至 ${lan} Test Ftp</a>
       <a href="javascript:" class="ui-button ui-button-primary dey-to-pro" role="button" data-lan="${lan}" style="display: none">上传至 ${lan} Pro Ftp</a>
-      <a href="javascript:" class="ui-button ui-button-primary all-img" style="display: ${selectLan === lan ? "none" : ""}" role="button" data-lan="${lan}">Resource Batching</a>
-      <a href="javascript:" class="ui-button ui-button-primary publish" role="button" data-lan="${lan}">Publish</a>
-      <a href="javascript:" class="ui-button ui-button-primary vs-code" role="button" data-lan="${lan}">Vs Code</a>
-      <a href="javascript:" class="ui-button ui-button-primary open-site" role="button" data-lan="${lan}">Copy URL</a>
+      <a href="javascript:" class="ui-button ui-button-primary all-img" style="display: ${selectLan === lan ? "none" : ""}" title="Resource Async" role="button" data-lan="${lan}"><svg t="1729820839670" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="19174" width="30" height="30"><path d="M636.330667 133.717333c99.072 9.898667 178.773333 69.674667 195.669333 172.117334h-57.344l92.672 137.984L960 305.834667h-63.914667c-17.066667-137.984-121.429333-227.626667-253.226666-240.426667-18.218667-1.408-35.157333 14.208-35.157334 34.133333 1.194667 17.066667 12.885333 32.725333 28.586667 34.133334zM450.133333 64H127.914667c-18.261333 0-32.554667 15.616-32.554667 35.584v307.2c0 19.968 14.293333 35.584 32.554667 35.584h322.261333c18.218667 0 32.554667-15.616 32.554667-35.584v-307.2c0-19.968-14.336-35.584-32.554667-35.584z m-31.36 310.101333H159.274667V132.266667H418.986667l-0.128 241.834666zM387.413333 888.96c-110.933333-9.898667-195.712-83.882667-199.68-206.250667h61.312l-92.416-137.813333L64 682.666667h61.312c2.474667 157.909333 113.408 260.352 255.701333 274.56 18.218667 1.408 35.157333-14.208 35.157334-34.133334a33.877333 33.877333 0 0 0-28.714667-34.133333z m509.824-308.650667h-322.261333c-18.346667 0-32.554667 15.786667-32.554667 35.584v308.650667c0 19.84 14.293333 35.413333 32.554667 35.413333h322.261333c18.218667 0 32.554667-15.573333 32.554667-35.413333v-308.650667c0-19.84-15.616-35.584-32.554667-35.584z m-31.402666 310.101334H606.293333v-240.384h259.626667v240.384z" p-id="19175" fill="#ffffff"></path></svg></a>
+      <a href="javascript:" class="ui-button ui-button-primary publish" title="Publish" role="button" data-lan="${lan}"><svg t="1729820784129" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="18059" width="30" height="30"><path d="M939.52 22.752L28.448 392.256l173.792 164.416 53.76-55.456-86.464-81.92L783.648 170.112 173.504 750.368h-1.984V1024h76.224v-237.792l115.488-109.504 55.744-53.184L937.248 131.136l-86.752 89.6-94.432 319.712L655.648 879.232l-118.912-112.64-53.76 55.456 210.496 199.104 224.416-759.168L995.552 0l-56.032 22.752z" p-id="18060" fill="#ffffff"></path></svg></a>
+      <a href="javascript:" class="ui-button ui-button-primary vs-code" title="Vs Code" role="button" data-lan="${lan}"><svg t="1729820704088" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="14901" width="30" height="30"><path d="M927.5 161.4L786.9 93.8l-43.5-20.9c-5.4-2.6-11-4.2-16.7-5h-0.2c-0.6-0.1-1.2-0.2-1.8-0.2-16.3-1.6-32.9 4-44.9 16.1 0.8-0.8 1.7-1.6 2.6-2.3-0.8 0.7-1.7 1.5-2.5 2.3L327.3 405.1 173.7 288.7c-14.3-10.9-34.4-10-47.7 2.1l-49.2 44.7c-0.9 0.8-1.7 1.6-2.5 2.5-13.8 15.2-12.7 38.8 2.6 52.6L210.1 512 76.9 633.4c-15.2 13.8-16.4 37.4-2.6 52.6 0.8 0.9 1.6 1.7 2.5 2.5l49.2 44.7c13.3 12.1 33.3 13 47.6 2.1l153.6-116.5 352.7 321.6c16.7 16.7 42.2 21.1 63.5 10.8l184.2-88.5c19.4-9.3 31.7-28.9 31.7-50.3V211.7c0-21.5-12.4-41.1-31.8-50.3zM468.1 512l267.5-202.9v405.8L468.1 512z" fill="#ffffff" p-id="14902"></path></svg></a>
+      <a href="javascript:" class="ui-button ui-button-primary open-site" title="Copy Website URL" role="button" data-lan="${lan}"><svg t="1729820741115" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="16916" width="30" height="30"><path d="M536.704 162.944a229.312 229.312 0 0 1 324.352 324.352L755.84 595.2a42.688 42.688 0 0 1-61.056-59.584l105.728-108.416a144 144 0 1 0-203.648-203.648l-0.384 0.384-108.032 105.344a42.688 42.688 0 0 1-59.52-61.056l107.776-105.216zM702.08 321.92c16.64 16.64 16.64 43.648 0 60.288l-320 320a42.688 42.688 0 0 1-60.288-60.352l320-320c16.64-16.64 43.648-16.64 60.288 0z m-373.696 106.24c16.896 16.512 17.28 43.52 0.768 60.352L223.488 596.864a144 144 0 1 0 203.648 203.648l0.384-0.384 108.032-105.344a42.688 42.688 0 1 1 59.52 61.056l-107.776 105.152a229.312 229.312 0 0 1-324.288-324.288L268.16 428.8a42.688 42.688 0 0 1 60.288-0.768z" fill="#ffffff" p-id="16917"></path></svg></a>
     </div>
     <ul>
       ${data
-        .map((info) => {
-          const str = generateRandomString(20);
-          let lujing = curDatas2?.[info] || "unknown";
-          if (selectLan === lan) lujing = info;
-          return `<li data-path="${info}" data-path2="${lujing}" data-lan="${lan}">
+      .map((info) => {
+        const str = generateRandomString(20);
+        let lujing = curDatas2?.[info] || "unknown";
+        if (selectLan === lan) lujing = info;
+        return `<li data-path="${info}" data-path2="${lujing}" data-lan="${lan}">
           <div class="check-handle" title="已完成可选中">
             <input type="checkbox" id="${str}" name="${str}">
             <label for="${str}" class="ui-checkbox"></label>
@@ -171,8 +171,8 @@ const createContent = (
            <a href="javascript:" class="ui-button ui-button-warning delete" style="display: none" role="button">Delete</a>
           </div>
         </li>`;
-        })
-        .join("")}
+      })
+      .join("")}
     </ul>
   </div>`;
 
@@ -796,14 +796,14 @@ const setMerge = (item, lan) => {
         <div class="setCommit_left">
           <select name="from">
               ${data.map((h) => {
-                return `<option class="feat" value="${h}" title="${h}">${h}</option>`;
-              })}
+      return `<option class="feat" value="${h}" title="${h}">${h}</option>`;
+    })}
           </select>
           <p>Mergr To</p>
           <select name="to">
           ${data.map((h) => {
-            return `<option class="feat" value="${h}" title="${h}">${h}</option>`;
-          })}
+      return `<option class="feat" value="${h}" title="${h}">${h}</option>`;
+    })}
           </select>
         </div>
         <div class="setCommit_btns">
