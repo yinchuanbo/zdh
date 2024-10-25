@@ -5,7 +5,7 @@ async function waitForDeploymentCompletion(page, timeout) {
   const startTime = Date.now();
   while (Date.now() - startTime < timeout) {
     const content = await page.content();
-    if (!content.includes("view-content")) {
+    if (content.includes("blog-login")) {
       return false;
     }
     if (content.includes("更新完成")) {
@@ -18,8 +18,9 @@ async function waitForDeploymentCompletion(page, timeout) {
 
 async function deployLanguage(language, url, username, password) {
   const browser = await puppeteer.launch({
-    headless: "new", // 使用新的无头模式
-    args: ["--no-sandbox", "--disable-setuid-sandbox"], // 添加这些参数以提高稳定性
+    headless: "new",
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    ignoreDefaultArgs: ["--enable-automation"],
   });
   let page = await browser.newPage();
 
