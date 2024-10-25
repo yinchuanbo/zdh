@@ -5,9 +5,22 @@ const io = require("socket.io-client");
 let deployInfo;
 let successArr = [];
 let errorArr = [];
+let inProgress = 0;
 const socket = io("http://localhost:4000");
 
-async function deployBatch(languages, deployInfoCopy) {
+function sendProgressUpdate(total) {
+  socket.emit("chat message", {
+    type: "deploy-progress",
+    message: `部署进度: ${successArr.length + errorArr.length}/${total}，成功: ${successArr.length}，失败: ${errorArr.length}`,
+  });
+}
+
+function updateProgress(total) {
+  inProgress--;
+  sendProgressUpdate(total);
+}
+
+async function deployBatch(languages, deployInfoCopy, totalLanguages) {
   return new Promise((resolve) => {
     const maxWorkers = Math.min(4, languages.length);
     const workerPool = new Array(maxWorkers).fill().map(() =>
@@ -19,6 +32,7 @@ async function deployBatch(languages, deployInfoCopy) {
 
     function assignTaskToWorker(worker) {
       if (currentLanguageIndex < languages.length) {
+        inProgress++;
         const [language, url] = languages[currentLanguageIndex];
         const { username, password } = deployInfoCopy;
         worker.postMessage({ language, url, username, password });
@@ -39,14 +53,15 @@ async function deployBatch(languages, deployInfoCopy) {
         } else {
           errorArr.push(result.language);
         }
+        updateProgress(totalLanguages);
         assignTaskToWorker(worker);
       });
       worker.on('error', (error) => {
         console.error(`Error in worker:`, error);
-        errorArr.push(error.language);
+        errorArr.push("Unknown language due to error.");
+        updateProgress(totalLanguages);
         assignTaskToWorker(worker);
       });
-
       assignTaskToWorker(worker);
     }
   });
@@ -61,25 +76,27 @@ async function deployAllLanguages(needLans = [], configs) {
   const filteredLanguages = Object.entries(deployInfoCopy.languages).filter(
     ([lang]) => needLans.length === 0 || needLans.includes(lang)
   );
+  const totalLanguages = filteredLanguages.length;
 
-  // Process languages in batches of 4
-  for (let i = 0; i < filteredLanguages.length; i += 4) {
-    const batch = filteredLanguages.slice(i, i + 4);
-    await deployBatch(batch, deployInfoCopy);
+  const progressInterval = setInterval(() => sendProgressUpdate(totalLanguages), 5000);
+
+  const batches = [];
+  for (let i = 0; i < totalLanguages; i += 4) {
+    batches.push(filteredLanguages.slice(i, i + 4));
   }
+  await Promise.all(batches.map(batch => deployBatch(batch, deployInfoCopy, totalLanguages)));
 
-  let str = "";
+  clearInterval(progressInterval);
+  let resultMessage = "";
   if (successArr.length) {
-    str += `${successArr.join(",")} 部署成功，`;
+    resultMessage += `${successArr.join(",")} 部署成功，`;
   }
   if (errorArr.length) {
-    str += `${errorArr.join(",")} 部署失败。`;
+    resultMessage += `${errorArr.join(",")} 部署失败。`;
   }
-
-  console.log('str', str);
   socket.emit("chat message", {
     type: "deploy-result",
-    message: str,
+    message: resultMessage,
   });
 }
 

@@ -4,14 +4,16 @@ const puppeteer = require("puppeteer");
 async function waitForDeploymentCompletion(page, timeout) {
   const startTime = Date.now();
   while (Date.now() - startTime < timeout) {
-    const content = await page.content();
-    if (content.includes("blog-login")) {
+    const failMessage = await page.$(".blog-login");
+    const viewContent = await page.$(".view-content");
+    const successMessage = await page.$(".el-message--success");
+    if (failMessage || !viewContent) {
       return false;
     }
-    if (content.includes("更新完成")) {
+    if (successMessage) {
       return true;
     }
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
   }
   return false;
 }

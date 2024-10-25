@@ -5,7 +5,6 @@ async function deployBatch(batchOutputs, env, configs) {
   return new Promise((resolve, reject) => {
     const maxWorkers = Math.min(4, Object.keys(batchOutputs).length);
     let completedWorkers = 0;
-    let errorOccurred = false;
     const workerPool = new Array(maxWorkers).fill().map(() =>
       new Worker(path.join(__dirname, 'ftpWorker.js'))
     );
