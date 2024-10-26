@@ -1,7 +1,10 @@
 const { getDynamicFilePath, getRequireDynamicFile } = require("./setData")
 const { execSync } = require("child_process");
+const prettier = require("prettier");
+const settings = require("./settings");
 const fs = require("fs").promises;
 const path = require("path");
+const diff = require('diff');
 
 function getCurrentBranchName(folderPath) {
   try {
@@ -16,13 +19,57 @@ function getCurrentBranchName(folderPath) {
   }
 }
 
+function getChangedLines(beforeContent, afterContent) {
+  console.log('beforeContent', beforeContent.length)
+  console.log('afterContent', afterContent.length)
+  const diffResult = diff.diffLines(beforeContent, afterContent);
+  const changedLineNumbers = new Set();
+
+  let beforeLineNumber = 1;
+  let afterLineNumber = 1;
+
+  diffResult.forEach(part => {
+    if (part.added) {
+      changedLineNumbers.add(afterLineNumber);
+      afterLineNumber += part.count || 0;
+    } else if (part.removed) {
+      changedLineNumbers.add(beforeLineNumber);
+      beforeLineNumber += part.count || 0;
+    } else {
+      beforeLineNumber += part.count || 0;
+      afterLineNumber += part.count || 0;
+    }
+  });
+  return Array.from(changedLineNumbers);
+}
+
+async function getStagedFileDiffs(lanPath) {
+  try {
+    const stdout = execSync(`git -C ${lanPath} diff --cached --name-only`);
+    const stagedFiles = stdout.toString().split("\n").filter(file => file.trim() !== '');
+    const obj = {};
+    for (const file of stagedFiles) {
+      if (file && !(file.includes("/img/") || file.includes("\\img\\"))) {
+        const previousContent = execSync(`git -C ${lanPath} show HEAD:${file}`, { encoding: 'utf-8' });
+        const formattedPreviousContent = await prettier.format(previousContent, settings(file));
+        const stagedContent = execSync(`git -C ${lanPath} show :${file}`, { encoding: 'utf-8' });
+        const formattedstagedContent = await prettier.format(stagedContent, settings(file));
+        const changedLines = getChangedLines(formattedPreviousContent, formattedstagedContent);
+        obj[path.basename(file)] = changedLines;
+      }
+    }
+    return obj;
+  } catch (error) {
+    console.error('Error fetching staged file diffs:', error.message);
+  }
+}
 async function getFileFunc(onlyLan = "en", asyncLans = [], commitIds = "", configs) {
   if (!configs || !configs.localPaths || !configs.LocalListPro) {
     throw new Error("Invalid configuration");
   }
 
   const folderList = configs.localPaths;
-  let allData = {};
+  let allData = {}, lineObj = null;
 
   const getAllCommitName = async (commitList, lanPath) => {
     let fileNameArr = [];
@@ -68,6 +115,8 @@ async function getFileFunc(onlyLan = "en", asyncLans = [], commitIds = "", confi
       let stdout = await execSync(`git -C ${lanPath} diff --cached --name-only`);
       if (!stdout?.length) {
         stdout = await execSync(`git -C ${lanPath} log ${last} --name-only --pretty=format:`);
+      } else {
+        lineObj = await getStagedFileDiffs(lanPath);
       }
       const fileNames = stdout
         .toString()
@@ -81,7 +130,6 @@ async function getFileFunc(onlyLan = "en", asyncLans = [], commitIds = "", confi
     } catch (error) {
       console.error(`执行Git命令时出错: ${error.message}`);
     }
-    // console.log('configs.localPaths', configs.localPaths[lanName])
   }
   const cbObj = {};
   for (let i = 0; i < asyncLans.length; i++) {
@@ -89,14 +137,13 @@ async function getFileFunc(onlyLan = "en", asyncLans = [], commitIds = "", confi
     const lanP = configs.localPaths[asyncLan]
     const cB = getCurrentBranchName(lanP)
     cbObj[asyncLan] = cB;
-    // 获取 lanP 文件夹下当前分支名
   }
   await handleAsyncLans(allData[onlyLan], asyncLans, onlyLan, configs);
   const jsContent = `module.exports = ${JSON.stringify(allData, null, 2)};`;
   const outputPath = getDynamicFilePath('output.js');
   await fs.mkdir(path.dirname(outputPath), { recursive: true });
   await fs.writeFile(outputPath, jsContent);
-  return cbObj
+  return {cbObj, lineObj}
 }
 
 async function findTplFiles(dirPath) {

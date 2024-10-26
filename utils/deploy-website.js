@@ -8,6 +8,8 @@ let errorArr = [];
 let inProgress = 0;
 const socket = io("http://localhost:4000");
 
+const maxLen = 2;
+
 function sendProgressUpdate(total) {
   socket.emit("chat message", {
     type: "deploy-progress",
@@ -20,16 +22,15 @@ function updateProgress(total) {
   sendProgressUpdate(total);
 }
 
-async function deployBatch(languages, deployInfoCopy, totalLanguages) {
+// languages 4个元素
+function deployBatch(languages, deployInfoCopy, totalLanguages) {
   return new Promise((resolve) => {
-    const maxWorkers = Math.min(4, languages.length);
+    const maxWorkers = Math.min(maxLen, languages.length);
     const workerPool = new Array(maxWorkers).fill().map(() =>
       new Worker(path.join(__dirname, 'deployWorker.js'))
     );
-
     let currentLanguageIndex = 0;
     let completedWorkers = 0;
-
     function assignTaskToWorker(worker) {
       if (currentLanguageIndex < languages.length) {
         inProgress++;
@@ -40,24 +41,25 @@ async function deployBatch(languages, deployInfoCopy, totalLanguages) {
       } else {
         worker.terminate();
         completedWorkers++;
+        console.log('completedWorkers', completedWorkers)
         if (completedWorkers === maxWorkers) {
           resolve();
         }
       }
     }
-
     for (const worker of workerPool) {
       worker.on('message', (result) => {
         if (result.success) {
           successArr.push(result.language);
         } else {
+          console.log("fail3", result)
           errorArr.push(result.language);
         }
         updateProgress(totalLanguages);
         assignTaskToWorker(worker);
       });
       worker.on('error', (error) => {
-        console.error(`Error in worker:`, error);
+        console.log("fail4", error)
         errorArr.push("Unknown language due to error.");
         updateProgress(totalLanguages);
         assignTaskToWorker(worker);
@@ -78,13 +80,17 @@ async function deployAllLanguages(needLans = [], configs) {
   );
   const totalLanguages = filteredLanguages.length;
 
-  const progressInterval = setInterval(() => sendProgressUpdate(totalLanguages), 5000);
+  const progressInterval = setInterval(() => sendProgressUpdate(totalLanguages), 10000);
 
   const batches = [];
-  for (let i = 0; i < totalLanguages; i += 4) {
-    batches.push(filteredLanguages.slice(i, i + 4));
+  for (let i = 0; i < totalLanguages; i += maxLen) {
+    batches.push(filteredLanguages.slice(i, i + maxLen));
   }
-  await Promise.all(batches.map(batch => deployBatch(batch, deployInfoCopy, totalLanguages)));
+
+  for (let i = 0; i < batches.length; i++) {
+    const batch = batches[i];
+    await deployBatch(batch, deployInfoCopy, totalLanguages)
+  }
 
   clearInterval(progressInterval);
   let resultMessage = "";

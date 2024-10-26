@@ -128,6 +128,7 @@ const createContent = (
   data = [],
   data2 = {},
   data3 = {},
+  data4 = {},
   initLan = "en"
 ) => {
   data2Info = data2;
@@ -155,7 +156,8 @@ const createContent = (
         const str = generateRandomString(20);
         let lujing = curDatas2?.[info] || "unknown";
         if (selectLan === lan) lujing = info;
-        return `<li data-path="${info}" data-path2="${lujing}" data-lan="${lan}">
+        let fileN = info.split("/") || []
+        return `<li data-path="${info}" data-path2="${lujing}" data-lan="${lan}" data-lines="${data4?.[fileN.at(-1)] || ''}">
           <div class="check-handle" title="已完成可选中">
             <input type="checkbox" id="${str}" name="${str}">
             <label for="${str}" class="ui-checkbox"></label>
@@ -913,6 +915,9 @@ function setEditor(path = "", modifiedText = "", originalText = "") {
         originalEditable: true,
         automaticLayout: true,
         fontSize: 16,
+        formatOnPaste: true,
+        glyphMargin: true,
+        selectOnLineNumbers: true,
       }
     );
 
@@ -920,18 +925,15 @@ function setEditor(path = "", modifiedText = "", originalText = "") {
       original: originalModel,
       modified: modifiedModel,
     });
-    diffEditor.updateOptions({
-      renderSideBySide: false
-    })
+    // diffEditor.updateOptions({
+    //   renderSideBySide: false
+    // })
     // 创建差异导航器
     diffNavigator = monaco.editor.createDiffNavigator(diffEditor, {
       followsCaret: true, // 跟随光标
       ignoreCharChanges: true, // 只关注行级别的变化
       alwaysRevealFirst: true, // 初次打开时自动跳到第一个差异
     });
-    // 启用代码收缩
-    enableCodeFolding(originalModel);
-    enableCodeFolding(modifiedModel);
   });
 }
 
@@ -1130,7 +1132,7 @@ const handleGetFile = () => {
           header.innerHTML = "";
           content.innerHTML = "";
           selectedValues.forEach((lan) => {
-            createContent(lan, res?.data, res?.data2, res?.data3, select.value);
+            createContent(lan, res?.data, res?.data2, res?.data3, res?.data4, select.value);
           });
         } else {
           handleNoData();

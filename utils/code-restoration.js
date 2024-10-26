@@ -65,22 +65,7 @@ async function getFileContentsForCommit({
 }) {
   const git = simpleGit(pathVal);
   let completePath = `${pathVal}/${filename}`.replaceAll("\\", "/")
-  let setInfo = {};
-  if (filename.endsWith(".js")) {
-    setInfo = settings();
-  }
-  if (filename.endsWith(".tpl")) {
-    setInfo = settings("html");
-  }
-  if (filename.endsWith(".css")) {
-    setInfo = settings("css");
-  }
-  if (filename.endsWith(".scss")) {
-    setInfo = settings("scss");
-  }
-  if (filename.endsWith(".json")) {
-    setInfo = settings("json");
-  }
+  let setInfo = settings(filename)
   try {
     let beforeContent = '';
     let afterContent = '', afterContentOrigin = '';

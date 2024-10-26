@@ -86,7 +86,7 @@ socket.on("chat message", (msg) => {
     });
     allDeploy.classList.remove("loading");
   } else if (type === 'deploy-progress') {
-    new LightTip().success(`${message} 部署成功`);
+    new LightTip().success(`${message}`);
   }
 });
 

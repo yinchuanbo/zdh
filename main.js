@@ -87,7 +87,6 @@ function createWindow() {
   io.on('connection', (socket) => {
     console.log('A client connected');
     socket.on('chat message', (msg) => {
-      console.log('Message received:', msg);
       io.emit('chat message', msg);
     });
     socket.on('disconnect', () => {

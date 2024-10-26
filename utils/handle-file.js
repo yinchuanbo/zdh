@@ -32,28 +32,7 @@ async function getFileContent({ path, lan, initLan, path2, LocalListPro }) {
   const nowC = fs.readFileSync(nowPath, { encoding: "utf-8", flag: "rs" });
   const initC = fs.readFileSync(initPath, { encoding: "utf-8", flag: "rs" });
 
-  let setInfo = {};
-
-  if (path.endsWith(".js")) {
-    setInfo = settings();
-  }
-
-  if (path.endsWith(".tpl")) {
-    setInfo = settings("html");
-  }
-
-  if (path.endsWith(".css")) {
-    setInfo = settings("css");
-  }
-
-  if (path.endsWith(".scss")) {
-    setInfo = settings("scss");
-  }
-
-  if (path.endsWith(".json")) {
-    setInfo = settings("json");
-  }
-
+  let setInfo = settings(path);
   let formattedinitC, formattednowC;
 
   try {
