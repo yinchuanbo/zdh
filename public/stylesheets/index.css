@@ -270,6 +270,14 @@ body {
   position: relative;
 }
 
+.select-lines {
+  opacity: 1;
+  margin-left: 10px;
+  width: 200px;
+  font-size: 14px;
+  font-family: "JetBrains Mono";
+}
+
 .disabled::before {
   content: "";
   position: absolute;
@@ -811,4 +819,9 @@ select {
 
 .ui-button.loading svg {
   display: none;
+}
+
+.monaco-editor .line-numbers.active-line-number {
+  background-color: #ff0000!important;
+  color: #fff!important;
 }

@@ -123,6 +123,11 @@ function getRandomHexColor() {
   return `#${randomColor}`;
 }
 
+function keepFirstOfConsecutive(arr) {
+  return arr.filter((num, index) => index === 0 || num !== arr[index - 1] + 1);
+}
+
+
 const createContent = (
   lan = "en",
   data = [],
@@ -156,8 +161,18 @@ const createContent = (
         const str = generateRandomString(20);
         let lujing = curDatas2?.[info] || "unknown";
         if (selectLan === lan) lujing = info;
-        let fileN = info.split("/") || []
-        return `<li data-path="${info}" data-path2="${lujing}" data-lan="${lan}" data-lines="${data4?.[fileN.at(-1)] || ''}">
+        let fileN = info.split("/") || [];
+        let lineVal = '';
+        if(!fileN || !fileN?.length) {
+          lineVal = ''
+        } else {
+          lineVal = data4?.[fileN.at(-1)] || [];
+          lineVal = lineVal.sort((a, b) => a - b);
+          lineVal = [...new Set(lineVal)]
+          lineVal = keepFirstOfConsecutive(lineVal);
+          lineVal = lineVal + ''
+        }
+        return `<li data-path="${info}" data-path2="${lujing}" data-lan="${lan}" data-lines="${lineVal}">
           <div class="check-handle" title="已完成可选中">
             <input type="checkbox" id="${str}" name="${str}">
             <label for="${str}" class="ui-checkbox"></label>
@@ -249,7 +264,7 @@ const createContent = (
       item.classList.add("loading");
       const p = item.parentNode.parentNode;
       curP = p;
-      const { path, lan, path2 } = p.dataset;
+      const { path, lan, path2, lines } = p.dataset;
       fetch("/receive-files", {
         method: "POST",
         headers: {
@@ -278,7 +293,7 @@ const createContent = (
             originalModel = null;
             diffEditor = null;
             jsonEditor = null;
-            diffHTML(res.data, lan, path, initLan);
+            diffHTML(res.data, lan, path, initLan, lines);
           }
           item.classList.remove("loading");
         })
@@ -948,14 +963,29 @@ function enableCodeFolding(model) {
   });
 }
 
-const diffHTML = function (data = {}, lan = "", path = "", initLan = "") {
+const diffHTML = function (data = {}, lan = "", path = "", initLan = "", lines = '') {
   let doc = null;
+  let linesArr = [];
+  if (lines) {
+    linesArr = lines.split(",")
+    linesArr = linesArr.filter(Boolean)
+  }
   const html = `
     <div class="diffHTML">
       <div class="diffHTML-header">
         <a href="javascript:" class="ui-button ui-button-primary" id="Prev" role="button">Prev</a>
         <a href="javascript:" class="ui-button ui-button-primary" id="Next" role="button">Next</a>
         <input class="ui-input select-text" style="display: none" placeholder="Search...">
+
+        ${linesArr?.length ? `<select class="select-lines">
+          <option value="">Select Skip Line</option>
+        ${linesArr.map(s => {
+    return `<option value="${s}">${s}</option>`
+  }).join('')
+      }
+</select>
+          `: ''
+    }
         <a href="javascript:" data-lan="${lan}" class="ui-button ui-button-primary" id="Save" role="button">Save</a>
         <a href="javascript:" class="ui-button ui-button-warning red_button" id="Cancel" role="button">Cancel</a>
       </div>
@@ -973,6 +1003,13 @@ const diffHTML = function (data = {}, lan = "", path = "", initLan = "") {
   // setEditor(path, data.initC.content, data.nowC.content);
   if (!data.initC.path.endsWith(".json")) {
     setEditor(path, data.nowC.content, data.initC.content);
+    const selectLines = document.querySelector(".select-lines");
+    selectLines.onchange = () => {
+      const line = selectLines.value || 0;
+      const a = diffEditor.getOriginalEditor()
+      a.setPosition({ lineNumber: Number(line), column: 1 });
+      a.revealLine(Number(line))
+    }
     // doc = new Mergely("#compare", {
     //   sidebar: true,
     //   ignorews: false,

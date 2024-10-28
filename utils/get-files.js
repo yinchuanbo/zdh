@@ -3,6 +3,7 @@ const { execSync } = require("child_process");
 const prettier = require("prettier");
 const settings = require("./settings");
 const fs = require("fs").promises;
+const simpleGit = require('simple-git');
 const path = require("path");
 const diff = require('diff');
 
@@ -20,9 +21,7 @@ function getCurrentBranchName(folderPath) {
 }
 
 function getChangedLines(beforeContent, afterContent) {
-  console.log('beforeContent', beforeContent.length)
-  console.log('afterContent', afterContent.length)
-  const diffResult = diff.diffLines(beforeContent, afterContent);
+  const diffResult = diff.diffLines(beforeContent.trim(), afterContent.trim());
   const changedLineNumbers = new Set();
 
   let beforeLineNumber = 1;
@@ -43,24 +42,66 @@ function getChangedLines(beforeContent, afterContent) {
   return Array.from(changedLineNumbers);
 }
 
-async function getStagedFileDiffs(lanPath) {
+async function getStagedFileDiffs({
+  execCommand, lanPath, execType, lastCommitId
+}) {
+  const git = simpleGit(lanPath);
   try {
-    const stdout = execSync(`git -C ${lanPath} diff --cached --name-only`);
-    const stagedFiles = stdout.toString().split("\n").filter(file => file.trim() !== '');
+    const stdout = execSync(execCommand);
+    let stagedFiles = stdout.toString().split("\n").filter(file => file.trim() !== '');
     const obj = {};
     for (const file of stagedFiles) {
-      if (file && !(file.includes("/img/") || file.includes("\\img\\"))) {
-        const previousContent = execSync(`git -C ${lanPath} show HEAD:${file}`, { encoding: 'utf-8' });
-        const formattedPreviousContent = await prettier.format(previousContent, settings(file));
-        const stagedContent = execSync(`git -C ${lanPath} show :${file}`, { encoding: 'utf-8' });
-        const formattedstagedContent = await prettier.format(stagedContent, settings(file));
-        const changedLines = getChangedLines(formattedPreviousContent, formattedstagedContent);
-        obj[path.basename(file)] = changedLines;
+      if (file && (file.includes("/Dev/") || file.includes("/lan/") || file.includes("/tpl/"))) {
+        let beforeContent = '', afterContent = '';
+        if (execType === 'cache') {
+          try {
+            beforeContent = execSync(`git -C ${lanPath} show HEAD:${file}`, { encoding: 'utf-8' });
+            beforeContent = await prettier.format(beforeContent, settings(file));
+          } catch (error) {
+            beforeContent = ''
+            console.log('error01', error)
+          }
+          try {
+            afterContent = execSync(`git -C ${lanPath} show :${file}`, { encoding: 'utf-8' });
+            afterContent = await prettier.format(afterContent, settings(file));
+          } catch (error) {
+            afterContent = '';
+            console.log('error02', error)
+          }
+        } else if (execType === "last" && lastCommitId) {
+          try {
+            const status = await git.show([`${lastCommitId}:${file}`])
+            if (status !== 'A') {
+              try {
+                beforeContent = await git.show([`${lastCommitId}^:${file}`]);
+                beforeContent = await prettier.format(beforeContent, settings(file));
+              } catch (error) {
+                beforeContent = '';
+                console.log('error03', error)
+              }
+            }
+            if (status !== 'D') {
+              try {
+                afterContent = await git.show([`${lastCommitId}:${file}`])
+                afterContent = await prettier.format(afterContent, settings(file));
+              } catch (error) {
+                afterContent = '';
+                console.log('error04', error)
+              }
+            }
+          } catch (error) {
+            beforeContent = afterContent = '';
+          }
+        }
+        if (beforeContent && afterContent) {
+          const changedLines = getChangedLines(beforeContent, afterContent);
+          obj[path.basename(file)] = changedLines;
+        }
       }
     }
     return obj;
   } catch (error) {
-    console.error('Error fetching staged file diffs:', error.message);
+    console.error('Error fetching staged file diffs:', error);
   }
 }
 async function getFileFunc(onlyLan = "en", asyncLans = [], commitIds = "", configs) {
@@ -75,9 +116,11 @@ async function getFileFunc(onlyLan = "en", asyncLans = [], commitIds = "", confi
     let fileNameArr = [];
     for (const commit of commitList) {
       try {
-        const stdout = await execSync(
-          `git -C ${lanPath} log --first-parent -1 ${commit} --name-only --pretty=format:`
-        );
+        const execCommand = `git -C ${lanPath} log --first-parent -1 ${commit} --name-only --pretty=format:`;
+        const stdout = await execSync(execCommand);
+        lineObj = await getStagedFileDiffs({
+          execCommand, lanPath, execType: "last", lastCommitId: commit.slice(0, 8)
+        });
         const fileNames = stdout
           .toString()
           .split("\n")
@@ -112,12 +155,20 @@ async function getFileFunc(onlyLan = "en", asyncLans = [], commitIds = "", confi
 
     try {
       // execSync(`git -C ${lanPath} add .`);
-      let stdout = await execSync(`git -C ${lanPath} diff --cached --name-only`);
+      let execCommand = `git -C ${lanPath} diff --cached --name-only`;
+      let execType = "cache";
+      let stdout = await execSync(execCommand);
+      let lastCommitId = '';
       if (!stdout?.length) {
-        stdout = await execSync(`git -C ${lanPath} log ${last} --name-only --pretty=format:`);
-      } else {
-        lineObj = await getStagedFileDiffs(lanPath);
+        execCommand = `git -C ${lanPath} log ${last} --name-only --pretty=format:`;
+        execType = "last";
+        stdout = await execSync(execCommand);
+        lastCommitId = await execSync(`git -C ${lanPath}  log ${last} --format=%H"`);
+        lastCommitId = lastCommitId.toString()
       }
+      lineObj = await getStagedFileDiffs({
+        execCommand, lanPath, execType, lastCommitId: lastCommitId.slice(0, 8)
+      });
       const fileNames = stdout
         .toString()
         .split("\n")
@@ -143,7 +194,7 @@ async function getFileFunc(onlyLan = "en", asyncLans = [], commitIds = "", confi
   const outputPath = getDynamicFilePath('output.js');
   await fs.mkdir(path.dirname(outputPath), { recursive: true });
   await fs.writeFile(outputPath, jsContent);
-  return {cbObj, lineObj}
+  return { cbObj, lineObj }
 }
 
 async function findTplFiles(dirPath) {
