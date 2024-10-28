@@ -37,7 +37,7 @@ body {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #212121;
+  background-color: #292929;
 }
 
 .wrappper__header {
@@ -47,7 +47,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  background-color: #171717;
+  background-color: #212121;
   padding: 0 20px;
   padding-left: 0;
   flex-shrink: 0;
@@ -64,7 +64,7 @@ body {
   width: 350px;
   height: calc(100% + 60px);
   padding: 20px;
-  background-color: #171717;
+  background-color: #212121;
   margin-top: -60px;
   /* border-right: 1px solid rgb(68, 71, 70); */
 }
@@ -79,7 +79,7 @@ body {
   padding: 20px;
   padding-right: 15px;
   padding-top: 15px;
-  background-color: #212121;
+  background-color: #292929;
 }
 
 .ui-dialog {
@@ -253,7 +253,7 @@ body {
   align-items: center;
   padding: 20px;
   font-size: 14px;
-  background-color: #171717;
+  background-color: #212121;
   gap: 10px;
   position: relative;
   padding-top: 30px;
@@ -359,7 +359,7 @@ body {
 .diffHTML {
   position: fixed;
   inset: 0;
-  background-color: #212121;
+  background-color: #292929;
   z-index: 10000;
   display: flex;
   flex-direction: column;
@@ -372,7 +372,7 @@ body {
   align-items: center;
   padding: 0 10px;
   flex-shrink: 0;
-  background-color: #171717;
+  background-color: #212121;
 }
 
 #Save {
@@ -386,7 +386,7 @@ body {
 .diffHTML-content {
   width: 100%;
   flex: 1;
-  /* background-color: #333; */
+  /* background-color: #292929; */
   overflow: auto;
 }
 
@@ -536,7 +536,7 @@ select {
 
 .ui-checkbox {
   border: 0;
-  background-color: #212121;
+  background-color: #292929;
   outline: none;
   box-shadow: none;
 }
@@ -716,7 +716,7 @@ select {
 }
 
 .CodeMirror {
-  background-color: #212121 !important;
+  background-color: #292929 !important;
 }
 
 .CodeMirror-gutters {
@@ -823,5 +823,5 @@ select {
 
 .monaco-editor .line-numbers.active-line-number {
   background-color: #ff0000!important;
-  color: #fff!important;
+  color: #fff
 }
