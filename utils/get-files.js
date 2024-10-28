@@ -95,7 +95,12 @@ async function getStagedFileDiffs({
         }
         if (beforeContent && afterContent) {
           const changedLines = getChangedLines(beforeContent, afterContent);
-          obj[path.basename(file)] = changedLines;
+          const curKey = path.basename(file);
+          if (!obj[curKey]) obj[curKey] = []
+          obj[curKey] = [
+            ...obj[curKey],
+            ...changedLines
+          ];
         }
       }
     }
