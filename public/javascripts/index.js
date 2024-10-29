@@ -183,8 +183,8 @@ const createContent = (
             <div class="tpl__ele" title="[${lan}] ${lujing}" data-es="${info.endsWith(".tpl") && selectLan !== lan ? "tpl" : ""}">[${lan}] ${lujing}</div>
           </div>
           <div class="btns">
-           <a href="javascript:" class="ui-button ui-button-primary async-res" style="display: ${selectLan === lan ? "none" : ""}" role="button">${info.startsWith("img/") ? "Async" : "Diff"}</a>
-           <a href="javascript:" class="ui-button ui-button-primary one-deploy" role="button" style="display: ${info.endsWith(".json") ? "none" : ""}">To Test</a>
+           <a href="javascript:" class="ui-button ui-button-warning async-res" style="display: ${selectLan === lan ? "none" : ""}" role="button">${info.startsWith("img/") ? "ASYNC" : "DIFF"}</a>
+           <a href="javascript:" class="ui-button ui-button-primary one-deploy" role="button" title="Deylop To Test Env" style="display: ${info.endsWith(".json") ? "none" : ""}">TEST</a>
            <a href="javascript:" class="ui-button ui-button-warning delete" style="display: none" role="button">Delete</a>
           </div>
         </li>`;
@@ -294,6 +294,8 @@ const createContent = (
             diffEditor = null;
             jsonEditor = null;
             diffHTML(res.data, lan, path, initLan, lines);
+          } else if (res.code === 200 && res.message === "error") {
+            new LightTip().error(res?.data);
           }
           item.classList.remove("loading");
         })
@@ -976,16 +978,6 @@ const diffHTML = function (data = {}, lan = "", path = "", initLan = "", lines =
         <a href="javascript:" class="ui-button ui-button-primary" id="Prev" role="button">Prev</a>
         <a href="javascript:" class="ui-button ui-button-primary" id="Next" role="button">Next</a>
         <input class="ui-input select-text" style="display: none" placeholder="Search...">
-
-        ${linesArr?.length ? `<select class="select-lines">
-          <option value="">Select Skip Line</option>
-        ${linesArr.map(s => {
-    return `<option value="${s}">${s}</option>`
-  }).join('')
-      }
-</select>
-          `: ''
-    }
         <a href="javascript:" data-lan="${lan}" class="ui-button ui-button-primary" id="Save" role="button">Save</a>
         <a href="javascript:" class="ui-button ui-button-warning red_button" id="Cancel" role="button">Cancel</a>
       </div>
@@ -1003,13 +995,13 @@ const diffHTML = function (data = {}, lan = "", path = "", initLan = "", lines =
   // setEditor(path, data.initC.content, data.nowC.content);
   if (!data.initC.path.endsWith(".json")) {
     setEditor(path, data.nowC.content, data.initC.content);
-    const selectLines = document.querySelector(".select-lines");
-    selectLines.onchange = () => {
-      const line = selectLines.value || 0;
-      const a = diffEditor.getOriginalEditor()
-      a.setPosition({ lineNumber: Number(line), column: 1 });
-      a.revealLine(Number(line))
-    }
+    // const selectLines = document.querySelector(".select-lines");
+    // selectLines.onchange = () => {
+    //   const line = selectLines.value || 0;
+    //   const a = diffEditor.getOriginalEditor()
+    //   a.setPosition({ lineNumber: Number(line), column: 1 });
+    //   a.revealLine(Number(line))
+    // }
     // doc = new Mergely("#compare", {
     //   sidebar: true,
     //   ignorews: false,

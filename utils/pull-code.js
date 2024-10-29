@@ -16,7 +16,6 @@ async function pullCode({ lan, localPaths }) {
     const { stdout: status } = await executeGitCommand(
       "git status --porcelain"
     );
-    console.log("status", status);
     if (status) {
       throw new Error("工作目录不干净，有未提交的更改");
     }

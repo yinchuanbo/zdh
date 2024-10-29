@@ -13,7 +13,13 @@ const mergeCode = require("../utils/merge-code");
 const getBranchs = require("../utils/get-branchs");
 const io = require("socket.io-client");
 
-const { copyAndMoveImg, getFileContent, deleteFile, openVsCode, openSite } = require("../utils/handle-file");
+const {
+  copyAndMoveImg,
+  getFileContent,
+  deleteFile,
+  openVsCode,
+  openSite,
+} = require("../utils/handle-file");
 const { authenticateToken } = require("../permissions");
 var router = express.Router();
 
@@ -61,7 +67,12 @@ router.post("/handle-files", authenticateToken, async (req, res) => {
   const configs = getConf(req.uname, res);
   const { init, async, commitIds } = req.body;
   try {
-    const {cbObj, lineObj} = await getFileFunc(init, async, commitIds, configs);
+    const { cbObj, lineObj } = await getFileFunc(
+      init,
+      async,
+      commitIds,
+      configs
+    );
     const output = getRequireDynamicFile("output.js", {});
     const outputOther = getRequireDynamicFile("output-other.js", {});
     res.json({
@@ -70,7 +81,7 @@ router.post("/handle-files", authenticateToken, async (req, res) => {
       data: output[init],
       data2: outputOther,
       data3: cbObj || {},
-      data4: lineObj || {}
+      data4: lineObj || {},
     });
   } catch (error) {
     res.json({
@@ -94,7 +105,7 @@ router.post("/publish", authenticateToken, async (req, res) => {
     res.json({
       code: 200,
       message: "publish-fail",
-      data: error || error?.message || "Publish 失败"
+      data: error || error?.message || "Publish 失败",
     });
   }
 });
@@ -103,42 +114,42 @@ router.post("/all-publish", authenticateToken, async (req, res) => {
   const { lans } = req.body;
   const { ports, domain } = getConf(req.uname, res);
   let s = [];
-  let f = []
-  let errorObj = {}
+  let f = [];
+  let errorObj = {};
   let portsObj = {};
   for (let i = 0; i < lans.length; i++) {
     const lan = lans[i];
-    portsObj[lan] = ports[lan]
+    portsObj[lan] = ports[lan];
   }
   if (!Object.keys(portsObj)?.length) portsObj = ports;
   async function setPub() {
     for (const key in portsObj) {
       try {
         await handlePublish(key, portsObj, domain);
-        s.push(key)
+        s.push(key);
       } catch (error) {
         f.push(key);
-        errorObj[key] = error?.message || error
+        errorObj[key] = error?.message || error;
       }
     }
     return Promise.resolve();
   }
   setPub().then(() => {
-    let str = ''
+    let str = "";
     if (s?.length) {
-      str += `${s.join(',')} publish success`;
+      str += `${s.join(",")} publish success`;
     }
     if (f?.length) {
-      str += `, ${f.join(',')} publish failed`
+      str += `, ${f.join(",")} publish failed`;
     }
     if (Object.keys(errorObj)?.length) {
-      str += `\n` + JSON.stringify(errorObj)
+      str += `\n` + JSON.stringify(errorObj);
     }
     socket.emit("chat message", {
       type: "all-publish",
-      message: str
+      message: str,
     });
-  })
+  });
   res.json({
     code: 200,
     message: "publish-success",
@@ -159,22 +170,31 @@ router.post("/receive-files", authenticateToken, async (req, res) => {
     } catch (error) {
       res.json({
         code: 200,
-        message: error || error?.message || "fail",
+        message: "error",
+        data: error?.message || error,
       });
     }
   } else {
-    const result = await getFileContent({
-      path,
-      lan,
-      initLan,
-      path2,
-      LocalListPro,
-    });
-    res.json({
-      code: 200,
-      message: "processing",
-      data: result,
-    });
+    try {
+      const result = await getFileContent({
+        path,
+        lan,
+        initLan,
+        path2,
+        LocalListPro,
+      });
+      res.json({
+        code: 200,
+        message: "processing",
+        data: result,
+      });
+    } catch (error) {
+      res.json({
+        code: 200,
+        message: "error",
+        data: error?.message || error,
+      });
+    }
   }
 });
 
@@ -182,11 +202,11 @@ router.post("/delete-file", authenticateToken, async (req, res) => {
   const { LocalListPro } = getConf(req.uname, res);
   const { path2, lan } = req.body;
   try {
-    await deleteFile({ path2, lan, LocalListPro })
+    await deleteFile({ path2, lan, LocalListPro });
     res.json({
       code: 200,
       message: "delete-success",
-      data: '',
+      data: "",
     });
   } catch (error) {
     res.json({
@@ -195,18 +215,17 @@ router.post("/delete-file", authenticateToken, async (req, res) => {
       data: error?.message || error,
     });
   }
-
 });
 
 router.post("/open-vscode", authenticateToken, async (req, res) => {
   const configs = getConf(req.uname, res);
   const { lan } = req.body;
   try {
-    await openVsCode({ lan, localPaths: configs.localPaths })
+    await openVsCode({ lan, localPaths: configs.localPaths });
     res.json({
       code: 200,
       message: "open-vscode-success",
-      data: '',
+      data: "",
     });
   } catch (error) {
     res.json({
@@ -215,14 +234,17 @@ router.post("/open-vscode", authenticateToken, async (req, res) => {
       data: error?.message || error,
     });
   }
-
 });
 
 router.post("/open-site", authenticateToken, async (req, res) => {
   const configs = getConf(req.uname, res);
   const { lan } = req.body;
   try {
-    const url = await openSite({ lan, ports: configs.ports, domain: configs.domain })
+    const url = await openSite({
+      lan,
+      ports: configs.ports,
+      domain: configs.domain,
+    });
     res.json({
       code: 200,
       data: url,
@@ -230,10 +252,9 @@ router.post("/open-site", authenticateToken, async (req, res) => {
   } catch (error) {
     res.json({
       code: 200,
-      data: ''
+      data: "",
     });
   }
-
 });
 
 router.post("/receive-imgs", authenticateToken, async (req, res) => {
@@ -343,43 +364,43 @@ router.post("/all-pull", authenticateToken, async (req, res) => {
   const { localPaths, ports } = getConf(req.uname, res);
   let { lans } = req.body;
   if (!lans?.length) {
-    lans = Object.keys(ports)
+    lans = Object.keys(ports);
   }
-  let s = [], f = [], errorObj = {};
+  let s = [],
+    f = [],
+    errorObj = {};
   async function getAllPush() {
     for (let i = 0; i < lans.length; i++) {
       const lan = lans[i];
       try {
         await pullCode({ lan, localPaths });
-        s.push(lan)
+        s.push(lan);
       } catch (error) {
-        f.push(lan)
-        errorObj[lan] = error?.message || error
+        f.push(lan);
+        errorObj[lan] = error?.message || error;
       }
     }
     return Promise.resolve();
   }
 
   getAllPush().then(() => {
-    let str = '';
+    let str = "";
     if (s?.length) {
-      str += `${s.join(",")} Pull Success, `
+      str += `${s.join(",")} Pull Success, `;
     }
     if (f?.length) {
-      str += `${f.join(",")} Pull Fail, ${JSON.stringify(errorObj)}`
+      str += `${f.join(",")} Pull Fail, ${JSON.stringify(errorObj)}`;
     }
     socket.emit("chat message", {
       type: "all-pull",
-      message: str
+      message: str,
     });
-  })
+  });
   res.json({
-    code: 200
+    code: 200,
   });
 
   // try {
-
-
 
   //   const result = await pullCode({ lan, localPaths });
   //   res.json({

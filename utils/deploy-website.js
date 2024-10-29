@@ -13,7 +13,7 @@ const maxLen = 2;
 function sendProgressUpdate(total) {
   socket.emit("chat message", {
     type: "deploy-progress",
-    message: `部署进度: ${successArr.length + errorArr.length}/${total}，成功: ${successArr.length}，失败: ${errorArr.length}`,
+    message: `部署进度: ${successArr.length + errorArr.length}/${total}，成功: ${successArr.length}，失败: ${errorArr.length}, 成功语言: ${successArr + ''}`,
   });
 }
 
