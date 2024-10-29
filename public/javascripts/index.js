@@ -27,10 +27,10 @@ function openFullScreenWindow(url) {
       url,
       "_blank",
       "width=" +
-        window.screen.width +
-        ",height=" +
-        window.screen.height +
-        ",left=0,top=0"
+      window.screen.width +
+      ",height=" +
+      window.screen.height +
+      ",left=0,top=0"
     );
     if (newWindow) {
       newWindow.focus();
@@ -156,22 +156,22 @@ const createContent = (
     </div>
     <ul>
       ${data
-        .map((info) => {
-          const str = generateRandomString(20);
-          let lujing = curDatas2?.[info] || "unknown";
-          if (selectLan === lan) lujing = info;
-          let fileN = info.split("/") || [];
-          let lineVal = "";
-          if (!fileN || !fileN?.length) {
-            lineVal = "";
-          } else {
-            lineVal = data4?.[fileN.at(-1)] || [];
-            lineVal = lineVal.sort((a, b) => a - b);
-            lineVal = [...new Set(lineVal)];
-            lineVal = keepFirstOfConsecutive(lineVal);
-            lineVal = lineVal + "";
-          }
-          return `<li data-path="${info}" data-path2="${lujing}" data-lan="${lan}" data-lines="${lineVal}">
+      .map((info) => {
+        const str = generateRandomString(20);
+        let lujing = curDatas2?.[info] || "unknown";
+        if (selectLan === lan) lujing = info;
+        let fileN = info.split("/") || [];
+        let lineVal = "";
+        if (!fileN || !fileN?.length) {
+          lineVal = "";
+        } else {
+          lineVal = data4?.[fileN.at(-1)] || [];
+          lineVal = lineVal.sort((a, b) => a - b);
+          lineVal = [...new Set(lineVal)];
+          lineVal = keepFirstOfConsecutive(lineVal);
+          lineVal = lineVal + "";
+        }
+        return `<li data-path="${info}" data-path2="${lujing}" data-lan="${lan}" data-lines="${lineVal}">
           <div class="check-handle" title="已完成可选中">
             <input type="checkbox" id="${str}" name="${str}">
             <label for="${str}" class="ui-checkbox"></label>
@@ -187,8 +187,8 @@ const createContent = (
            <a href="javascript:" class="ui-button ui-button-warning delete" style="display: none" role="button">Delete</a>
           </div>
         </li>`;
-        })
-        .join("")}
+      })
+      .join("")}
     </ul>
   </div>`;
 
@@ -814,14 +814,14 @@ const setMerge = (item, lan) => {
         <div class="setCommit_left">
           <select name="from">
               ${data.map((h) => {
-                return `<option class="feat" value="${h}" title="${h}">${h}</option>`;
-              })}
+      return `<option class="feat" value="${h}" title="${h}">${h}</option>`;
+    })}
           </select>
           <p>Mergr To</p>
           <select name="to">
           ${data.map((h) => {
-            return `<option class="feat" value="${h}" title="${h}">${h}</option>`;
-          })}
+      return `<option class="feat" value="${h}" title="${h}">${h}</option>`;
+    })}
           </select>
         </div>
         <div class="setCommit_btns">

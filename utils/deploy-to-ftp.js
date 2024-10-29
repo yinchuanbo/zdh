@@ -55,19 +55,19 @@ async function deployToFtp({ lan = "", data = [], env = "test", configs }) {
       [lan]: data,
     };
   }
-  if (env === "test") {
-    for (const key in outputs) {
-      const val = outputs[key];
-      const find = val.find((item) => {
-        const p = `${configs.LocalListTest[lan]}${item}`.replaceAll("\\", "/");
-        return !fs.existsSync(p);
-      });
-      console.log("sdfdsfdsf");
-      if (find) {
-        throw new Error(`${find} 文件不存在`);
-      }
-    }
-  }
+  // if (env === "test") {
+  //   for (const key in outputs) {
+  //     const val = outputs[key];
+  //     const find = val.find((item) => {
+  //       const p = `${configs.LocalListTest[lan]}${item}`.replaceAll("\\", "/");
+  //       return !fs.existsSync(p);
+  //     });
+  //     console.log("sdfdsfdsf");
+  //     if (find) {
+  //       throw new Error(`${find} 文件不存在`);
+  //     }
+  //   }
+  // }
   const batchSize = 4;
   const keys = Object.keys(outputs);
   for (let i = 0; i < keys.length; i += batchSize) {

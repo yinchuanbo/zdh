@@ -39,6 +39,7 @@ function deployBatch(languages, deployInfoCopy, totalLanguages) {
         worker.postMessage({ language, url, username, password });
         currentLanguageIndex++;
       } else {
+        console.log('我在关闭线程')
         worker.terminate();
         completedWorkers++;
         console.log('completedWorkers', completedWorkers)

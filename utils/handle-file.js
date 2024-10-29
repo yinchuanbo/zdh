@@ -10,9 +10,9 @@ function copyAndMoveImg({ path, lan, initLan, LocalListPro }) {
   const initPath = LocalListPro[initLan] + path.replaceAll("/", "\\");
   const nowPath = LocalListPro[lan] + path.replaceAll("/", "\\");
 
-  if (!fs.existsSync(initPath)) {
-    throw new Error(initPath + " 文件不存在");
-  }
+  // if (!fs.existsSync(initPath)) {
+  //   throw new Error(initPath + " 文件不存在");
+  // }
 
   try {
     fs.copyFileSync(initPath, nowPath);
@@ -26,9 +26,9 @@ async function getFileContent({ path, lan, initLan, path2, LocalListPro }) {
   const initPath = LocalListPro[initLan] + path.replaceAll("/", "\\");
   const nowPath = LocalListPro[lan] + path2.replaceAll("/", "\\");
 
-  if (!fs.existsSync(initPath)) {
-    throw new Error(initPath + " 文件不存在");
-  }
+  // if (!fs.existsSync(initPath)) {
+  //   throw new Error(initPath + " 文件不存在");
+  // }
 
   if (!fs.existsSync(nowPath)) {
     const dir = pathModule.dirname(nowPath);
