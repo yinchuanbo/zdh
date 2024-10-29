@@ -56,12 +56,14 @@ function deployBatch(languages, deployInfoCopy, totalLanguages) {
           console.log("fail3", result)
           errorArr.push(result.language);
         }
+        worker.terminate();
         updateProgress(totalLanguages);
         assignTaskToWorker(worker);
       });
       worker.on('error', (error) => {
         console.log("fail4", error)
         errorArr.push("Unknown language due to error.");
+        worker.terminate();
         updateProgress(totalLanguages);
         assignTaskToWorker(worker);
       });
