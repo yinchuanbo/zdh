@@ -321,6 +321,7 @@ router.post("/deploy-to-ftp", authenticateToken, async (req, res) => {
     res.json({
       code: 200,
       message: "deploy-error",
+      data: error?.message || error,
     });
   }
 });

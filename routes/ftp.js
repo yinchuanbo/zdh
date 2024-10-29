@@ -41,7 +41,7 @@ router.post("/upload-ftp", authenticateToken, async function (req, res, next) {
       console.log('handleFtp')
       socket.emit("chat message", {
         type: "upload-ftp-success",
-        message: "Ftp Upload Success",
+        message: "测试服部署成功",
       });
     }).catch((error) => {
       socket.emit("chat message", {
