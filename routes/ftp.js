@@ -38,10 +38,9 @@ router.post("/upload-ftp", authenticateToken, async function (req, res, next) {
   const socket = io("http://localhost:4000");
   try {
     handleFtp({ env, data, configs }).then(() => {
-      console.log('handleFtp')
       socket.emit("chat message", {
         type: "upload-ftp-success",
-        message: `${env === 'test' ? '测试服':'正式服'}部署成功`,
+        message: `${env === 'test' ? '测试服':'正式服'} FTP 上传成功`,
       });
     }).catch((error) => {
       socket.emit("chat message", {
