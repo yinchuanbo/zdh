@@ -44,6 +44,16 @@ const setWatch = () => {
   fetch("/watching?bool=" + isWatching);
 };
 
+const closeWatch = () => {
+  isWatching = false;
+  if (isWatching) {
+    watchBtn.classList.add("watching");
+  } else {
+    watchBtn.classList.remove("watching");
+  }
+  setWatch();
+}
+
 const watchBtnListen = () => {
   watchBtn.onclick = () => {
     isWatching = !isWatching;
@@ -63,12 +73,7 @@ const handleSocket = () => {
   socket.on("chat message", (msg) => {
     const { type, message, file } = msg;
     if (type === "watch error") {
-      isWatching = false;
-      if (isWatching) {
-        watchBtn.classList.add("watching");
-      } else {
-        watchBtn.classList.remove("watching");
-      }
+      closeWatch();
       new Dialog({
         title: "Error Info",
         content: message + "-" + file,
