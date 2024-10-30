@@ -1114,7 +1114,7 @@ const diffHTML = function (
 
 const handleNoData = () => {
   const contentDom = document.querySelector(".wrappper__content-content");
-  const noData = `<div class="no-data"><p>No Data</p></div>`;
+  const noData = `<div class="no-data"></div>`;
   contentDom.innerHTML = "";
   contentDom.insertAdjacentHTML("beforeend", noData);
 };
