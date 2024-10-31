@@ -764,7 +764,7 @@ select {
 }
 
 .wrappper__sider_02-label input:checked + label + label {
-  background-color: #2486ff;
+  background-color: #498205;
 }
 
 .mergely-editor .mergely.c.CodeMirror-linebackground {
