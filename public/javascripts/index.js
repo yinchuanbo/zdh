@@ -795,7 +795,6 @@ const setCommit = (item, lan, hasCommit = false, result = {}) => {
         }
       });
   };
-
   cancelBtn.onclick = () => {
     item.classList.remove("loading");
     setCommit.remove();
