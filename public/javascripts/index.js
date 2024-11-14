@@ -3,7 +3,7 @@ let imgs = [];
 let isWatching = false;
 
 let editor = null,
-  jsonEditor = null;
+  jsonEditor = null, isc = false;
 
 const watchBtn = document.querySelector(".watch-btn");
 const selectAllBtn = document.querySelector(".select-all-btn");
@@ -1126,8 +1126,6 @@ const handleNoData = () => {
   contentDom.insertAdjacentHTML("beforeend", noData);
 };
 
-let isc = false;
-
 const handleGetFile = () => {
   handleNoData();
   handleBtn.onclick = () => {
@@ -1227,6 +1225,7 @@ const selectOnChange = () => {
     const checkboxes = document.querySelectorAll("input[name='checkbox']");
     checkboxes.forEach(function (checkbox) {
       checkbox.checked = false;
+      isc = false
     });
   });
 };
