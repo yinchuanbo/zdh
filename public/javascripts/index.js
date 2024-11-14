@@ -6,6 +6,7 @@ let editor = null,
   jsonEditor = null;
 
 const watchBtn = document.querySelector(".watch-btn");
+const selectAllBtn = document.querySelector(".select-all-btn");
 const handleBtn = document.querySelector(".handle-btn");
 const allPublish = document.querySelector(".all-publish");
 const allPull = document.querySelector(".all-pull");
@@ -138,14 +139,18 @@ const createContent = (
   data2 = {},
   data3 = {},
   data4 = {},
-  initLan = "en"
+  initLan = "en",
+  _idx = 0
 ) => {
   data2Info = data2;
   const header = document.querySelector(".wrappper__content-header");
   const content = document.querySelector(".wrappper__content-content");
   const curDatas2 = data2[lan];
-  const html01 = `<div class="header-item active">${lan}<span title="${data3[lan]}">${data3[lan]}</span><div>`;
-  const html02 = `<div class="content-item active">
+
+  let isIdx = _idx === 0;
+
+  const html01 = `<div class="header-item ${isIdx ? 'active' : ''}">${lan}<span title="${data3[lan]}">${data3[lan]}</span><div>`;
+  const html02 = `<div class="content-item ${isIdx ? 'active' : ''}">
     <div class="content-item-btns">
       <a href="javascript:" class="ui-button ui-button-primary pull-code" title="Pull Code" role="button" data-lan="${lan}"><svg t="1729842156712" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="12812" width="30" height="30"><path d="M512 64C759.04 64 960 264.96 960 512S759.04 960 512 960s-448-200.96-448-448S264.96 64 512 64zM512 896.00000001C723.744 896 896 723.744 896.00000001 512c0-211.74400001-172.256-384.00000001-384.00000001-384.00000001-211.74400001 0-384.00000001 172.256-384.00000001 384.00000001C128 723.744 300.256 896 512 896.00000001z" p-id="12813" fill="#ffffff"></path><path d="M329.536 565.632l158.496 160.256c9.344 9.472 23.168 11.84 34.784 7.136 0.736-0.288 1.312-0.992 2.01600001-1.344 2.976-1.472 5.952-3.072 8.44799998-5.536 0.032-0.032 0.032-0.064 0.06400001-0.096s0.064-0.032 0.09599999-0.064l159.36000001-158.912c12.51200001-12.48 12.544-32.736 0.064-45.248-6.24-6.272-14.464-9.408-22.656-9.408-8.15999999 0-16.352 3.10399999-22.592 9.344L544 625.056 544 320c0-17.696-14.336-32-32-32.00000001s-32 14.304-32 32.00000001l0 306.752-104.96-106.112c-6.24-6.336-14.496-9.504-22.752-9.504-8.128 0-16.256 3.072-22.496 9.248C317.216 532.8 317.088 553.056 329.536 565.632z" p-id="12814" fill="#ffffff"></path></svg></a>
       <a href="javascript:" class="ui-button ui-button-primary discard-code" title="Discard Code" role="button" data-lan="${lan}" style="display: ${selectLan === lan ? "none" : ""}"><svg t="1729820332473" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5389" width="30" height="30"><path d="M224 128v224L256 384h224V320H318.656l60.224-60.224a227.328 227.328 0 1 1 321.472 321.472L367.744 913.92l46.08 46.08 332.672-332.672A292.48 292.48 0 0 0 332.8 213.696l-44.8 44.8V128h-64z" fill="#ffffff" p-id="5390"></path></svg></a>
@@ -200,8 +205,10 @@ const createContent = (
   let active01 = document.querySelector(".header-item.active");
   let active02 = document.querySelector(".content-item.active");
 
-  if (active01) active01.classList.remove("active");
-  if (active02) active02.classList.remove("active");
+  if (isIdx) {
+    if (active01) active01.classList.remove("active");
+    if (active02) active02.classList.remove("active");
+  }
 
   header.insertAdjacentHTML("beforeend", html01);
   content.insertAdjacentHTML("beforeend", html02);
@@ -1119,6 +1126,8 @@ const handleNoData = () => {
   contentDom.insertAdjacentHTML("beforeend", noData);
 };
 
+let isc = false;
+
 const handleGetFile = () => {
   handleNoData();
   handleBtn.onclick = () => {
@@ -1170,14 +1179,15 @@ const handleGetFile = () => {
           const content = document.querySelector(".wrappper__content-content");
           header.innerHTML = "";
           content.innerHTML = "";
-          selectedValues.forEach((lan) => {
+          selectedValues.forEach((lan, _idx) => {
             createContent(
               lan,
               res?.data,
               res?.data2,
               res?.data3,
               res?.data4,
-              select.value
+              select.value,
+              _idx
             );
           });
         } else {
@@ -1191,6 +1201,13 @@ const handleGetFile = () => {
         console.log("err", err);
       });
   };
+  selectAllBtn.onclick = () => {
+    isc = !isc;
+    const checkboxes = document.querySelectorAll("[name='checkbox']");
+    checkboxes.forEach(function (checkbox) {
+      checkbox.checked = isc;
+    });
+  }
 };
 
 const selectOnChange = () => {
