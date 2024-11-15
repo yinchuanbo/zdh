@@ -11,6 +11,7 @@ const pushCode = require("../utils/push-code");
 const discardCode = require("../utils/discard-code");
 const mergeCode = require("../utils/merge-code");
 const getBranchs = require("../utils/get-branchs");
+const RTLConverter = require("../utils/switch-css-ar")
 const io = require("socket.io-client");
 
 const {
@@ -106,6 +107,26 @@ router.post("/publish", authenticateToken, async (req, res) => {
       code: 200,
       message: "publish-fail",
       data: error || error?.message || "Publish 失败",
+    });
+  }
+});
+
+router.post("/switch-css-ar", authenticateToken, async (req, res) => {
+  const { ports, domain } = getConf(req.uname, res);
+  const { csscode } = req.body;
+  try {
+    const converter = new RTLConverter();
+    const rtlContent = await converter.convertStyles(csscode);
+    res.json({
+      code: 200,
+      message: "switch-code-success",
+      data: rtlContent
+    });
+  } catch (error) {
+    res.json({
+      code: 200,
+      message: "switch-code-fail",
+      data: error?.message || error
     });
   }
 });

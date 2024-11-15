@@ -6,6 +6,7 @@ let editor = null,
   jsonEditor = null, isc = false;
 
 const watchBtn = document.querySelector(".watch-btn");
+const arSwitchCss = document.querySelector(".ar-switch-css");
 const selectAllBtn = document.querySelector(".select-all-btn");
 const handleBtn = document.querySelector(".handle-btn");
 const allPublish = document.querySelector(".all-publish");
@@ -1205,7 +1206,79 @@ const handleGetFile = () => {
       checkbox.checked = isc;
     });
   }
+  arSwitchCss.onclick = () => {
+    renderCssSwitchHTML()
+  }
 };
+
+const renderCssSwitchHTML = () => {
+  const html = `
+    <div class="css-arcss">
+      <div class="css-arcss-header">
+        <a href="javascript:" class="ui-button ui-button-primary Switch-css" role="button">Switch</a>
+        <a href="javascript:" class="ui-button ui-button-warning red_button Cancel-switch" role="button">Cancel</a>
+        <a href="javascript:" class="ui-button ui-button-primary copy-code" role="button">Copy</a>
+      </div>
+      <div class="css-arcss-content">
+        <div class="css-arcss-content_left">
+          <textarea id="origin-css"></textarea>
+        </div>
+        <div class="css-arcss-content_content">
+          <textarea id="after-css" readonly></textarea>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.insertAdjacentHTML("beforeend", html)
+  const cssArcss = document.querySelector(".css-arcss")
+  const SwitcCss = document.querySelector(".Switch-css")
+  const copyCode = document.querySelector(".copy-code")
+  const CancelSwitch = document.querySelector(".Cancel-switch")
+  const afterCss = document.querySelector("#after-css")
+  const textareaCode = document.querySelector("#origin-css")
+  copyCode.onclick = () => {
+    navigator.clipboard.writeText(afterCss.value.trim())
+    .then(() => {
+      new LightTip().success("Copy Success!");
+    })
+    .catch(err => {
+      new LightTip().error("Copy Failed!");
+    });
+  }
+  CancelSwitch.onclick = () => {
+    cssArcss.remove()
+  }
+  SwitcCss.onclick = () => {
+    if (!textareaCode.value.trim()) {
+      new LightTip().error("请输入 Scss 或 Css 代码");
+      return;
+    }
+    SwitcCss.classList.add("loading")
+    fetch("/switch-css-ar", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        csscode: textareaCode.value.trim()
+      }),
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((res) => {
+        if(res?.message === 'switch-code-success') {
+          afterCss.innerHTML = res?.data
+        } else {
+          new LightTip().error(res?.data);
+        }
+        SwitcCss.classList.remove("loading");
+      })
+      .catch((err) => {
+        SwitcCss.classList.remove("loading");
+      });
+  }
+}
 
 const selectOnChange = () => {
   const select = document.querySelector(".wrappper__sider_01 select");
