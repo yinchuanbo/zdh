@@ -1216,7 +1216,7 @@ const renderCssSwitchHTML = () => {
     <div class="css-arcss">
       <div class="css-arcss-header">
         <a href="javascript:" class="ui-button ui-button-primary Switch-css" role="button">Switch</a>
-        <a href="javascript:" class="ui-button ui-button-primary copy-code" role="button">Copy</a>
+        <a href="javascript:" class="ui-button ui-button-primary copy-code" role="button" style="display:none">Copy</a>
         <a href="javascript:" class="ui-button ui-button-warning red_button Cancel-switch" role="button">Cancel</a>
       </div>
       <div class="css-arcss-content">
@@ -1238,12 +1238,15 @@ const renderCssSwitchHTML = () => {
   const textareaCode = document.querySelector("#origin-css")
   copyCode.onclick = () => {
     navigator.clipboard.writeText(afterCss.value.trim())
-    .then(() => {
-      new LightTip().success("Copy Success!");
-    })
-    .catch(err => {
-      new LightTip().error("Copy Failed!");
-    });
+      .then(() => {
+        new LightTip().success("Copy Success!");
+      })
+      .catch(err => {
+        new LightTip().error("Copy Failed!");
+      });
+  }
+  textareaCode.oninput = () => {
+    copyCode.style.display = "none"
   }
   CancelSwitch.onclick = () => {
     cssArcss.remove()
@@ -1267,8 +1270,9 @@ const renderCssSwitchHTML = () => {
         return res.json();
       })
       .then((res) => {
-        if(res?.message === 'switch-code-success') {
+        if (res?.message === 'switch-code-success') {
           afterCss.innerHTML = res?.data
+          copyCode.style.display = "block"
         } else {
           new LightTip().error(res?.data);
         }
