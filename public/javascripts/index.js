@@ -1216,8 +1216,8 @@ const renderCssSwitchHTML = () => {
     <div class="css-arcss">
       <div class="css-arcss-header">
         <a href="javascript:" class="ui-button ui-button-primary Switch-css" role="button">Switch</a>
-        <a href="javascript:" class="ui-button ui-button-warning red_button Cancel-switch" role="button">Cancel</a>
         <a href="javascript:" class="ui-button ui-button-primary copy-code" role="button">Copy</a>
+        <a href="javascript:" class="ui-button ui-button-warning red_button Cancel-switch" role="button">Cancel</a>
       </div>
       <div class="css-arcss-content">
         <div class="css-arcss-content_left">
