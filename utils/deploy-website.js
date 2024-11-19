@@ -1,4 +1,4 @@
-const { Worker } = require('worker_threads');
+const { Worker } = require("worker_threads");
 const path = require("path");
 const io = require("socket.io-client");
 
@@ -13,7 +13,7 @@ const maxLen = 2;
 function sendProgressUpdate(total) {
   socket.emit("chat message", {
     type: "deploy-progress",
-    message: `部署进度: ${successArr.length + errorArr.length}/${total}，成功: ${successArr.length}，失败: ${errorArr.length}, 成功语言: ${successArr + ''}`,
+    message: `部署进度: ${successArr.length + errorArr.length}/${total}，成功: ${successArr.length}，失败: ${errorArr.length}, 成功语言: ${successArr + ""}`,
   });
 }
 
@@ -26,9 +26,9 @@ function updateProgress(total) {
 function deployBatch(languages, deployInfoCopy, totalLanguages) {
   return new Promise((resolve) => {
     const maxWorkers = Math.min(maxLen, languages.length);
-    const workerPool = new Array(maxWorkers).fill().map(() =>
-      new Worker(path.join(__dirname, 'deployWorker.js'))
-    );
+    const workerPool = new Array(maxWorkers)
+      .fill()
+      .map(() => new Worker(path.join(__dirname, "deployWorker.js")));
     let currentLanguageIndex = 0;
     let completedWorkers = 0;
     function assignTaskToWorker(worker) {
@@ -39,30 +39,30 @@ function deployBatch(languages, deployInfoCopy, totalLanguages) {
         worker.postMessage({ language, url, username, password });
         currentLanguageIndex++;
       } else {
-        console.log('我在关闭线程')
+        console.log("我在关闭线程");
         worker.terminate();
         completedWorkers++;
-        console.log('completedWorkers', completedWorkers)
+        console.log("completedWorkers", completedWorkers);
         if (completedWorkers === maxWorkers) {
           resolve();
         }
       }
     }
     for (const worker of workerPool) {
-      worker.on('message', (result) => {
+      worker.on("message", (result) => {
         if (result.success) {
           successArr.push(result.language);
         } else {
-          console.log("fail3", result)
+          console.log("fail3", result);
           errorArr.push(result.language);
         }
         worker.terminate();
         updateProgress(totalLanguages);
         assignTaskToWorker(worker);
       });
-      worker.on('error', (error) => {
-        console.log("fail4", error)
-        errorArr.push("Unknown language due to error.");
+      worker.on("error", (error) => {
+        console.log("fail4", error);
+        errorArr.push("Unknown language due to error." + error?.message);
         worker.terminate();
         updateProgress(totalLanguages);
         assignTaskToWorker(worker);
@@ -83,7 +83,10 @@ async function deployAllLanguages(needLans = [], configs) {
   );
   const totalLanguages = filteredLanguages.length;
 
-  const progressInterval = setInterval(() => sendProgressUpdate(totalLanguages), 10000);
+  const progressInterval = setInterval(
+    () => sendProgressUpdate(totalLanguages),
+    10000
+  );
 
   const batches = [];
   for (let i = 0; i < totalLanguages; i += maxLen) {
@@ -92,7 +95,7 @@ async function deployAllLanguages(needLans = [], configs) {
 
   for (let i = 0; i < batches.length; i++) {
     const batch = batches[i];
-    await deployBatch(batch, deployInfoCopy, totalLanguages)
+    await deployBatch(batch, deployInfoCopy, totalLanguages);
   }
 
   clearInterval(progressInterval);

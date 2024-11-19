@@ -1,6 +1,6 @@
 {
   "name": "zdh",
-  "version": "2.0.9",
+  "version": "2.0.10",
   "private": true,
   "main": "main.js",
   "scripts": {
@@ -48,10 +48,10 @@
     "jsonwebtoken": "^9.0.2",
     "morgan": "~1.9.1",
     "nodemon": "^3.1.7",
+    "playwright": "^1.49.0",
     "postcss": "^8.4.49",
     "postcss-scss": "^4.0.9",
     "prettier": "^3.3.3",
-    "puppeteer": "^23.4.0",
     "sass": "^1.79.4",
     "simple-git": "^3.27.0",
     "socket.io": "^4.8.0",
