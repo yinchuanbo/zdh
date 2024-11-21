@@ -1,6 +1,6 @@
 {
   "name": "zdh",
-  "version": "2.0.13",
+  "version": "2.0.14",
   "private": true,
   "main": "main.js",
   "scripts": {
@@ -11,8 +11,8 @@
     "dir": "electron-builder --dir"
   },
   "build": {
-    "appId": "com.yourcompany.vidnozasync",
-    "productName": "VidnozAsync",
+    "appId": "com.yourcompany.VidnozManager",
+    "productName": "VidnozManager",
     "win": {
       "target": "portable",
       "icon": "favicon.ico"
