@@ -52,7 +52,7 @@ function listenWatch(isWatching, pathname, lans, ports, domain) {
 
   function checkSyntax(code) {
     try {
-      acorn.parse(code, { ecmaVersion: "latest" });
+      acorn.parse(code, { ecmaVersion: "latest", sourceType: "module" });
       return true;
     } catch (err) {
       return 'Syntax error:' + err.message;
