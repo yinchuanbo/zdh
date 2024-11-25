@@ -615,6 +615,7 @@ select {
   justify-content: center;
   align-items: center;
   border-radius: 5px;
+  overflow: hidden;
 }
 
 .nav_a:hover {

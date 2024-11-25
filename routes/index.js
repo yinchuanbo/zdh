@@ -11,7 +11,8 @@ const pushCode = require("../utils/push-code");
 const discardCode = require("../utils/discard-code");
 const mergeCode = require("../utils/merge-code");
 const getBranchs = require("../utils/get-branchs");
-const RTLConverter = require("../utils/switch-css-ar")
+const RTLConverter = require("../utils/switch-css-ar");
+const sync = require("../utils/sync");
 const io = require("socket.io-client");
 
 const {
@@ -120,15 +121,61 @@ router.post("/switch-css-ar", authenticateToken, async (req, res) => {
     res.json({
       code: 200,
       message: "switch-code-success",
-      data: rtlContent
+      data: rtlContent,
     });
   } catch (error) {
     res.json({
       code: 200,
       message: "switch-code-fail",
-      data: error?.message || error
+      data: error?.message || error,
     });
   }
+});
+
+router.post("/oneclick-sync", authenticateToken, async (req, res) => {
+  const { LocalListPro, localPaths } = getConf(req.uname, res);
+  const { init, data, data2 } = req.body;
+
+  const result = {};
+  data.forEach((path) => {
+    const key = `${LocalListPro[init]}${path}`.replaceAll("/", "\\");
+    result[key] = [];
+    for (const lang in data2) {
+      if (data2[lang][path]) {
+        result[key].push(
+          `${LocalListPro[lang]}${data2[lang][path]}`.replaceAll("/", "\\")
+        );
+      }
+    }
+  });
+
+  console.log("result", result);
+
+  sync({
+    result,
+    init,
+    localPaths,
+    LocalListPro,
+    data,
+    data2,
+    targetLans: Object.keys(data2),
+  });
+
+  // try {
+  //   const converter = new RTLConverter();
+  //   const rtlContent = await converter.convertStyles(csscode);
+  //   res.json({
+  //     code: 200,
+  //     message: "switch-code-success",
+  //     data: rtlContent
+  //   });
+  // } catch (error) {
+  //   res.json({
+  //     code: 200,
+  //     message: "switch-code-fail",
+  //     data: error?.message || error
+  //   });
+  // }
 });
 
 router.post("/all-publish", authenticateToken, async (req, res) => {

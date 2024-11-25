@@ -3,7 +3,8 @@ let imgs = [];
 let isWatching = false;
 
 let editor = null,
-  jsonEditor = null, isc = false;
+  jsonEditor = null,
+  isc = false;
 
 const watchBtn = document.querySelector(".watch-btn");
 const arSwitchCss = document.querySelector(".ar-switch-css");
@@ -11,6 +12,7 @@ const selectAllBtn = document.querySelector(".select-all-btn");
 const handleBtn = document.querySelector(".handle-btn");
 const allPublish = document.querySelector(".all-publish");
 const allPull = document.querySelector(".all-pull");
+const OneClick = document.querySelector(".One-click");
 
 let selectLan = document.querySelector(".wrappper__sider_01 select").value;
 
@@ -18,6 +20,7 @@ let isFirst = false;
 
 let curP = null;
 
+let dataInfo = {};
 let data2Info = {};
 
 function openFullScreenWindow(url) {
@@ -29,10 +32,10 @@ function openFullScreenWindow(url) {
       url,
       "_blank",
       "width=" +
-      window.screen.width +
-      ",height=" +
-      window.screen.height +
-      ",left=0,top=0"
+        window.screen.width +
+        ",height=" +
+        window.screen.height +
+        ",left=0,top=0"
     );
     if (newWindow) {
       newWindow.focus();
@@ -54,7 +57,7 @@ const closeWatch = () => {
     watchBtn.classList.remove("watching");
   }
   setWatch();
-}
+};
 
 const watchBtnListen = () => {
   watchBtn.onclick = () => {
@@ -143,15 +146,19 @@ const createContent = (
   initLan = "en",
   _idx = 0
 ) => {
+  dataInfo = data;
   data2Info = data2;
+  if(!(data2Info?.[initLan] && Object.keys(data2).length === 1)) {
+    OneClick.classList.remove("disabled");
+  }
   const header = document.querySelector(".wrappper__content-header");
   const content = document.querySelector(".wrappper__content-content");
   const curDatas2 = data2[lan];
 
   let isIdx = _idx === 0;
 
-  const html01 = `<div class="header-item ${isIdx ? 'active' : ''}">${lan}<span title="${data3[lan]}">${data3[lan]}</span><div>`;
-  const html02 = `<div class="content-item ${isIdx ? 'active' : ''}">
+  const html01 = `<div class="header-item ${isIdx ? "active" : ""}">${lan}<span title="${data3[lan]}">${data3[lan]}</span><div>`;
+  const html02 = `<div class="content-item ${isIdx ? "active" : ""}">
     <div class="content-item-btns">
       <a href="javascript:" class="ui-button ui-button-primary pull-code" title="Pull Code" role="button" data-lan="${lan}"><svg t="1729842156712" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="12812" width="30" height="30"><path d="M512 64C759.04 64 960 264.96 960 512S759.04 960 512 960s-448-200.96-448-448S264.96 64 512 64zM512 896.00000001C723.744 896 896 723.744 896.00000001 512c0-211.74400001-172.256-384.00000001-384.00000001-384.00000001-211.74400001 0-384.00000001 172.256-384.00000001 384.00000001C128 723.744 300.256 896 512 896.00000001z" p-id="12813" fill="#ffffff"></path><path d="M329.536 565.632l158.496 160.256c9.344 9.472 23.168 11.84 34.784 7.136 0.736-0.288 1.312-0.992 2.01600001-1.344 2.976-1.472 5.952-3.072 8.44799998-5.536 0.032-0.032 0.032-0.064 0.06400001-0.096s0.064-0.032 0.09599999-0.064l159.36000001-158.912c12.51200001-12.48 12.544-32.736 0.064-45.248-6.24-6.272-14.464-9.408-22.656-9.408-8.15999999 0-16.352 3.10399999-22.592 9.344L544 625.056 544 320c0-17.696-14.336-32-32-32.00000001s-32 14.304-32 32.00000001l0 306.752-104.96-106.112c-6.24-6.336-14.496-9.504-22.752-9.504-8.128 0-16.256 3.072-22.496 9.248C317.216 532.8 317.088 553.056 329.536 565.632z" p-id="12814" fill="#ffffff"></path></svg></a>
       <a href="javascript:" class="ui-button ui-button-primary discard-code" title="Discard Code" role="button" data-lan="${lan}" style="display: ${selectLan === lan ? "none" : ""}"><svg t="1729820332473" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5389" width="30" height="30"><path d="M224 128v224L256 384h224V320H318.656l60.224-60.224a227.328 227.328 0 1 1 321.472 321.472L367.744 913.92l46.08 46.08 332.672-332.672A292.48 292.48 0 0 0 332.8 213.696l-44.8 44.8V128h-64z" fill="#ffffff" p-id="5390"></path></svg></a>
@@ -167,22 +174,22 @@ const createContent = (
     </div>
     <ul>
       ${data
-      .map((info) => {
-        const str = generateRandomString(20);
-        let lujing = curDatas2?.[info] || "unknown";
-        if (selectLan === lan) lujing = info;
-        let fileN = info.split("/") || [];
-        let lineVal = "";
-        if (!fileN || !fileN?.length) {
-          lineVal = "";
-        } else {
-          lineVal = data4?.[fileN.at(-1)] || [];
-          lineVal = lineVal.sort((a, b) => a - b);
-          lineVal = [...new Set(lineVal)];
-          lineVal = keepFirstOfConsecutive(lineVal);
-          lineVal = lineVal + "";
-        }
-        return `<li data-path="${info}" data-path2="${lujing}" data-lan="${lan}" data-lines="${lineVal}">
+        .map((info) => {
+          const str = generateRandomString(20);
+          let lujing = curDatas2?.[info] || "unknown";
+          if (selectLan === lan) lujing = info;
+          let fileN = info.split("/") || [];
+          let lineVal = "";
+          if (!fileN || !fileN?.length) {
+            lineVal = "";
+          } else {
+            lineVal = data4?.[fileN.at(-1)] || [];
+            lineVal = lineVal.sort((a, b) => a - b);
+            lineVal = [...new Set(lineVal)];
+            lineVal = keepFirstOfConsecutive(lineVal);
+            lineVal = lineVal + "";
+          }
+          return `<li data-path="${info}" data-path2="${lujing}" data-lan="${lan}" data-lines="${lineVal}">
           <div class="check-handle" title="已完成可选中">
             <input type="checkbox" id="${str}" name="${str}">
             <label for="${str}" class="ui-checkbox"></label>
@@ -198,8 +205,8 @@ const createContent = (
            <a href="javascript:" class="ui-button ui-button-warning delete" style="display: none" role="button">Delete</a>
           </div>
         </li>`;
-      })
-      .join("")}
+        })
+        .join("")}
     </ul>
   </div>`;
 
@@ -826,14 +833,14 @@ const setMerge = (item, lan) => {
         <div class="setCommit_left">
           <select name="from">
               ${data.map((h) => {
-      return `<option class="feat" value="${h}" title="${h}">${h}</option>`;
-    })}
+                return `<option class="feat" value="${h}" title="${h}">${h}</option>`;
+              })}
           </select>
           <p>Mergr To</p>
           <select name="to">
           ${data.map((h) => {
-      return `<option class="feat" value="${h}" title="${h}">${h}</option>`;
-    })}
+            return `<option class="feat" value="${h}" title="${h}">${h}</option>`;
+          })}
           </select>
         </div>
         <div class="setCommit_btns">
@@ -1124,6 +1131,25 @@ const handleNoData = () => {
   const noData = `<div class="no-data"></div>`;
   contentDom.innerHTML = "";
   contentDom.insertAdjacentHTML("beforeend", noData);
+  OneClick.classList.add("disabled");
+};
+
+const OneClickHandle = () => {
+  const select = document.querySelector(".wrappper__sider_01 select");
+  fetch("/oneclick-sync", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      init: select.value,
+      data: dataInfo,
+      data2: data2Info,
+    }),
+  })
+    .then((res) => {
+      return res.json();
+    })
 };
 
 const handleGetFile = () => {
@@ -1205,10 +1231,13 @@ const handleGetFile = () => {
     checkboxes.forEach(function (checkbox) {
       checkbox.checked = isc;
     });
-  }
+  };
   arSwitchCss.onclick = () => {
-    renderCssSwitchHTML()
-  }
+    renderCssSwitchHTML();
+  };
+  OneClick.onclick = () => {
+    OneClickHandle();
+  };
 };
 
 const renderCssSwitchHTML = () => {
@@ -1229,50 +1258,51 @@ const renderCssSwitchHTML = () => {
       </div>
     </div>
   `;
-  document.body.insertAdjacentHTML("beforeend", html)
-  const cssArcss = document.querySelector(".css-arcss")
-  const SwitcCss = document.querySelector(".Switch-css")
-  const copyCode = document.querySelector(".copy-code")
-  const CancelSwitch = document.querySelector(".Cancel-switch")
-  const afterCss = document.querySelector("#after-css")
-  const textareaCode = document.querySelector("#origin-css")
+  document.body.insertAdjacentHTML("beforeend", html);
+  const cssArcss = document.querySelector(".css-arcss");
+  const SwitcCss = document.querySelector(".Switch-css");
+  const copyCode = document.querySelector(".copy-code");
+  const CancelSwitch = document.querySelector(".Cancel-switch");
+  const afterCss = document.querySelector("#after-css");
+  const textareaCode = document.querySelector("#origin-css");
   copyCode.onclick = () => {
-    navigator.clipboard.writeText(afterCss.value.trim())
+    navigator.clipboard
+      .writeText(afterCss.value.trim())
       .then(() => {
         new LightTip().success("Copy Success!");
       })
-      .catch(err => {
+      .catch((err) => {
         new LightTip().error("Copy Failed!");
       });
-  }
+  };
   textareaCode.oninput = () => {
-    copyCode.style.display = "none"
-  }
+    copyCode.style.display = "none";
+  };
   CancelSwitch.onclick = () => {
-    cssArcss.remove()
-  }
+    cssArcss.remove();
+  };
   SwitcCss.onclick = () => {
     if (!textareaCode.value.trim()) {
       new LightTip().error("请输入 Scss 或 Css 代码");
       return;
     }
-    SwitcCss.classList.add("loading")
+    SwitcCss.classList.add("loading");
     fetch("/switch-css-ar", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        csscode: textareaCode.value.trim()
+        csscode: textareaCode.value.trim(),
       }),
     })
       .then((res) => {
         return res.json();
       })
       .then((res) => {
-        if (res?.message === 'switch-code-success') {
-          afterCss.innerHTML = res?.data
-          copyCode.style.display = "block"
+        if (res?.message === "switch-code-success") {
+          afterCss.innerHTML = res?.data;
+          copyCode.style.display = "block";
         } else {
           new LightTip().error(res?.data);
         }
@@ -1281,11 +1311,12 @@ const renderCssSwitchHTML = () => {
       .catch((err) => {
         SwitcCss.classList.remove("loading");
       });
-  }
-}
+  };
+};
 
 const selectOnChange = () => {
   const select = document.querySelector(".wrappper__sider_01 select");
+  const checkboxes = document.querySelectorAll("[name='checkbox']");
   select.addEventListener("change", function () {
     const selectedValue = select.value;
     selectLan = selectedValue;
@@ -1293,16 +1324,25 @@ const selectOnChange = () => {
     const content = document.querySelector(".wrappper__content-content");
     header.innerHTML = "";
     content.innerHTML = "";
+    data2Info = {};
+    dataInfo = {};
     handleNoData();
-    // const divLanActive = document.querySelector(".div-lan.disabled");
-    // if (divLanActive) divLanActive.classList.remove("disabled");
-    // const divLan = document.querySelector(`.div-${selectedValue}`);
-    // if (divLan) divLan.classList.add("disabled");
     const checkboxes = document.querySelectorAll("input[name='checkbox']");
     checkboxes.forEach(function (checkbox) {
       checkbox.checked = false;
-      isc = false
+      isc = false;
     });
+  });
+  checkboxes.forEach((item) => {
+    item.onchange = () => {
+      const header = document.querySelector(".wrappper__content-header");
+      const content = document.querySelector(".wrappper__content-content");
+      header.innerHTML = "";
+      content.innerHTML = "";
+      data2Info = {};
+      dataInfo = {};
+      handleNoData();
+    };
   });
 };
 

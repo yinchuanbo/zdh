@@ -22,7 +22,7 @@ router.post("/login", async (req, res) => {
       { id: user.id, role: user.role, uname: user.username },
       JWT_SECRET,
       {
-        expiresIn: "24h",
+        expiresIn: "1y",
       }
     );
     res.cookie("token", token, {
