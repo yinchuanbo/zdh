@@ -192,6 +192,7 @@ body {
   margin: 0;
   display: none;
   transition: 0.5s;
+  text-transform: lowercase;
 }
 
 .header-item.active {
@@ -629,7 +630,7 @@ select {
   background-color: #242526;
 }
 
-.nav_a:not(.watch-btn):hover {
+.nav_a:not(.watch-btn,.select-all-btn):hover {
   background-color: #242526;
 }
 
@@ -641,6 +642,14 @@ select {
 .nav_a.loading {
   pointer-events: none;
   font-size: 0;
+}
+
+.select-all-btn {
+  background-color: #0d0d0d;
+}
+
+.select-all-btn:hover {
+  background-color: #1a1a1a;
 }
 
 .nav_a.loading * {

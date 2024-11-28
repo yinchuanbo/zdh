@@ -121,6 +121,12 @@
           <div class="wrappper__sider_02">
             <!-- <p>Select Languages:</p> -->
             <div class="wrappper__sider_02-label">
+              <a
+              href="javascript:"
+              class="nav_a select-all-btn"
+              role="button"
+              >ALL</a
+            >
               <% lans.forEach(function(lan, idx){ %>
               <div class="div-lan div-<%= lan %>">
                 <input
@@ -135,12 +141,6 @@
               <% }); %>
             </div>
             <div class="btns-handle">
-              <a
-              href="javascript:"
-              class="ui-button ui-button-success select-all-btn"
-              role="button"
-              >All</a
-            >
               <a
               href="javascript:"
               class="ui-button ui-button-primary handle-btn"
