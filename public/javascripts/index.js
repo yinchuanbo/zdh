@@ -20,6 +20,11 @@ let editor = null,
     ".avif",
   ];
 
+function isImageFile(filepath) {
+  const ext = "." + filepath.split(".").pop().toLowerCase();
+  return imageExtensions.includes(ext);
+}
+
 const watchBtn = document.querySelector(".watch-btn");
 const arSwitchCss = document.querySelector(".ar-switch-css");
 const selectAllBtn = document.querySelector(".select-all-btn");
@@ -214,7 +219,7 @@ const createContent = (
             <div class="tpl__ele" title="[${lan}] ${lujing}" data-es="${info.endsWith(".tpl") && selectLan !== lan ? "tpl" : ""}">[${lan}] ${lujing}</div>
           </div>
           <div class="btns">
-           <a href="javascript:" class="ui-button ui-button-warning async-res" style="display: ${selectLan === lan ? "none" : ""}" role="button">${info.startsWith("img/") ? "SYNC" : "DIFF"}</a>
+           <a href="javascript:" class="ui-button ui-button-warning async-res" style="display: ${selectLan === lan ? "none" : ""}" role="button">${isImageFile(info) ? "SYNC" : "DIFF"}</a>
            <a href="javascript:" class="ui-button ui-button-primary one-deploy" role="button" title="Deylop To Test Env" style="display: ${info.endsWith(".json") ? "none" : ""}">TEST</a>
            <a href="javascript:" class="ui-button ui-button-warning delete" style="display: none" role="button">Delete</a>
           </div>
@@ -392,15 +397,16 @@ const createContent = (
         })
         .then((res) => {
           if (res?.code === 200 && res?.message === "async-imgs-success") {
-            new LightTip().success("图片批量同步成功");
-            const elements = document.querySelectorAll(
-              `li[data-lan="${lan}"][data-path^="img/"]`
-            );
+            const selector = imageExtensions
+              .map((ext) => `li[data-lan="${lan}"][data-path$="${ext}"]`)
+              .join(", ");
+            const elements = document.querySelectorAll(selector);
             if (elements?.length) {
               elements.forEach((item) => {
                 item.querySelector(".check-handle input").checked = true;
               });
             }
+            new LightTip().success("图片批量同步成功");
           } else {
             new LightTip().error("图片批量同步失败");
           }
@@ -1208,10 +1214,6 @@ const handleGetFile = () => {
             new LightTip().error("No Modified Files");
             handleBtn.classList.remove("loading");
             return;
-          }
-          function isImageFile(filepath) {
-            const ext = "." + filepath.split(".").pop().toLowerCase();
-            return imageExtensions.includes(ext);
           }
           res?.data.forEach((item) => {
             if (isImageFile(item)) {
