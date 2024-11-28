@@ -37,7 +37,7 @@ body {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #1e1e1e;
+  background-color: #1a1a1a;
 }
 
 .wrappper__header {
@@ -47,10 +47,11 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  background-color: #2c2b28;
+  background-color: #242424;
   padding: 0 20px;
-  padding-left: 0;
+  padding-left: 20px;
   flex-shrink: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .wrappper__main {
@@ -64,9 +65,9 @@ body {
   width: 350px;
   height: calc(100% + 60px);
   padding: 20px;
-  background-color: #2c2b28;
+  background-color: #242424;
   margin-top: -60px;
-  /* border-right: 1px solid rgb(68, 71, 70); */
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .wrappper__sider2 {
@@ -79,7 +80,7 @@ body {
   padding: 20px;
   padding-right: 15px;
   padding-top: 15px;
-  background-color: #1e1e1e;
+  background-color: #1a1a1a;
 }
 
 .ui-dialog {
@@ -100,6 +101,9 @@ body {
   opacity: 1;
   outline: none;
   font-family: "JetBrains Mono";
+  background-color: #242424;
+  border: 1px solid rgba(255, 255, 255, .1);
+  color: #fff;
 }
 
 .wrappper__sider_02,
@@ -110,7 +114,10 @@ body {
 .ui-input {
   width: 100%;
   height: 40px !important;
-  border: 0 !important;
+  background-color: #242424!important;
+  border: 1px solid rgba(255, 255, 255, 0.1)!important;
+  color: #fff!important;;
+  border-radius: 0!important;
 }
 
 .div-lan {
@@ -266,8 +273,8 @@ body {
   background-color: #2c2b28;
   gap: 10px;
   position: relative;
-  border-radius: 5px;
   overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .content-item ul li span {
@@ -331,33 +338,13 @@ body {
 
 .ui-button {
   border: 0 !important;
-  box-shadow:
-    rgba(0, 0, 0, 0.4) 0px 2px 4px,
-    rgba(0, 0, 0, 0.3) 0px 7px 13px -3px,
-    rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
+  border-radius: 0 !important;
 }
 .push-code {
   display: flex;
   gap: 5px;
   font-style: normal;
 }
-/* .ui-button {
-  z-index: 1000;
-  user-select: none;
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  background-color: rgba(239, 246, 255, 0.6);
-  color: #2486ff;
-  box-shadow: rgba(102, 139, 204, 0.1) 0px -2px 0px 0px inset;
-  border-radius: 0;
-}
-
-.ui-button:hover,
-.ui-button:active {
-  box-shadow: none;
-  background-color: rgba(219, 234, 254, 0.5) !important;
-  border-color: rgba(59, 130, 246, 0.2) !important;
-  color: #2486ff;
-} */
 
 .ui-lightip {
   height: 50px;
@@ -369,20 +356,25 @@ body {
 .diffHTML {
   position: fixed;
   inset: 0;
-  background-color: #1e1e1e;
+  background-color: rgba(0, 0, 0, 0.8);
   z-index: 10000;
   display: flex;
   flex-direction: column;
+  padding: 5%;
 }
 
 .diffHTML-header {
   width: 100%;
-  height: 55px;
+  height: 60px;
   display: flex;
   align-items: center;
   padding: 0 10px;
   flex-shrink: 0;
-  background-color: #2c2b28;
+  background-color: #252526;
+}
+
+.ui-checkbox {
+  border-radius: 0!important;
 }
 
 #Save {
@@ -393,10 +385,21 @@ body {
   margin-left: 10px;
 }
 
+.monaco-editor .margin {
+  background-color: #252526!important;
+}
+
+.diffHTML-main {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 .diffHTML-content {
   width: 100%;
   flex: 1;
-  /* background-color: #1e1e1e; */
+  /* background-color: #1a1a1a; */
   overflow: auto;
 }
 
@@ -442,19 +445,17 @@ body {
 .setCommit {
   width: 500px;
   height: 200px;
-  background-color: #f2f2f2;
+  background-color: #242424;
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 10000;
-  border-radius: 10px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: 30px;
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  /* height: 50%; */
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .setCommit_left {
@@ -464,15 +465,30 @@ body {
   color: #4c5161;
 }
 
+.setCommit_left p {
+  color: #fff;
+}
+
 .setCommit_left select {
   opacity: 1;
   font-family: "JetBrains Mono";
   border-right-width: 1px;
   outline: none;
+  background-color: #242424;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+label {
+  color: #fff;
 }
 
 .setCommit_left .ui-input {
   margin-left: 10px;
+}
+
+[disabled], .select-type-item:has(input[disabled]) {
+  opacity: 0.5!important;
 }
 
 .setCommit_btns {
@@ -519,10 +535,6 @@ body {
   color: #ccc;
 }
 
-.setMerge {
-  top: 10%;
-  transform: translate(-50%, 0);
-}
 
 .setMerge .setCommit_left {
   flex-direction: row;
@@ -534,26 +546,20 @@ body {
   width: 150px;
 }
 
-.ui-input {
-  color: #4c5161;
-  border: 0 !important;
-  outline: none;
-}
-
 select {
   color: #4c5161;
   outline: none;
   padding: 0 5px;
   border-right-width: 5px;
   border-color: transparent;
-  border-radius: 5px;
+  border-radius: 0;
   font-size: 16px;
   font-weight: 500;
 }
 
 .ui-checkbox {
   border: 0;
-  background-color: #1e1e1e;
+  background-color: #1a1a1a;
   outline: none;
   box-shadow: none;
 }
@@ -610,16 +616,21 @@ select {
   height: 38px;
   line-height: 38px;
   padding: 0 10px;
-  background-color: #1e1e1e;
+  background-color: #1a1a1a;
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 5px;
   overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
 }
 
-.nav_a:hover {
-  opacity: 0.8;
+.wrappper__sider_02-label input + label + label:hover {
+  background-color: #242526;
+}
+
+.nav_a:not(.watch-btn):hover {
+  background-color: #242526;
 }
 
 .nav_a svg {
@@ -627,16 +638,14 @@ select {
   height: 20px;
 }
 
-.nav_a:active {
-  opacity: 0.7;
-}
-
 .nav_a.loading {
   pointer-events: none;
+  font-size: 0;
 }
 
-.nav_a.loading svg {
+.nav_a.loading * {
   opacity: 0;
+  font-size: 0;
 }
 .nav_a.loading::before {
   content: "";
@@ -734,7 +743,7 @@ select {
 }
 
 .CodeMirror {
-  background-color: #1e1e1e !important;
+  background-color: #1a1a1a !important;
 }
 
 .CodeMirror-gutters {
@@ -743,11 +752,11 @@ select {
 }
 
 /* .CodeMirror pre.CodeMirror-line {
-  background-color: #1e1e1e!important;
+  background-color: #1a1a1a!important;
 } */
 
 .mergely-editor .mergely.CodeMirror-gutter-background.current {
-  background-color: #1e1e1e !important;
+  background-color: #1a1a1a !important;
 }
 
 .wrappper__sider_02-label .ui-checkbox {
@@ -755,7 +764,7 @@ select {
 }
 
 .wrappper__sider_02-label input + label + label {
-  background-color: #1e1e1e;
+  background-color: #1a1a1a;
   width: 40px;
   height: 40px;
   display: block;
@@ -763,11 +772,12 @@ select {
   line-height: 40px;
   padding: 0 !important;
   cursor: pointer;
-  border-radius: 5px;
+  border-radius: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .wrappper__sider_02-label input:checked + label + label {
-  background-color: #498205;
+  background-color: #2486ff;
 }
 
 .mergely-editor .mergely.c.CodeMirror-linebackground {
@@ -817,11 +827,11 @@ select {
 
 .iframe-cover-close {
   position: absolute;
-  bottom: 20px;
+  top: 20px;
   left: 20px;
   width: 40px;
   height: 40px;
-  background-color: #1e1e1e;
+  background-color: #1a1a1a;
   border-radius: 100%;
   color: #fff;
   cursor: pointer;
@@ -864,7 +874,7 @@ select {
 }
 
 .css-arcss-content {
-  background-color: #1e1e1e;
+  background-color: #1a1a1a;
   width: 100%;
   flex: 1;
   display: flex;

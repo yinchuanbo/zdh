@@ -26,20 +26,20 @@
     <div class="wrappper">
       <div class="wrapper__back"></div>
       <div class="wrappper__env">
-        <p>选择环境：</p>
+        <!-- <p>选择环境：</p> -->
         <div class="wrappper__env_item">
           <input type="radio" id="radio1" name="env" value="test" checked />
           <label for="radio1" class="ui-radio"></label
-          ><label for="radio1" style="padding-left: 5px;">Test</label>
+          ><label for="radio1" style="padding-left: 5px;">TEST</label>
         </div>
         <div class="wrappper__env_item">
           <input type="radio" id="radio2" value="production" name="env" />
           <label for="radio2" class="ui-radio"></label
-          ><label for="radio2" style="padding-left: 5px;">Production</label>
+          ><label for="radio2" style="padding-left: 5px;">PRODUCTION</label>
         </div>
       </div>
       <div class="wrappper__lans">
-        <p>选择语言：</p>
+        <!-- <p>选择语言：</p> -->
         <div class="wrappper__lans_list">
           <% lans.forEach(function(lan, idx){ %>
             <div class="wrappper__lans_item">
@@ -55,7 +55,7 @@
       <div class="wrappper__getFiles">
         <a href="javascript:" class="ui-button ui-button-primary getFiles" role="button">GET</a>
         <a href="javascript:" class="ui-button ui-button-primary preview" role="button">PREVIEW</a>
-        <a href="javascript:" class="ui-button ui-button-warning upload" role="button">UPLOAD</a>
+        <a href="javascript:" class="ui-button ui-button-success upload" role="button">UPLOAD</a>
       </div>
     </div>
     <script src="/javascripts/jquery.js"></script>

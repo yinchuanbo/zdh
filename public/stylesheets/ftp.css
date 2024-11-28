@@ -16,7 +16,7 @@ body {
 .wrappper {
   width: 100%;
   height: 100vh;
-  background-color: #3c3c3c;
+  background-color: #242424;
   display: flex;
   flex-direction: column;
   gap: 30px;
@@ -28,13 +28,13 @@ body {
 .wrappper__env {
   display: flex;
   gap: 20px;
-  width: 800px;
+  width: 700px;
 }
 
 .wrappper__lans {
   display: flex;
   gap: 20px;
-  width: 800px;
+  width: 700px;
 }
 
 .pull-new-code {
@@ -104,20 +104,12 @@ body {
 }
 
 .ui-button {
-  box-shadow:
-    rgba(0, 0, 0, 0.4) 0px 2px 4px,
-    rgba(0, 0, 0, 0.3) 0px 7px 13px -3px,
-    rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
   border: 0 !important;
+  border-radius: 0 !important;
 }
 
 .ui-checkbox {
   border-radius: 0 !important;
-}
-
-.ui-input > input,
-input.ui-input {
-  border: 0 !important;
 }
 
 .wrappper__getFiles {
@@ -151,7 +143,7 @@ select {
 }
 
 .wrappper__lans_item input + label + label {
-  background-color: #212121;
+  background-color: #1a1a1a;
   width: 40px;
   height: 40px;
   display: block;
@@ -159,13 +151,19 @@ select {
   line-height: 40px;
   padding: 0 !important;
   cursor: pointer;
-  border-radius: 5px;
 }
 
 .wrappper__lans_item input:checked + label + label {
-  background-color: #f4615c;
+  background-color: #01cf97;
 }
 
 .ui-button.loading svg {
   display: none;
+}
+
+.ui-input {
+  background-color: #242424!important;
+  border: 1px solid rgba(255, 255, 255, 0.1)!important;
+  color: #fff!important;;
+  border-radius: 0!important;
 }

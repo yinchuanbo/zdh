@@ -435,55 +435,73 @@ router.post("/all-pull", authenticateToken, async (req, res) => {
   if (!lans?.length) {
     lans = Object.keys(ports);
   }
-  let s = [],
-    f = [],
-    errorObj = {};
-  async function getAllPush() {
-    for (let i = 0; i < lans.length; i++) {
-      const lan = lans[i];
+
+  // 并发控制函数
+  async function runWithConcurrency(tasks, maxConcurrent = 2) {
+    const results = [];
+    const running = new Set();
+
+    async function runTask(task) {
+      running.add(task);
       try {
-        await pullCode({ lan, localPaths });
-        s.push(lan);
-      } catch (error) {
-        f.push(lan);
-        errorObj[lan] = error?.message || error;
+        const result = await task();
+        results.push(result);
+      } catch (err) {
+        results.push({ error: err });
+      } finally {
+        running.delete(task);
       }
     }
-    return Promise.resolve();
+
+    const taskQueue = tasks.map(lan => async () => {
+      try {
+        await pullCode({ lan, localPaths });
+        return { success: true, lan };
+      } catch (error) {
+        return {
+          success: false,
+          lan,
+          error: error?.message || error
+        };
+      }
+    });
+
+    while (taskQueue.length > 0 || running.size > 0) {
+      while (running.size < maxConcurrent && taskQueue.length > 0) {
+        const task = taskQueue.shift();
+        runTask(task);
+      }
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+
+    return results;
   }
 
-  getAllPush().then(() => {
-    let str = "";
-    if (s?.length) {
-      str += `${s.join(",")} Pull Success, `;
+  // 执行并发任务
+  runWithConcurrency(lans).then(results => {
+    const successful = results.filter(r => r.success).map(r => r.lan);
+    const failed = results.filter(r => !r.success).map(r => r.lan);
+    const errors = results
+      .filter(r => !r.success)
+      .reduce((acc, r) => ({ ...acc, [r.lan]: r.error }), {});
+
+    let message = "";
+    if (successful.length) {
+      message += `${successful.join(",")} Pull Success, `;
     }
-    if (f?.length) {
-      str += `${f.join(",")} Pull Fail, ${JSON.stringify(errorObj)}`;
+    if (failed.length) {
+      message += `${failed.join(",")} Pull Fail, ${JSON.stringify(errors)}`;
     }
+
     socket.emit("chat message", {
       type: "all-pull",
-      message: str,
+      message
     });
   });
+
   res.json({
     code: 200,
   });
-
-  // try {
-
-  //   const result = await pullCode({ lan, localPaths });
-  //   res.json({
-  //     code: 200,
-  //     message: "pull-success",
-  //     data: result,
-  //   });
-  // } catch (error) {
-  //   res.json({
-  //     code: 200,
-  //     message: "pull-error",
-  //     data: error?.message || error,
-  //   });
-  // }
 });
 
 router.post("/check-status", authenticateToken, async (req, res) => {

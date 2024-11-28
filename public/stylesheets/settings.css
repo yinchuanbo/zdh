@@ -36,7 +36,7 @@ body {
 .wrappper {
   width: 100%;
   height: 100vh;
-  background-color: #3c3c3c;
+  background-color: #242424;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -149,7 +149,7 @@ input.ui-input {
   width: 50px;
   height: 50px;
   border-radius: 5px;
-  background: #212121
+  background: #1a1a1a
     url("data:image/svg+xml;base64,PHN2ZyB0PSIxNzI3NTA5NjE0OTE4IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjQzNDkiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCI+PHBhdGggZD0iTTc2OS40MDUgOTc3LjQ4M2MtMjcuMDc0IDI3LjU2OC03MS4wNDUgMjcuNTY4LTk4LjEyMSAwbC00MTYuNTkxLTQyMy44MDRjLTI3LjE3My0yNy41NjgtMjcuMTczLTcyLjIzMSAwLTk5Ljg5OWw0MTYuNDkyLTQyMy44MDRjMTMuNTM3LTEzLjczNCAzMS4zMjQtMjAuNjUyIDQ5LjEwOS0yMC42NTJzMzUuNTcyIDYuOTE3IDQ5LjEwOSAyMC42NTJjMjcuMTczIDI3LjU2OCAyNy4xNzMgNzIuMzMxIDAgOTkuODk5bC0zNjcuNDgyIDM3My44MDYgMzY3LjQ4MiAzNzMuOTA0YzI3LjA3NCAyNy41NjggMjcuMDc0IDcyLjIzMSAwIDk5Ljg5OXoiIHAtaWQ9IjQzNTAiIGZpbGw9IiNmZmZmZmYiPjwvcGF0aD48L3N2Zz4=")
     no-repeat;
   background-position: center;
