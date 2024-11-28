@@ -4,7 +4,21 @@ let isWatching = false;
 
 let editor = null,
   jsonEditor = null,
-  isc = false;
+  isc = false,
+  imageExtensions = [
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".gif",
+    ".webp",
+    ".bmp",
+    ".svg",
+    ".ico",
+    ".tiff",
+    ".tif",
+    ".heic",
+    ".avif",
+  ];
 
 const watchBtn = document.querySelector(".watch-btn");
 const arSwitchCss = document.querySelector(".ar-switch-css");
@@ -1195,8 +1209,12 @@ const handleGetFile = () => {
             handleBtn.classList.remove("loading");
             return;
           }
+          function isImageFile(filepath) {
+            const ext = "." + filepath.split(".").pop().toLowerCase();
+            return imageExtensions.includes(ext);
+          }
           res?.data.forEach((item) => {
-            if (item.startsWith("img/")) {
+            if (isImageFile(item)) {
               imgs.push(item);
             }
           });
