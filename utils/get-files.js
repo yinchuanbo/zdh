@@ -7,6 +7,21 @@ const simpleGit = require("simple-git");
 const path = require("path");
 const diff = require("diff");
 
+const imageExtensions = [
+  ".jpg",
+  ".jpeg",
+  ".png",
+  ".gif",
+  ".webp",
+  ".bmp",
+  ".svg",
+  ".ico",
+  ".tiff",
+  ".tif",
+  ".heic",
+  ".avif",
+];
+
 function filterFun(fileName) {
   const basicPaths = ["/Dev/", "/lan/", "/img/", "/tpl/"];
   const jsPaths = [
@@ -67,6 +82,11 @@ function getChangedLines(beforeContent, afterContent) {
   return Array.from(changedLineNumbers);
 }
 
+function isImageFile(filepath) {
+  const ext = "." + filepath.split(".").pop().toLowerCase();
+  return imageExtensions.includes(ext);
+}
+
 async function getStagedFileDiffs({
   execCommand,
   lanPath,
@@ -83,7 +103,7 @@ async function getStagedFileDiffs({
     const obj = {};
     for (const file of stagedFiles) {
       if (
-        file && filterFun(file)) {
+        file && filterFun(file) && !isImageFile(file)) {
         console.log("file", file);
         let beforeContent = "",
           afterContent = "";

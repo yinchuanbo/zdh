@@ -25,6 +25,21 @@ const {
 const { authenticateToken } = require("../permissions");
 var router = express.Router();
 
+imageExtensions = [
+  ".jpg",
+  ".jpeg",
+  ".png",
+  ".gif",
+  ".webp",
+  ".bmp",
+  ".svg",
+  ".ico",
+  ".tiff",
+  ".tif",
+  ".heic",
+  ".avif",
+];
+
 const socket = io("http://localhost:4000");
 
 router.get("/", authenticateToken, function (req, res, next) {
@@ -227,7 +242,11 @@ router.post("/all-publish", authenticateToken, async (req, res) => {
 router.post("/receive-files", authenticateToken, async (req, res) => {
   const { LocalListPro, ports, domain } = getConf(req.uname, res);
   const { path, path2, lan, initLan } = req.body;
-  if (path.includes("img/")) {
+  function isImageFile(filepath) {
+    const ext = "." + filepath.split(".").pop().toLowerCase();
+    return imageExtensions.includes(ext);
+  }
+  if (isImageFile(path)) {
     try {
       await copyAndMoveImg({ path, lan, initLan, LocalListPro });
       await handlePublish(lan, ports, domain);
@@ -453,7 +472,7 @@ router.post("/all-pull", authenticateToken, async (req, res) => {
       }
     }
 
-    const taskQueue = tasks.map(lan => async () => {
+    const taskQueue = tasks.map((lan) => async () => {
       try {
         await pullCode({ lan, localPaths });
         return { success: true, lan };
@@ -461,7 +480,7 @@ router.post("/all-pull", authenticateToken, async (req, res) => {
         return {
           success: false,
           lan,
-          error: error?.message || error
+          error: error?.message || error,
         };
       }
     });
@@ -471,18 +490,18 @@ router.post("/all-pull", authenticateToken, async (req, res) => {
         const task = taskQueue.shift();
         runTask(task);
       }
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     }
 
     return results;
   }
 
   // 执行并发任务
-  runWithConcurrency(lans).then(results => {
-    const successful = results.filter(r => r.success).map(r => r.lan);
-    const failed = results.filter(r => !r.success).map(r => r.lan);
+  runWithConcurrency(lans).then((results) => {
+    const successful = results.filter((r) => r.success).map((r) => r.lan);
+    const failed = results.filter((r) => !r.success).map((r) => r.lan);
     const errors = results
-      .filter(r => !r.success)
+      .filter((r) => !r.success)
       .reduce((acc, r) => ({ ...acc, [r.lan]: r.error }), {});
 
     let message = "";
@@ -495,7 +514,7 @@ router.post("/all-pull", authenticateToken, async (req, res) => {
 
     socket.emit("chat message", {
       type: "all-pull",
-      message
+      message,
     });
   });
 
