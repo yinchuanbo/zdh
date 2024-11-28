@@ -444,8 +444,8 @@ body {
 }
 
 .setCommit {
-  width: 500px;
-  height: 200px;
+  width: 100%;
+  height: 100%;
   background-color: #242424;
   position: fixed;
   top: 50%;
@@ -455,19 +455,22 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 30px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0 calc((100vw - 500px) / 2);
+  /* border: 1px solid rgba(255, 255, 255, 0.1); */
 }
 
 .setCommit_left {
   display: flex;
   flex-direction: column;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   color: #4c5161;
 }
 
 .setCommit_left p {
   color: #fff;
+  width: 130px;
+  flex-shrink: 0;
+  text-align: center;
 }
 
 .setCommit_left select {
@@ -478,6 +481,8 @@ body {
   background-color: #242424;
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #fff;
+  flex: 1;
+  width: calc((800 - 130) / 2px);
 }
 
 label {
@@ -495,7 +500,7 @@ label {
 .setCommit_btns {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 10px;
 }
 
@@ -536,6 +541,10 @@ label {
   color: #ccc;
 }
 
+.setMerge {
+  padding: 0 calc((100vw - 800px) / 2);
+}
+
 
 .setMerge .setCommit_left {
   flex-direction: row;
@@ -543,9 +552,10 @@ label {
   justify-content: space-between;
 }
 
-.setMerge .setCommit_left select {
+.setCommit:not(setMerge) select {
   width: 150px;
 }
+
 
 select {
   color: #4c5161;
@@ -726,7 +736,7 @@ select {
 .select-type {
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   gap: 20px;
 }
 
