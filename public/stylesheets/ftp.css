@@ -16,13 +16,19 @@ body {
 .wrappper {
   width: 100%;
   height: 100vh;
-  background-color: #242424;
+  background-color: #1a1a1a;
   display: flex;
   flex-direction: column;
   gap: 30px;
   padding: 50px;
   align-items: center;
   justify-content: center;
+}
+
+.monaco-editor,
+.monaco-editor-background,
+.monaco-editor .margin {
+  background-color: #252526!important;
 }
 
 .wrappper__env {
@@ -71,7 +77,7 @@ body {
 
 .preview__mark {
   position: fixed;
-  inset: 0;
+  inset: 70px;
 }
 
 .save-files,
@@ -106,6 +112,7 @@ body {
 .ui-button {
   border: 0 !important;
   border-radius: 0 !important;
+  box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
 }
 
 .ui-checkbox {
@@ -125,7 +132,7 @@ body {
   width: 50px;
   height: 50px;
   border-radius: 5px;
-  background: #212121
+  background: #252526
     url("data:image/svg+xml;base64,PHN2ZyB0PSIxNzI3NTA5NjE0OTE4IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjQzNDkiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCI+PHBhdGggZD0iTTc2OS40MDUgOTc3LjQ4M2MtMjcuMDc0IDI3LjU2OC03MS4wNDUgMjcuNTY4LTk4LjEyMSAwbC00MTYuNTkxLTQyMy44MDRjLTI3LjE3My0yNy41NjgtMjcuMTczLTcyLjIzMSAwLTk5Ljg5OWw0MTYuNDkyLTQyMy44MDRjMTMuNTM3LTEzLjczNCAzMS4zMjQtMjAuNjUyIDQ5LjEwOS0yMC42NTJzMzUuNTcyIDYuOTE3IDQ5LjEwOSAyMC42NTJjMjcuMTczIDI3LjU2OCAyNy4xNzMgNzIuMzMxIDAgOTkuODk5bC0zNjcuNDgyIDM3My44MDYgMzY3LjQ4MiAzNzMuOTA0YzI3LjA3NCAyNy41NjggMjcuMDc0IDcyLjIzMSAwIDk5Ljg5OXoiIHAtaWQ9IjQzNTAiIGZpbGw9IiNmZmZmZmYiPjwvcGF0aD48L3N2Zz4=")
     no-repeat;
   background-position: center;
@@ -143,7 +150,7 @@ select {
 }
 
 .wrappper__lans_item input + label + label {
-  background-color: #1a1a1a;
+  background-color: #252526;
   width: 40px;
   height: 40px;
   display: block;
@@ -151,10 +158,11 @@ select {
   line-height: 40px;
   padding: 0 !important;
   cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .wrappper__lans_item input:checked + label + label {
-  background-color: #01cf97;
+  background-color: #564afe;
 }
 
 .ui-button.loading svg {
@@ -162,8 +170,8 @@ select {
 }
 
 .ui-input {
-  background-color: #242424!important;
-  border: 1px solid rgba(255, 255, 255, 0.1)!important;
-  color: #fff!important;;
-  border-radius: 0!important;
+  background-color: #242424 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
+  border-radius: 0 !important;
 }

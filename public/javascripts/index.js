@@ -219,8 +219,8 @@ const createContent = (
             <div class="tpl__ele" title="[${lan}] ${lujing}" data-es="${info.endsWith(".tpl") && selectLan !== lan ? "tpl" : ""}">[${lan}] ${lujing}</div>
           </div>
           <div class="btns">
-           <a href="javascript:" class="ui-button ui-button-warning async-res" style="display: ${selectLan === lan ? "none" : ""}" role="button">${isImageFile(info) ? "SYNC" : "DIFF"}</a>
-           <a href="javascript:" class="ui-button ui-button-primary one-deploy" role="button" title="Deylop To Test Env" style="display: ${info.endsWith(".json") ? "none" : ""}">TEST</a>
+           <a href="javascript:" class="nav_a async-res" style="display: ${selectLan === lan ? "none" : ""}" role="button">${isImageFile(info) ? "SYNC" : "DIFF"}</a>
+           <a href="javascript:" class="nav_a one-deploy" role="button" title="Deylop To Test Env" style="display: ${info.endsWith(".json") ? "none" : ""}">TEST</a>
            <a href="javascript:" class="ui-button ui-button-warning delete" style="display: none" role="button">Delete</a>
           </div>
         </li>`;

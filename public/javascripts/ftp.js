@@ -150,14 +150,14 @@ upload.onclick = () => {
     });
 };
 
-const wrapperBack = document.querySelector(".wrapper__back")
+const wrapperBack = document.querySelector(".wrapper__back");
 wrapperBack.onclick = () => {
-  window.close()
-}
+  window.close();
+};
 
-const pullNewCodes = document.querySelectorAll(".pull-new-code")
+const pullNewCodes = document.querySelectorAll(".pull-new-code");
 
-pullNewCodes.forEach(item => {
+pullNewCodes.forEach((item) => {
   item.onclick = () => {
     const { lan } = item.dataset;
     item.classList.add("loading");
@@ -181,8 +181,8 @@ pullNewCodes.forEach(item => {
         }
         item.classList.remove("loading");
       });
-  }
-})
+  };
+});
 
 const handleSocket = () => {
   socket.on("connect", () => {
