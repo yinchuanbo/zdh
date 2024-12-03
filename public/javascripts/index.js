@@ -31,6 +31,7 @@ const selectAllBtn = document.querySelector(".select-all-btn");
 const handleBtn = document.querySelector(".handle-btn");
 const allPublish = document.querySelector(".all-publish");
 const allPull = document.querySelector(".all-pull");
+const allPush = document.querySelector(".all-push");
 const OneClick = document.querySelector(".One-click");
 
 let selectLan = document.querySelector(".wrappper__sider_01 select").value;
@@ -121,6 +122,19 @@ const handleSocket = () => {
         content: message,
       });
       allPull.classList.remove("loading");
+    } else if (type === "all-push") {
+      new Dialog({
+        title: "Push Info",
+        content: message,
+      });
+      allPush.classList.remove("loading");
+      allPush.classList.remove("loading");
+      const saveBtn = document.querySelector(".setCommit .ui-button-primary");
+      const cancelBtn = document.querySelector(".setCommit .ui-button-warning");
+      if(saveBtn && cancelBtn) {
+        cancelBtn.classList.remove("disabled");
+        saveBtn.classList.remove("loading");
+      }
     }
   });
 };
@@ -1416,6 +1430,89 @@ allPull.onclick = () => {
       lans: selectedValues,
     }),
   });
+};
+
+allPush.onclick = () => {
+  if (isWatching) {
+    new LightTip().error("请先关闭 Watching，其他操作需要开启");
+    return;
+  }
+  const checkboxes = document.querySelectorAll("[name='checkbox']:checked");
+  var selectedValues = [];
+  checkboxes.forEach(function (checkbox) {
+    selectedValues.push(checkbox.value);
+  });
+  if (!selectedValues?.length) {
+    new LightTip().error("请选择需要 Push 的语言");
+    return;
+  }
+  setAllCommitOrPush(allPush, selectedValues);
+};
+
+const setAllCommitOrPush = (item, selectedValues = []) => {
+  const html = `
+    <div class="setCommit">
+      <div class="setCommit_left">
+        <div class="set-commit-comtent">
+          <select name="commit__style">
+            <option class="feat" title="新功能 feature">feat</option>
+            <option class="fix" title="修复 bug">fix</option>
+            <option class="docs" title="文档注释">docs</option>
+            <option class="style" title="代码格式(不影响代码运行的变动)">style</option>
+            <option class="refactor" title="重构、优化(既不增加新功能，也不是修复bug)">refactor</option>
+            <option class="perf" title="性能优化">perf</option>
+            <option class="test" title="增加测试">test</option>
+            <option class="chore" title="构建过程或辅助工具的变动">chore</option>
+            <option class="revert" title="回退">revert</option>
+            <option class="build" title="打包">build</option>
+          </select>
+          <input class="ui-input commit-input" placeholder="输入 commit 内容">
+        </div>
+      </div>
+      <div class="setCommit_btns">
+        <a href="javascript:" class="ui-button ui-button-primary" role="button">Send</a>
+        <a href="javascript:" class="ui-button ui-button-warning red_button" role="button">Cancel</a>
+      </div>
+    </div>
+  `;
+  document.body.insertAdjacentHTML("beforeend", html);
+  const setCommit = document.querySelector(".setCommit");
+  const saveBtn = document.querySelector(".setCommit .ui-button-primary");
+  const cancelBtn = document.querySelector(".setCommit .ui-button-warning");
+  const select = document.querySelector('[name="commit__style"]');
+  const input = setCommit.querySelector(".commit-input");
+  function removeLoading(str = "", bool = false) {
+    if (bool) {
+      new LightTip().success(str);
+    } else {
+      new LightTip().error(str);
+    }
+    saveBtn.classList.remove("loading");
+    cancelBtn.classList.remove("disabled");
+  }
+  saveBtn.onclick = async () => {
+    if (!input.value) {
+      removeLoading("必须填写 commit 内容");
+      return;
+    }
+    saveBtn.classList.add("loading");
+    cancelBtn.classList.add("disabled");
+    const content = `${select.value}:${input.value}`;
+    fetch("/all-push", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        lans: selectedValues,
+        commit: content,
+      }),
+    });
+  };
+  cancelBtn.onclick = () => {
+    item.classList.remove("loading");
+    setCommit.remove();
+  };
 };
 
 const iframeCover = (src = "") => {

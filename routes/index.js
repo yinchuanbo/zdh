@@ -12,6 +12,7 @@ const discardCode = require("../utils/discard-code");
 const mergeCode = require("../utils/merge-code");
 const getBranchs = require("../utils/get-branchs");
 const RTLConverter = require("../utils/switch-css-ar");
+const allPush = require("../utils/all-push");
 const sync = require("../utils/sync");
 const io = require("socket.io-client");
 
@@ -559,6 +560,20 @@ router.post("/push-code", authenticateToken, async (req, res) => {
       data: error?.message || error,
     });
   }
+});
+
+router.post("/all-push", authenticateToken, async (req, res) => {
+  const { localPaths } = getConf(req.uname, res);
+  const { lans, commit } = req.body;
+  allPush({ lans, commit, localPaths }).then((results) => {
+    socket.emit("chat message", {
+      type: "all-push",
+      message: JSON.stringify(results),
+    });
+  })
+  res.json({
+    code: 200,
+  });
 });
 
 router.post("/discard-code", authenticateToken, async (req, res) => {
