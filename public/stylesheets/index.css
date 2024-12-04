@@ -168,7 +168,7 @@ body {
   background-color: #242424 !important;
   border: 0 !important;
   color: #fff !important;
-  border-radius: 0 !important;
+  border-radius: 4px !important;
 }
 
 .div-lan {
@@ -354,7 +354,7 @@ body {
 }
 
 .header-item span::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -3px;
   left: 50%;
@@ -386,7 +386,8 @@ body {
 }
 
 @keyframes glow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 5px rgba(36, 134, 255, 0.3);
   }
   50% {
@@ -395,7 +396,8 @@ body {
 }
 
 @keyframes activeScale {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
   }
   50% {
@@ -494,6 +496,8 @@ body {
     0 0 0 1px rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
   cursor: pointer;
+  border-radius: 4px;
+  overflow: hidden;
 }
 
 .content-item ul li:hover {
@@ -818,7 +822,7 @@ body {
   position: absolute !important;
   top: 0;
   right: 0;
-  border-radius: 0 !important;
+  border-radius: 0 0 0 4px !important;
   box-shadow: none !important;
   height: 45% !important;
   border: 0 !important;
@@ -830,7 +834,7 @@ body {
   position: absolute !important;
   bottom: 0;
   right: 0;
-  border-radius: 0 !important;
+  border-radius: 4px 0 0 0 !important;
   box-shadow: none !important;
   height: 45% !important;
   border: 0 !important;
@@ -957,7 +961,7 @@ select {
   padding: 0 5px;
   border-right-width: 5px;
   border-color: transparent;
-  border-radius: 0;
+  border-radius: 4px;
   font-size: 16px;
   font-weight: 500;
   border: 0 !important;
@@ -1034,6 +1038,7 @@ select {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   backdrop-filter: blur(10px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
 }
 
 .nav_a:hover {
@@ -1227,6 +1232,7 @@ select {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   cursor: pointer;
   text-align: center;
+  border-radius: 4px;
 }
 
 .wrappper__sider_02-label input:checked + label + label {
