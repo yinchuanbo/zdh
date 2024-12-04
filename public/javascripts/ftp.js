@@ -103,7 +103,7 @@ function setEditor(obj = {}) {
       value: obj,
       language: "json",
       automaticLayout: true,
-      theme: "hc-black",
+      theme: "vs-dark",
       fontSize: 16,
       fontFamily: "JetBrains Mono",
       scrollbar: {

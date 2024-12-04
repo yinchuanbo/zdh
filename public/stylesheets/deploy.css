@@ -17,12 +17,18 @@ body {
 .wrappper {
   width: 100%;
   height: 100vh;
-  background-color: #1a1a1a;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 20px;
+  background: linear-gradient(
+    135deg,
+    rgba(36, 134, 255, 0.7) 0%,
+    rgba(26, 108, 209, 0.5) 100%
+  );
+  backdrop-filter: blur(10px);
+  will-change: transform;
 }
 
 select {
@@ -32,17 +38,21 @@ select {
   outline: none;
   border: none !important;
   margin-left: 20px;
-  background: linear-gradient(135deg, rgba(36, 36, 36, 0.95), rgba(28, 28, 28, 0.95));
+  background: linear-gradient(
+    135deg,
+    rgba(36, 36, 36, 0.95),
+    rgba(28, 28, 28, 0.95)
+  );
   color: #fff;
   padding: 8px 12px;
-  box-shadow: 
+  box-shadow:
     0 2px 8px rgba(0, 0, 0, 0.2),
     0 0 0 1px rgba(255, 255, 255, 0.05);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 select:focus {
-  box-shadow: 
+  box-shadow:
     0 4px 12px rgba(36, 134, 255, 0.2),
     0 0 0 1px rgba(36, 134, 255, 0.3);
 }
@@ -64,9 +74,8 @@ select:focus {
 }
 
 .lan_all label:nth-child(3) {
-  background-color: #111;
+  background: #111;
 }
-
 
 .lan_boxs {
   display: flex;
@@ -82,7 +91,11 @@ select:focus {
   font-size: 14px;
   height: 38px;
   padding: 0 20px;
-  background: linear-gradient(135deg, rgba(36, 36, 36, 0.95), rgba(28, 28, 28, 0.95));
+  background: linear-gradient(
+    135deg,
+    rgba(36, 36, 36, 0.95),
+    rgba(28, 28, 28, 0.95)
+  );
   display: flex;
   justify-content: center;
   align-items: center;
@@ -91,15 +104,19 @@ select:focus {
   position: relative;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 
+  box-shadow:
     0 2px 8px rgba(0, 0, 0, 0.2),
     0 0 0 1px rgba(255, 255, 255, 0.05);
   border: none !important;
-  border-radius: 0 !important;
+  border-radius: 4px !important;
 }
 
 .ui-button:hover {
-  background: linear-gradient(135deg, rgba(46, 46, 46, 0.98), rgba(36, 36, 36, 0.98));
+  background: linear-gradient(
+    135deg,
+    rgba(46, 46, 46, 0.98),
+    rgba(36, 36, 36, 0.98)
+  );
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
@@ -135,7 +152,7 @@ select:focus {
   background: linear-gradient(135deg, #2486ff, #1a76f2, #2486ff);
   background-size: 200% 200%;
   animation: gradient 3s ease infinite;
-  box-shadow: 
+  box-shadow:
     0 2px 8px rgba(36, 134, 255, 0.3),
     0 0 0 1px rgba(255, 255, 255, 0.05);
   border: none !important;
@@ -147,25 +164,31 @@ select:focus {
   background-size: 200% 200%;
   animation: gradient 3s ease infinite;
   transform: translateY(-1px);
-  box-shadow: 
+  box-shadow:
     0 4px 12px rgba(36, 134, 255, 0.4),
     0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
 .ui-checkbox {
-  border-radius: 0!important;
+  border-radius: 0 !important;
 }
 
-.ui-input>input, input.ui-input {
-  border: 0!important;
+.ui-input > input,
+input.ui-input {
+  border: 0 !important;
 }
 
-.ui-input>input, input.ui-input {
-  border: 0!important;
+.ui-input > input,
+input.ui-input {
+  border: 0 !important;
 }
 
 .checkboxes input + label + label {
-  background: linear-gradient(135deg, rgba(36, 36, 36, 0.95), rgba(28, 28, 28, 0.95));
+  background: linear-gradient(
+    135deg,
+    rgba(36, 36, 36, 0.95),
+    rgba(28, 28, 28, 0.95)
+  );
   width: 40px;
   height: 40px;
   display: flex;
@@ -173,14 +196,19 @@ select:focus {
   align-items: center;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 
+  box-shadow:
     0 2px 8px rgba(0, 0, 0, 0.2),
     0 0 0 1px rgba(255, 255, 255, 0.05);
   border: none !important;
+  border-radius: 4px;
 }
 
 .checkboxes input + label + label:hover {
-  background: linear-gradient(135deg, rgba(46, 46, 46, 0.98), rgba(36, 36, 36, 0.98));
+  background: linear-gradient(
+    135deg,
+    rgba(46, 46, 46, 0.98),
+    rgba(36, 36, 36, 0.98)
+  );
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
@@ -189,7 +217,7 @@ select:focus {
   background: linear-gradient(135deg, #2486ff, #1a76f2, #2486ff);
   background-size: 200% 200%;
   animation: gradient 3s ease infinite;
-  box-shadow: 
+  box-shadow:
     0 2px 8px rgba(36, 134, 255, 0.3),
     0 0 0 1px rgba(255, 255, 255, 0.05);
 }
@@ -199,7 +227,7 @@ select:focus {
   background-size: 200% 200%;
   animation: gradient 3s ease infinite;
   transform: translateY(-1px);
-  box-shadow: 
+  box-shadow:
     0 4px 12px rgba(36, 134, 255, 0.4),
     0 0 0 1px rgba(255, 255, 255, 0.08);
 }
@@ -217,7 +245,9 @@ select:focus {
   width: 50px;
   height: 50px;
   border-radius: 5px;
-  background: #212121 url("data:image/svg+xml;base64,PHN2ZyB0PSIxNzI3NTA5NjE0OTE4IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjQzNDkiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCI+PHBhdGggZD0iTTc2OS40MDUgOTc3LjQ4M2MtMjcuMDc0IDI3LjU2OC03MS4wNDUgMjcuNTY4LTk4LjEyMSAwbC00MTYuNTkxLTQyMy44MDRjLTI3LjE3My0yNy41NjgtMjcuMTczLTcyLjIzMSAwLTk5Ljg5OWw0MTYuNDkyLTQyMy44MDRjMTMuNTM3LTEzLjczNCAzMS4zMjQtMjAuNjUyIDQ5LjEwOS0yMC42NTJzMzUuNTcyIDYuOTE3IDQ5LjEwOSAyMC42NTJjMjcuMTczIDI3LjU2OCAyNy4xNzMgNzIuMzMxIDAgOTkuODk5bC0zNjcuNDgyIDM3My44MDYgMzY3LjQ4MiAzNzMuOTA0YzI3LjA3NCAyNy41NjggMjcuMDc0IDcyLjIzMSAwIDk5Ljg5OXoiIHAtaWQ9IjQzNTAiIGZpbGw9IiNmZmZmZmYiPjwvcGF0aD48L3N2Zz4=") no-repeat;
+  background: #212121
+    url("data:image/svg+xml;base64,PHN2ZyB0PSIxNzI3NTA5NjE0OTE4IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjQzNDkiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCI+PHBhdGggZD0iTTc2OS40MDUgOTc3LjQ4M2MtMjcuMDc0IDI3LjU2OC03MS4wNDUgMjcuNTY4LTk4LjEyMSAwbC00MTYuNTkxLTQyMy44MDRjLTI3LjE3My0yNy41NjgtMjcuMTczLTcyLjIzMSAwLTk5Ljg5OWw0MTYuNDkyLTQyMy44MDRjMTMuNTM3LTEzLjczNCAzMS4zMjQtMjAuNjUyIDQ5LjEwOS0yMC42NTJzMzUuNTcyIDYuOTE3IDQ5LjEwOSAyMC42NTJjMjcuMTczIDI3LjU2OCAyNy4xNzMgNzIuMzMxIDAgOTkuODk5bC0zNjcuNDgyIDM3My44MDYgMzY3LjQ4MiAzNzMuOTA0YzI3LjA3NCAyNy41NjggMjcuMDc0IDcyLjIzMSAwIDk5Ljg5OXoiIHAtaWQ9IjQzNTAiIGZpbGw9IiNmZmZmZmYiPjwvcGF0aD48L3N2Zz4=")
+    no-repeat;
   background-position: center;
   background-size: 20px 20px;
   cursor: pointer;
@@ -225,7 +255,7 @@ select:focus {
 }
 
 select {
-  border: 0!important;
+  border: 0 !important;
 }
 
 .checkboxes .ui-checkbox {
