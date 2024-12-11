@@ -136,6 +136,15 @@ const handleSocket = () => {
         cancelBtn.classList.remove("disabled");
         saveBtn.classList.remove("loading");
       }
+    } else if (type === "upload-ftp-success") {
+      const toTest = document.querySelector(
+        ".getUrlName .getUrlName-popup .to-test"
+      );
+      new Dialog({
+        title: "Ftp Success Info",
+        content: message,
+      });
+      toTest.classList.remove("loading");
     }
   });
 };
@@ -1279,16 +1288,22 @@ const handleGetFile = () => {
   };
 };
 
+let urlData2 = {};
+
 const getUrlNameHanle = () => {
   const html = `
     <div class="getUrlName">
       <div class="getUrlName_header">
         <input type="text" placeholder="请输入 URL, 如 https://www.vidnoz.com/talking-head.html" class="getUrlName-input">
         <a href="javascript:" class="getUrlName-btn ui-button ui-button-primary" role="button">GET URL</a>
-        <div class="getUrlName-number">0</div>
+        <div class="getUrlName-progress">
+          <div class="getUrlName-copy">COPY</div>
+          <div class="getUrlName-number">0</div>
+        </div>
       </div>
       <div class="getUrlName-textarea"></div>
       <div class="iframe-cover-close"><svg t="1732002642334" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6223" width="256" height="256"><path d="M887.2 774.2L624.8 510.8l263-260c10.8-10.8 10.8-28.4 0-39.2l-74.8-75.2c-5.2-5.2-12.2-8-19.6-8-7.4 0-14.4 3-19.6 8L512 395.6 249.8 136.6c-5.2-5.2-12.2-8-19.6-8-7.4 0-14.4 3-19.6 8L136 211.8c-10.8 10.8-10.8 28.4 0 39.2l263 260L136.8 774.2c-5.2 5.2-8.2 12.2-8.2 19.6 0 7.4 2.8 14.4 8.2 19.6l74.8 75.2c5.4 5.4 12.4 8.2 19.6 8.2 7 0 14.2-2.6 19.6-8.2L512 626.2l261.4 262.2c5.4 5.4 12.4 8.2 19.6 8.2 7 0 14.2-2.6 19.6-8.2l74.8-75.2c5.2-5.2 8.2-12.2 8.2-19.6-0.2-7.2-3.2-14.2-8.4-19.4z" p-id="6224" fill="#ffffff"></path></svg></div>
+      <div class="getUrlName-popup"></div>
     </div>
   `;
   document.body.insertAdjacentHTML("beforeend", html);
@@ -1298,8 +1313,23 @@ const getUrlNameHanle = () => {
   const input = getUrlName.querySelector(".getUrlName-input");
   const textarea = getUrlName.querySelector(".getUrlName-textarea");
   const number = getUrlName.querySelector(".getUrlName-number");
+  const copyBtn = getUrlName.querySelector(".getUrlName-copy");
+  const popup = getUrlName.querySelector(".getUrlName-popup");
   closeBtn.onclick = () => {
     getUrlName.remove();
+  };
+  copyBtn.onclick = () => {
+    const ps = document.querySelectorAll(".getUrlName-textarea p");
+    if (!ps?.length) {
+      new LightTip().error("No Data To Copy");
+      return;
+    }
+    let str = "";
+    ps.forEach((item) => {
+      str += `${item.querySelector("span").textContent}\n`;
+    });
+    navigator.clipboard.writeText(str);
+    new LightTip().success("Copy Successfull!");
   };
   getBtn.onclick = () => {
     if (!input?.value) {
@@ -1321,20 +1351,76 @@ const getUrlNameHanle = () => {
       })
       .then((res) => {
         textarea.innerHTML = "";
-        number.innerHTML = "0"
+        number.innerHTML = "0";
+        urlData2 = {};
         if (res?.code === 200 && res?.message === "get-urls-success") {
           const ress = res?.data || {};
-          Object.keys(ress).forEach((key) => {
+          const ress2 = res?.data2 || {};
+          urlData2 = ress2;
+          const keysA = Object.keys(ress);
+          keysA.forEach((key) => {
             const p = document.createElement("p");
-            p.textContent = `${key}: https://${key}-test.vidnoz.com/${ress[key]}`;
+            const button = document.createElement("a");
+            button.href = `javascript:;`;
+            button.className = "ui-button ui-button-primary get-Sync-btn";
+            button.textContent = "Get Include Path";
+            p.innerHTML = `<span>${key}: https://${key}-test.vidnoz.com/${ress[key]}</span>`;
+            p.appendChild(button);
             textarea.appendChild(p);
+
+            button.onclick = () => {
+              popup.innerHTML = "";
+              let toTestData = [`${ress[key]}`];
+              let html = `<ul><li>${`${ress[key]}`}</li>`;
+              let lanData = urlData2[key];
+              for (const key1 in lanData) {
+                const resourses = lanData[key1];
+                for (let i = 0; i < resourses.length; i++) {
+                  const resourse = resourses[i];
+                  html += `<li>${resourse}</li>`;
+                  toTestData.push(resourse);
+                }
+              }
+              html += `</ul><a href="javascript:;" class="ui-button ui-button-primary to-test">To Test</a>`;
+              popup.insertAdjacentHTML("beforeend", html);
+              const toTest = popup.querySelector(".to-test");
+              toTest.onclick = () => {
+                toTest.classList.add("loading");
+                fetch("/ftp/upload-ftp", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    env: "test",
+                    data: {
+                      [key]: toTestData,
+                    },
+                  }),
+                })
+                  .then((res) => {
+                    return res.json();
+                  })
+                  .then((res) => {
+                    // if (res?.code === 200 && res?.message === "ftp-upload-success") {
+                    //   new LightTip().success(`${getEnv} 上传 ftp 成功`);
+                    // } else {
+                    //   new LightTip().error(`${getEnv} 上传 ftp 失败`);
+                    // }
+                    // upload.classList.remove("loading");
+                  });
+              };
+            };
           });
-          number.innerHTML = Object.keys(ress).length;
+          if (!keysA.length) {
+            new LightTip().error(`No Data`);
+          }
+          number.innerHTML = keysA.length;
         } else {
           new LightTip().error(`${res?.data || "获取失败"} `);
         }
         getBtn.classList.remove("loading");
-      })
+      });
   };
 };
 

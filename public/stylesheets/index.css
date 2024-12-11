@@ -1028,8 +1028,8 @@ select {
   color: #fff;
   font-size: 14px;
   height: 38px;
-  padding: 0 20px;
-  min-width: 60px;
+  padding: 0 15px;
+  min-width: 50px;
   background: linear-gradient(
     135deg,
     rgba(36, 36, 36, 0.95),
@@ -1652,12 +1652,12 @@ select {
 .getUrlName_header {
   display: flex;
   gap: 10px;
-  width: 600px;
+  width: 660px;
   position: relative;
 }
 
 .getUrlName-textarea {
-  min-width: 600px;
+  min-width: 660px;
   min-height: 200px;
   resize: none;
   display: block;
@@ -1668,18 +1668,74 @@ select {
   color: #fff;
   font-size: 14px;
   caret-color: #fff;
+  padding-top: 46px;
 }
 
 .getUrlName-textarea p + p {
   margin-top: 10px;
 }
 
-.getUrlName-number {
+.getUrlName-textarea p {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.get-Sync-btn {
+  width: 150px;
+  margin-left: 10px;
+  height: 30px;
+  padding: 0;
+}
+
+.getUrlName-progress {
   position: absolute;
-    top: 58px;
-    right: 10px;
-    background: rgba(255, 255, 255, 0.2);
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 12px;
+  top: 58px;
+  right: 20px;
+  display: flex;
+  gap: 5px;
+}
+
+.getUrlName-number,
+.getUrlName-copy {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.getUrlName-popup {
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+  min-width: 0;
+  min-height: 0;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  padding: 20px;
+  display: none;
+}
+
+.getUrlName-popup ul {
+  list-style: none;
+  width: 100%;
+  height: 100%;
+  margin-bottom: 20px;
+}
+
+.getUrlName-popup ul li + li {
+  margin-top: 15px;
+}
+
+.getUrlName-popup ul li {
+  font-size: 14px;
+}
+
+.to-test {
+  width: 100%;
+}
+
+.getUrlName-popup:has(ul) {
+  display: block;
 }
