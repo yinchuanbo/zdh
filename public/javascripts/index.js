@@ -140,13 +140,15 @@ const handleSocket = () => {
       const toTest = document.querySelector(
         ".getUrlName .getUrlName-popup .to-test"
       );
-      if(toTest) {
+      if (toTest) {
         new Dialog({
           title: "Ftp Success Info",
           content: message,
         });
         toTest.classList.remove("loading");
       }
+    } else if (type === "ftp-upload-progress") {
+      new LightTip().success(`${message}`);
     }
   });
 };
