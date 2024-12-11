@@ -202,6 +202,8 @@ const handleSocket = () => {
         content: message,
       });
       upload.classList.remove("loading");
+    } else if (type === 'ftp-upload-progress') {
+      new LightTip().success(`${message}`);
     }
   });
 };

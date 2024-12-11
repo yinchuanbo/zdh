@@ -140,11 +140,13 @@ const handleSocket = () => {
       const toTest = document.querySelector(
         ".getUrlName .getUrlName-popup .to-test"
       );
-      new Dialog({
-        title: "Ftp Success Info",
-        content: message,
-      });
-      toTest.classList.remove("loading");
+      if(toTest) {
+        new Dialog({
+          title: "Ftp Success Info",
+          content: message,
+        });
+        toTest.classList.remove("loading");
+      }
     }
   });
 };
