@@ -38,9 +38,10 @@ function getIncludedFiles(curPath) {
   // 读取 .tpl 文件内容
   const tplContent = fs2.readFileSync(curPath, "utf-8");
   // 更宽松的正则表达式匹配 <script> 和 <link> 标签
-  const jsRegex = /<script[^>]*\s+src=["']([^"']+)["'][^>]*><\/script>/gi;
+  const jsRegex =
+    /<script(?=(?:[^>]*?\s+(?:src|type|async|defer|charset|crossorigin|integrity|nomodule|nonce|referrerpolicy)(?:=["'][^"']*?["'])?)*?\s+src=["']([^"']+)["'])(?:[^>]*?type=["'](?:text\/javascript|application\/javascript|module)["'])?[^>]*>(?:<\/script>)?/gi;
   const cssRegex =
-    /<link[^>]*\s+rel=["']stylesheet["'][^>]*\s+href=["']([^"']+\.css(?:\?[^"']*)?)["'][^>]*>/gi;
+    /<link(?=(?:[^>]*?\s+(?:href|rel|type|media|crossorigin|integrity|referrerpolicy)(?:=["'][^"']*?["'])?)*?\s+(?:href=["']([^"']+?\.css(?:\?[^"']*?)?))["'])(?:[^>]*?rel=["']stylesheet["'])[^>]*?\/?>/gi;
   const jsFiles = [];
   const cssFiles = [];
   // 提取 .js 文件路径
@@ -52,7 +53,9 @@ function getIncludedFiles(curPath) {
       jsPath.includes("face-api") ||
       jsPath.includes("gsap.") ||
       jsPath.includes("swiper-bundle") ||
-      !jsPath.startsWith("./")
+      jsPath.includes("swiper.min") ||
+      jsPath.includes("lottie-player") ||
+      !jsPath.includes("js/")
     ) {
       continue;
     }
@@ -64,14 +67,15 @@ function getIncludedFiles(curPath) {
   while ((cssMatch = cssRegex.exec(tplContent)) !== null) {
     let cssPath = cssMatch[1];
     if (
-        cssPath.includes("jquery") ||
-        cssPath.includes("face-api") ||
-        cssPath.includes("gsap.") ||
-        cssPath.includes("swiper-bundle") ||
-        !cssPath.startsWith("./")
-      ) {
-        continue;
-      }
+      cssPath.includes("jquery") ||
+      cssPath.includes("face-api") ||
+      cssPath.includes("gsap.") ||
+      cssPath.includes("swiper-bundle") ||
+      cssPath.includes("swiper.min") ||
+      !cssPath.includes("css/")
+    ) {
+      continue;
+    }
     if (cssPath.startsWith("./")) cssPath = cssPath.replace("./", "");
     cssFiles.push(cssPath);
   }

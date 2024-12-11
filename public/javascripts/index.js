@@ -1297,8 +1297,8 @@ const getUrlNameHanle = () => {
         <input type="text" placeholder="请输入 URL, 如 https://www.vidnoz.com/talking-head.html" class="getUrlName-input">
         <a href="javascript:" class="getUrlName-btn ui-button ui-button-primary" role="button">GET URL</a>
         <div class="getUrlName-progress">
-          <div class="getUrlName-copy">COPY</div>
           <div class="getUrlName-number">0</div>
+          <div class="getUrlName-copy">COPY</div>
         </div>
       </div>
       <div class="getUrlName-textarea"></div>
@@ -1336,6 +1336,10 @@ const getUrlNameHanle = () => {
       new LightTip().error("请输入 URL ");
       return;
     }
+    textarea.innerHTML = "";
+    number.innerHTML = "0";
+    urlData2 = {};
+    popup.innerHTML = "";
     getBtn.classList.add("loading");
     fetch("/get-urls", {
       method: "POST",
@@ -1363,7 +1367,7 @@ const getUrlNameHanle = () => {
             const button = document.createElement("a");
             button.href = `javascript:;`;
             button.className = "ui-button ui-button-primary get-Sync-btn";
-            button.textContent = "Get Include Path";
+            button.textContent = "Include Path";
             p.innerHTML = `<span>${key}: https://${key}-test.vidnoz.com/${ress[key]}</span>`;
             p.appendChild(button);
             textarea.appendChild(p);
