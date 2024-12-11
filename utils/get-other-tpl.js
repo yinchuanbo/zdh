@@ -51,7 +51,8 @@ function getIncludedFiles(curPath) {
       jsPath.includes("jquery") ||
       jsPath.includes("face-api") ||
       jsPath.includes("gsap.") ||
-      jsPath.includes("swiper-bundle")
+      jsPath.includes("swiper-bundle") ||
+      !jsPath.startsWith("./")
     ) {
       continue;
     }
@@ -62,6 +63,15 @@ function getIncludedFiles(curPath) {
   let cssMatch;
   while ((cssMatch = cssRegex.exec(tplContent)) !== null) {
     let cssPath = cssMatch[1];
+    if (
+        cssPath.includes("jquery") ||
+        cssPath.includes("face-api") ||
+        cssPath.includes("gsap.") ||
+        cssPath.includes("swiper-bundle") ||
+        !cssPath.startsWith("./")
+      ) {
+        continue;
+      }
     if (cssPath.startsWith("./")) cssPath = cssPath.replace("./", "");
     cssFiles.push(cssPath);
   }
