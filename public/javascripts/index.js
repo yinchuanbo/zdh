@@ -33,6 +33,7 @@ const allPublish = document.querySelector(".all-publish");
 const allPull = document.querySelector(".all-pull");
 const allPush = document.querySelector(".all-push");
 const OneClick = document.querySelector(".One-click");
+const getUrlName = document.querySelector(".get-url-name");
 
 let selectLan = document.querySelector(".wrappper__sider_01 select").value;
 
@@ -131,7 +132,7 @@ const handleSocket = () => {
       allPush.classList.remove("loading");
       const saveBtn = document.querySelector(".setCommit .ui-button-primary");
       const cancelBtn = document.querySelector(".setCommit .ui-button-warning");
-      if(saveBtn && cancelBtn) {
+      if (saveBtn && cancelBtn) {
         cancelBtn.classList.remove("disabled");
         saveBtn.classList.remove("loading");
       }
@@ -1272,6 +1273,68 @@ const handleGetFile = () => {
   };
   OneClick.onclick = () => {
     OneClickHandle();
+  };
+  getUrlName.onclick = () => {
+    getUrlNameHanle();
+  };
+};
+
+const getUrlNameHanle = () => {
+  const html = `
+    <div class="getUrlName">
+      <div class="getUrlName_header">
+        <input type="text" placeholder="请输入 URL, 如 https://www.vidnoz.com/talking-head.html" class="getUrlName-input">
+        <a href="javascript:" class="getUrlName-btn ui-button ui-button-primary" role="button">GET URL</a>
+        <div class="getUrlName-number">0</div>
+      </div>
+      <div class="getUrlName-textarea"></div>
+      <div class="iframe-cover-close"><svg t="1732002642334" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6223" width="256" height="256"><path d="M887.2 774.2L624.8 510.8l263-260c10.8-10.8 10.8-28.4 0-39.2l-74.8-75.2c-5.2-5.2-12.2-8-19.6-8-7.4 0-14.4 3-19.6 8L512 395.6 249.8 136.6c-5.2-5.2-12.2-8-19.6-8-7.4 0-14.4 3-19.6 8L136 211.8c-10.8 10.8-10.8 28.4 0 39.2l263 260L136.8 774.2c-5.2 5.2-8.2 12.2-8.2 19.6 0 7.4 2.8 14.4 8.2 19.6l74.8 75.2c5.4 5.4 12.4 8.2 19.6 8.2 7 0 14.2-2.6 19.6-8.2L512 626.2l261.4 262.2c5.4 5.4 12.4 8.2 19.6 8.2 7 0 14.2-2.6 19.6-8.2l74.8-75.2c5.2-5.2 8.2-12.2 8.2-19.6-0.2-7.2-3.2-14.2-8.4-19.4z" p-id="6224" fill="#ffffff"></path></svg></div>
+    </div>
+  `;
+  document.body.insertAdjacentHTML("beforeend", html);
+  const getUrlName = document.querySelector(".getUrlName");
+  const closeBtn = getUrlName.querySelector(".iframe-cover-close");
+  const getBtn = getUrlName.querySelector(".getUrlName-btn");
+  const input = getUrlName.querySelector(".getUrlName-input");
+  const textarea = getUrlName.querySelector(".getUrlName-textarea");
+  const number = getUrlName.querySelector(".getUrlName-number");
+  closeBtn.onclick = () => {
+    getUrlName.remove();
+  };
+  getBtn.onclick = () => {
+    if (!input?.value) {
+      new LightTip().error("请输入 URL ");
+      return;
+    }
+    getBtn.classList.add("loading");
+    fetch("/get-urls", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        url: input.value,
+      }),
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((res) => {
+        textarea.innerHTML = "";
+        number.innerHTML = "0"
+        if (res?.code === 200 && res?.message === "get-urls-success") {
+          const ress = res?.data || {};
+          Object.keys(ress).forEach((key) => {
+            const p = document.createElement("p");
+            p.textContent = `${key}: https://${key}-test.vidnoz.com/${ress[key]}`;
+            textarea.appendChild(p);
+          });
+          number.innerHTML = Object.keys(ress).length;
+        } else {
+          new LightTip().error(`${res?.data || "获取失败"} `);
+        }
+        getBtn.classList.remove("loading");
+      })
   };
 };
 

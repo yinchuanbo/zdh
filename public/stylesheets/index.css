@@ -845,7 +845,11 @@ body {
 .setCommit {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, rgba(36, 134, 255, 0.7) 0%, rgba(26, 108, 209, 0.5) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(36, 134, 255, 0.7) 0%,
+    rgba(26, 108, 209, 0.5) 100%
+  );
   position: fixed;
   top: 50%;
   left: 50%;
@@ -1619,4 +1623,63 @@ select {
 
 .handle-btn {
   width: 100%;
+}
+
+.getUrlName {
+  position: fixed;
+  inset: 0;
+  z-index: 9999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    135deg,
+    rgba(36, 134, 255, 0.7) 0%,
+    rgba(26, 108, 209, 0.5) 100%
+  );
+  backdrop-filter: blur(10px);
+  will-change: transform;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.getUrlName-input {
+  border: 0;
+  flex: 1;
+}
+
+.getUrlName_header {
+  display: flex;
+  gap: 10px;
+  width: 600px;
+  position: relative;
+}
+
+.getUrlName-textarea {
+  min-width: 600px;
+  min-height: 200px;
+  resize: none;
+  display: block;
+  border: 0;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  padding: 20px;
+  color: #fff;
+  font-size: 14px;
+  caret-color: #fff;
+}
+
+.getUrlName-textarea p + p {
+  margin-top: 10px;
+}
+
+.getUrlName-number {
+  position: absolute;
+    top: 58px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
 }

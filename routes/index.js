@@ -13,6 +13,7 @@ const mergeCode = require("../utils/merge-code");
 const getBranchs = require("../utils/get-branchs");
 const RTLConverter = require("../utils/switch-css-ar");
 const allPush = require("../utils/all-push");
+const getOtherTpl = require("../utils/get-other-tpl");
 const sync = require("../utils/sync");
 const io = require("socket.io-client");
 
@@ -83,7 +84,7 @@ router.get("/watching", authenticateToken, function (req, res, next) {
 
 router.post("/handle-files", authenticateToken, async (req, res) => {
   const configs = getConf(req.uname, res);
-  const { init, async, commitIds } = req.body;
+  const { init, async, commitIds, url } = req.body;
   try {
     const { cbObj, lineObj } = await getFileFunc(
       init,
@@ -105,6 +106,27 @@ router.post("/handle-files", authenticateToken, async (req, res) => {
     res.json({
       code: 200,
       message: "handle-files-fail",
+      data: error?.message || error || "获取数据失败",
+    });
+  }
+});
+
+router.post("/get-urls", authenticateToken, async (req, res) => {
+  const configs = getConf(req.uname, res);
+  const { url } = req.body;
+  try {
+    const result =await getOtherTpl({
+      url, configs
+    })
+    res.json({
+      code: 200,
+      message: "get-urls-success",
+      data: result
+    });
+  } catch (error) {
+    res.json({
+      code: 200,
+      message: "get-urls-fail",
       data: error?.message || error || "获取数据失败",
     });
   }
@@ -570,7 +592,7 @@ router.post("/all-push", authenticateToken, async (req, res) => {
       type: "all-push",
       message: JSON.stringify(results),
     });
-  })
+  });
   res.json({
     code: 200,
   });

@@ -311,6 +311,7 @@ async function checkLinkHrefInTplFiles(tplFiles, url) {
 }
 
 async function handleAsyncLans(oLan, aLan, onlyLan, configs) {
+  console.log("oLan, aLan", oLan, aLan)
   const obj = {};
   for (const al of aLan) {
     const alP = configs.LocalListPro[al];
