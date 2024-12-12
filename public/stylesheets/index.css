@@ -1721,12 +1721,24 @@ select {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: relative;
+  transition: 0.5s;
+}
+
+.getUrlName-textarea p.active::before {
+  content: "";
+  position: absolute;
+  inset: -5px -8px;
+  border-radius: 4px;
+  border: 2px solid rgba(255,255,255,0.5);
+  transition: 0.5s;
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .get-Sync-btn {
-  width: 115px;
+  width: 94px;
   margin-left: 10px;
-  height: 30px;
+  height: 32px;
   padding: 0;
 }
 

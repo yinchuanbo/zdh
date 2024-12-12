@@ -1369,12 +1369,14 @@ const getUrlNameHanle = () => {
             const button = document.createElement("a");
             button.href = `javascript:;`;
             button.className = "ui-button ui-button-primary get-Sync-btn";
-            button.textContent = "Include Path";
+            button.textContent = "Get Path";
             p.innerHTML = `<span>${key}: https://${key}-test.vidnoz.com/${ress[key]}</span>`;
             p.appendChild(button);
             textarea.appendChild(p);
 
             button.onclick = () => {
+              document.querySelectorAll(".get-Sync-btn").forEach(item => item.parentNode.classList.remove("active"));
+              button.parentNode.classList.add('active')
               popup.innerHTML = "";
               let toTestData = [`${ress[key]}`];
               let html = `<ul><li>${`${ress[key]}`}</li>`;
