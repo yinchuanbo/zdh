@@ -1494,7 +1494,7 @@ const renderCssSwitchHTML = () => {
       .then((res) => {
         if (res?.message === "switch-code-success") {
           afterCss.innerHTML = res?.data;
-          copyCode.style.display = "block";
+          copyCode.style.display = "flex";
         } else {
           new LightTip().error(res?.data);
         }
