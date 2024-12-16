@@ -115,14 +115,15 @@ router.post("/get-urls", authenticateToken, async (req, res) => {
   const configs = getConf(req.uname, res);
   const { url } = req.body;
   try {
-    const result =await getOtherTpl({
-      url, configs
-    })
+    const result = await getOtherTpl({
+      url,
+      configs,
+    });
     res.json({
       code: 200,
       message: "get-urls-success",
       data: result?.urls,
-      data2: result?.otherUrls
+      data2: result?.otherUrls,
     });
   } catch (error) {
     res.json({
@@ -155,8 +156,7 @@ router.post("/switch-css-ar", authenticateToken, async (req, res) => {
   const { ports, domain } = getConf(req.uname, res);
   const { csscode } = req.body;
   try {
-    const converter = new RTLConverter();
-    const rtlContent = await converter.convertStyles(csscode);
+    const rtlContent = await RTLConverter(csscode);
     res.json({
       code: 200,
       message: "switch-code-success",
