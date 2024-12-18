@@ -1375,8 +1375,10 @@ const getUrlNameHanle = () => {
             textarea.appendChild(p);
 
             button.onclick = () => {
-              document.querySelectorAll(".get-Sync-btn").forEach(item => item.parentNode.classList.remove("active"));
-              button.parentNode.classList.add('active')
+              document
+                .querySelectorAll(".get-Sync-btn")
+                .forEach((item) => item.parentNode.classList.remove("active"));
+              button.parentNode.classList.add("active");
               popup.innerHTML = "";
               let toTestData = [`${ress[key]}`];
               let html = `<ul><li>${`${ress[key]}`}</li>`;
