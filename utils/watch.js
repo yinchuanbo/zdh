@@ -9,10 +9,10 @@ const path = require("path");
 const sass = require("sass");
 const io = require("socket.io-client");
 const babel = require("@babel/core");
-const postcss = require("postcss")
-const autoprefixer = require("autoprefixer")
-const acorn = require('acorn');
-const { lintFiles } = require("../eslint-integration")
+const postcss = require("postcss");
+const autoprefixer = require("autoprefixer");
+const acorn = require("acorn");
+const { lintFiles } = require("../eslint-integration");
 
 const watcherList = [];
 
@@ -55,27 +55,34 @@ function listenWatch(isWatching, pathname, lans, ports, domain) {
       acorn.parse(code, { ecmaVersion: "latest", sourceType: "module" });
       return true;
     } catch (err) {
-      return 'Syntax error:' + err.message;
+      return "Syntax error:" + err.message;
     }
   }
 
   const compressAndObfuscate = async (filePath, jsOutputDir) => {
+    console.log("filePath", filePath, jsOutputDir);
     try {
       // try {
       //   await lintFiles({ filePath })
       // } catch (error) {
       //   throw new Error(error)
       // }
+
+      let cengji = filePath.split("\\js\\")[1];
+      cengji = cengji.split("\\");
+      cengji.pop();
+      cengji = cengji.join("\\");
+
       const fileContent = await fs.readFile(filePath, "utf-8");
-      const res1 = checkSyntax(fileContent)
-      if (res1 !== true) throw new Error(res1)
+      const res1 = checkSyntax(fileContent);
+      if (res1 !== true) throw new Error(res1);
       // const presetEnvPath = require.resolve("@babel/preset-env");
       // let es5Content = await babel.transformAsync(fileContent, {
       //   presets: [[presetEnvPath]]
       // });
       const minified = await minify(fileContent);
       await fs.writeFile(
-        path.join(jsOutputDir, path.basename(filePath)),
+        path.join(jsOutputDir, cengji, path.basename(filePath)),
         minified.code
       );
       return Promise.resolve();
@@ -86,15 +93,23 @@ function listenWatch(isWatching, pathname, lans, ports, domain) {
 
   const compileSCSS = (filePath, cssOutputDir) => {
     return new Promise(async (resolve, reject) => {
+      let cengji = filePath.split("\\scss\\")[1];
+      cengji = cengji.split("\\");
+      cengji.pop();
+      cengji = cengji.join("\\");
       const outputFilePath = path.join(
         cssOutputDir,
+        cengji,
         path.basename(filePath).replace(".scss", ".css")
       );
       try {
         const result = await sass.compileAsync(filePath, {
           style: "compressed",
         });
-        const res = await postcss([autoprefixer]).process(result.css, { from: undefined });
+        const res = await postcss([autoprefixer]).process(result.css, {
+          from: undefined,
+        });
+
         await fs.writeFile(outputFilePath, res.css);
         resolve(); // 处理成功
       } catch (writeError) {

@@ -35,6 +35,7 @@ async function checkLinkHrefInTplFiles(tplFiles, url) {
 }
 
 function getIncludedFiles(curPath) {
+  console.log("curPath", curPath);
   // 读取 .tpl 文件内容
   const tplContent = fs2.readFileSync(curPath, "utf-8");
   // 更宽松的正则表达式匹配 <script> 和 <link> 标签
@@ -102,6 +103,8 @@ async function getOtherTpl({ url, configs }) {
     if (matchingFiles.length > 0) {
       const curP = path.join(alP, "tpl", matchingFiles[0]);
       const includesPath = getIncludedFiles(curP);
+      console.log("----01",matchingFiles )
+      console.log("----02",includesPath )
       urls[lan] = `${matchingFiles[0].replaceAll(".tpl", ".html")}`;
       otherUrls[lan] = includesPath;
     }

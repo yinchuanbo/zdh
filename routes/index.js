@@ -126,6 +126,7 @@ router.post("/get-urls", authenticateToken, async (req, res) => {
       data2: result?.otherUrls,
     });
   } catch (error) {
+    console.log("sdfdsfsdfds", error)
     res.json({
       code: 200,
       message: "get-urls-fail",
