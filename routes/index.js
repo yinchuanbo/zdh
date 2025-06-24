@@ -45,7 +45,6 @@ imageExtensions = [
 const socket = io("http://localhost:4000");
 
 router.get("/", authenticateToken, function (req, res, next) {
-  console.log("req", req)
   const { lans } = getConf(req.uname, res);
   res.render("index", {
     title: "Index",
