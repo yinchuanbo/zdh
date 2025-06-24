@@ -22,11 +22,12 @@ body {
   align-items: center;
   justify-content: center;
   gap: 20px;
-  background: linear-gradient(
-    135deg,
-    rgba(36, 134, 255, 0.7) 0%,
-    rgba(26, 108, 209, 0.5) 100%
-  );
+  background: #1a1a1a
+    linear-gradient(
+      135deg,
+      rgba(36, 134, 255, 0.7) 0%,
+      rgba(26, 108, 209, 0.5) 100%
+    );
   backdrop-filter: blur(10px);
   will-change: transform;
 }

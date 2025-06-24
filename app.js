@@ -1,4 +1,4 @@
-const express = require('express');
+const express = require("express");
 const cors = require("cors");
 const createError = require("http-errors");
 const path = require("path");
@@ -23,14 +23,27 @@ function createApp() {
   app.set("view engine", "ejs");
 
   // 中间件
-  app.use(logger("dev"));
-  app.use(cors({
-    origin: "*", // 根据需要设置允许的域名
-  }));
-  app.use(express.json({ limit: "100mb" }));
-  app.use(express.urlencoded({ extended: true, limit: "100mb" }));
+  // 在生产环境中使用更简洁的日志格式
+  app.use(logger(app.get("env") === "production" ? "combined" : "dev"));
+
+  app.use(
+    cors({
+      origin: true, // 允许所有来源
+      credentials: true, // 允许发送cookies
+    })
+  );
+
+  // 为大型请求设置合理的限制
+  app.use(express.json({ limit: "50mb" })); // 减小了限制，但仍然足够大
+  app.use(express.urlencoded({ extended: true, limit: "50mb" }));
   app.use(cookieParser());
-  app.use(express.static(path.join(__dirname, "public")));
+
+  // 为静态资源添加缓存控制
+  app.use(
+    express.static(path.join(__dirname, "public"), {
+      maxAge: app.get("env") === "production" ? "1d" : 0, // 生产环境缓存1天
+    })
+  );
 
   // 路由
   app.use("/", indexRouter);
@@ -40,6 +53,18 @@ function createApp() {
   app.use("/users", usersRouter);
   app.use("/deploy", deployRouter);
   app.use("/ftp", ftpRouter);
+
+  // 添加简单的性能监控
+  app.use((req, res, next) => {
+    const start = Date.now();
+    res.on("finish", () => {
+      const duration = Date.now() - start;
+      if (duration > 500) {
+        console.warn(`Slow request: ${req.method} ${req.url} - ${duration}ms`);
+      }
+    });
+    next();
+  });
 
   // 捕获 404 并转发到错误处理程序
   app.use(function (req, res, next) {

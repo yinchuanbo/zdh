@@ -22,7 +22,12 @@ body {
   padding: 50px;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, rgba(36, 134, 255, 0.7) 0%, rgba(26, 108, 209, 0.5) 100%);
+  background: #1a1a1a
+    linear-gradient(
+      135deg,
+      rgba(36, 134, 255, 0.7) 0%,
+      rgba(26, 108, 209, 0.5) 100%
+    );
   backdrop-filter: blur(10px);
   will-change: transform;
 }
@@ -174,7 +179,6 @@ body {
   align-items: center;
 }
 
-
 .wrappper__lans_item .ui-input {
   margin-left: 10px;
 }
@@ -296,8 +300,7 @@ input.ui-input {
 
 .preview__mark {
   position: fixed;
-  inset: 70px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  inset: 0;
 }
 
 .save-files,

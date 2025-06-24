@@ -1,8 +1,10 @@
-const { app } = require('electron');
 const path = require("path");
+const os = require("os");
 
 const getDynamicFilePath = (fileName) => {
-  const cP = path.join(app.getPath('userData'), 'dynamic_files', fileName);
+  // Use a local directory for data storage
+  const userDataPath = path.join(os.homedir(), '.zdh-app');
+  const cP = path.join(userDataPath, 'dynamic_files', fileName);
   return cP;
 };
 

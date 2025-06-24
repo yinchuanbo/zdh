@@ -27,7 +27,9 @@ router.post("/login", async (req, res) => {
     );
     res.cookie("token", token, {
       httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000,
+      maxAge: 365 * 24 * 60 * 60 * 1000, // 1年，与JWT过期时间一致
+      secure: false, // 开发环境设为false
+      // 不设置sameSite和domain，让浏览器使用默认值
     });
     res.json({ code: 200, token });
   } else {

@@ -29,14 +29,40 @@ Login.onclick = () => {
       return res.json();
     })
     .then((res) => {
+      console.log('登录响应:', res);
       if (res?.code === 200) {
         localStorage.setItem('usr', usernameVal.trim())
         localStorage.setItem('pwd', passwordVal.trim())
         new LightTip().success("登录成功");
-        location.href = "/";
+        console.log('准备跳转到首页');
+        
+        // 通知父窗口登录成功
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({
+            type: 'login_success',
+            message: '登录成功'
+          }, '*');
+        }
+        
+        // 使用setTimeout确保提示显示后再跳转
+        setTimeout(() => {
+          // 如果在iframe中，让父窗口处理导航
+          if (window.parent && window.parent !== window) {
+            // 在iframe中，不自动跳转，让父窗口处理
+            console.log('在iframe中，等待父窗口处理导航');
+          } else {
+            // 在普通窗口中，正常跳转
+            window.location.href = "/";
+          }
+        }, 1000);
       } else {
+        console.log('登录失败:', res);
         new LightTip().error("登录失败，请切换账号");
       }
+    })
+    .catch((error) => {
+      console.error('登录请求错误:', error);
+      new LightTip().error("网络错误，请重试");
     });
 };
 

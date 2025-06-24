@@ -1,3 +1,48 @@
+// 添加到文件顶部
+// 延迟加载非关键资源
+function deferNonCriticalResources() {
+  // 使用 requestIdleCallback 延迟加载 Monaco 编辑器
+  if ("requestIdleCallback" in window) {
+    requestIdleCallback(
+      function () {
+        require.config({
+          paths: {
+            vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs",
+          },
+        });
+      },
+      { timeout: 2000 }
+    );
+  }
+
+  // 延迟初始化非关键UI元素
+  const nonCriticalElements = document.querySelectorAll(
+    ".nav_a:not(.select-all-btn):not(.handle-btn)"
+  );
+  nonCriticalElements.forEach((el) => {
+    el.style.opacity = "0.7";
+    setTimeout(() => {
+      el.style.opacity = "1";
+      el.style.transition = "opacity 0.3s ease";
+    }, 500);
+  });
+}
+
+// 在页面加载时初始化
+window.addEventListener("load", deferNonCriticalResources);
+
+// 添加性能监控
+if (window.performance && window.performance.mark) {
+  window.performance.mark("start_app");
+  window.addEventListener("load", function () {
+    window.performance.mark("end_app");
+    window.performance.measure("app_load_time", "start_app", "end_app");
+    const loadTime =
+      window.performance.getEntriesByName("app_load_time")[0].duration;
+    console.log("应用加载时间: " + loadTime.toFixed(2) + "ms");
+  });
+}
+
 const socket = io("http://localhost:4000");
 let imgs = [];
 let isWatching = false;
@@ -46,7 +91,7 @@ let dataInfo = {};
 let data2Info = {};
 
 function openFullScreenWindow(url) {
-  const isWeb = navigator.userAgent.includes("Electron");
+  const isWeb = false; // Running as web application
   if (!isWeb) {
     window.open(url, "_blank");
   } else {
@@ -1701,4 +1746,29 @@ window.addEventListener("load", () => {
   handleGetFile();
   selectOnChange();
   logOut();
+});
+
+// 将此代码放在您的 index.js 文件中的适当位置
+document.addEventListener("DOMContentLoaded", function () {
+  // 优化全选按钮
+  const selectAllBtn = document.querySelector(".select-all-btn");
+  const checkboxes = document.querySelectorAll('input[name="checkbox"]');
+  let allSelected = false;
+
+  // 使用事件委托而不是为每个复选框添加事件监听器
+  selectAllBtn.addEventListener("click", function (e) {
+    e.preventDefault();
+    allSelected = !allSelected;
+
+    // 批量更改复选框状态而不是逐个设置
+    checkboxes.forEach((checkbox) => {
+      checkbox.checked = allSelected;
+    });
+
+    // 更新按钮状态
+    this.textContent = allSelected ? "NONE" : "ALL";
+    this.style.background = allSelected
+      ? "linear-gradient(135deg, #ff4b4b, #ff0000)"
+      : "linear-gradient(135deg, #2486ff, #1a76f2, #2486ff)";
+  });
 });
