@@ -117,7 +117,7 @@
           href="javascript:"
           role="button"
           class="nav_a"
-          onclick="window.open('/ftp')"
+          onclick="iframeCover('/ftp')"
           title="FTP Handle"
           ><svg t="1733218170899" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="9751" width="100" height="100"><path d="M130.8672 634.88v71.68h159.232v71.68h-159.232V921.6H51.2v-358.4h238.9504v71.68H130.8672z m487.7824-71.68H379.7504v71.68h79.616V921.6h79.6672v-286.72h79.616V563.2z m292.7104 104.1408a45.1584 45.1584 0 0 1-45.1584 45.1584H785.92v-90.3168h80.2816c24.9344 0 45.1584 20.224 45.1584 45.1584zM855.3984 563.2h-147.1488v358.4h79.6672v-143.36h67.4816c65.9968 0 119.5008-48.128 119.5008-107.52 0-59.392-53.504-107.52-119.5008-107.52zM716.8 102.4l204.8 204.8v163.84h-81.92V341.1968L682.8032 184.32H184.32v286.72H102.4V102.4z" p-id="9752" fill="#ffffff"></path></svg></a
         >
@@ -126,7 +126,7 @@
           role="button"
           class="nav_a"
           title="Deploy"
-          onclick="window.open('/deploy')"
+          onclick="iframeCover('/deploy')"
           ><svg t="1729139632555" class="icon" viewBox="0 0 1342 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="24109" width="256" height="256"><path d="M475.447288 866.858225v78.570887h393.367974v-78.570887z m-197.197522 78.570887A276.79548 276.79548 0 0 1 239.22109 394.405828 429.828974 429.828974 0 0 1 670.590669 0.010784a435.991396 435.991396 0 0 1 432.910185 393.367974 273.714269 273.714269 0 0 1 237.253269 274.227804 278.849621 278.849621 0 0 1-275.254875 275.768409z m787.249482-78.570887a197.711057 197.711057 0 0 0 23.62262-393.881509l-63.164831-7.703028V402.108856a355.879903 355.879903 0 0 0-708.16506 0L311.11602 465.273688l-56.488874 7.703028a197.711057 197.711057 0 0 0 23.62262 393.881509z" p-id="24110" fill="#ffffff"></path><path d="M673.158345 311.726659l278.336086 278.336086-55.461803 55.461803-278.336086-277.822551 55.461803-55.975338z" p-id="24111" fill="#ffffff"></path><path d="M394.308724 594.171026l277.822551-278.336085 55.975338 55.461803-278.336086 278.336085-55.461803-55.461803z" p-id="24112" fill="#ffffff"></path><path d="M632.589063 394.405828h78.570888v629.594172h-78.570888V394.405828z" p-id="24113" fill="#ffffff"></path></svg></a
         >
         <a
@@ -150,7 +150,8 @@
           <div class="wrappper__sider_03">
             <!-- <p>Commit Ids:</p> -->
             <!-- value="77b054b92d614"  -->
-            <input autocomplete="off" id="commit-ids" class="ui-input" placeholder="OR, 多个 commit id 用 , 逗号分隔">
+            <!-- <input autocomplete="off" id="commit-ids" class="ui-input" placeholder="OR, 多个 commit id 用 , 逗号分隔"> -->
+            <textarea name="" id="commit-ids" placeholder="OR, 多个 commit id 用 , 逗号分隔"></textarea>
           </div>
           <div class="wrappper__sider_02">
             <!-- <p>Select Languages:</p> -->

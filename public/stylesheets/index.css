@@ -1059,8 +1059,8 @@ select {
   min-width: 50px;
   background: linear-gradient(
     135deg,
-    rgba(36, 36, 36, 0.95),
-    rgba(28, 28, 28, 0.95)
+    rgba(36, 36, 36, 0.75),
+    rgba(28, 28, 28, 0.75)
   );
   display: flex;
   justify-content: center;
@@ -1074,7 +1074,7 @@ select {
   border-radius: 4px;
 }
 
-.nav_a:hover {
+.nav_a:not(.watch-btn, .log-out):hover {
   background: linear-gradient(
     135deg,
     rgba(46, 46, 46, 0.98),
@@ -1095,13 +1095,9 @@ select {
   transition: all 0.3s ease;
 }
 
-.nav_a:hover svg {
+.nav_a.nav_a:not(.watch-btn, .log-out):hover svg {
   opacity: 1;
   transform: scale(1.05);
-}
-
-.nav_a:not(.watch-btn, .select-all-btn):hover {
-  background-color: #242526;
 }
 
 .nav_a svg {
@@ -1114,9 +1110,20 @@ select {
   font-size: 0;
 }
 
+#commit-ids {
+  height: 100px!important;
+  resize: none;
+  border: none;
+  outline: none;
+  width: 100%;
+  color: #fff;
+}
+
+
 .select-all-btn {
   background-color: #0d0d0d;
   min-width: initial;
+  display: none;
 }
 
 .select-all-btn:hover {
@@ -1266,6 +1273,7 @@ select {
   cursor: pointer;
   text-align: center;
   border-radius: 4px;
+  text-transform: uppercase;
 }
 
 .wrappper__sider_02-label input:checked + label + label {
