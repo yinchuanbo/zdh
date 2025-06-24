@@ -1,5 +1,16 @@
 const settings = require("./settings");
-const prettier = require("prettier");
+// Conditional prettier loading for pkg compatibility
+let prettier;
+try {
+  if (process.pkg) {
+    // In pkg environment, skip prettier functionality
+    prettier = null;
+  } else {
+    prettier = require("prettier");
+  }
+} catch (error) {
+  prettier = null;
+}
 const pathModule = require("path");
 const { execSync, exec } = require("child_process");
 const fs = require("fs");
@@ -44,8 +55,13 @@ async function getFileContent({ path, lan, initLan, path2, LocalListPro }) {
   let formattedinitC, formattednowC;
 
   try {
-    formattedinitC = await prettier.format(initC, setInfo);
-    formattednowC = await prettier.format(nowC, setInfo);
+    if (prettier) {
+      formattedinitC = await prettier.format(initC, setInfo);
+      formattednowC = await prettier.format(nowC, setInfo);
+    } else {
+      formattedinitC = initC;
+      formattednowC = nowC;
+    }
   } catch (error) {
     formattedinitC = initC;
     formattednowC = nowC;

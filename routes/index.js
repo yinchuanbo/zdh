@@ -120,6 +120,7 @@ router.post("/get-urls", authenticateToken, async (req, res) => {
       url,
       configs,
     });
+    console.log("result", result)
     res.json({
       code: 200,
       message: "get-urls-success",

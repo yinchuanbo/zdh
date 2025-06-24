@@ -1,7 +1,18 @@
 const simpleGit = require('simple-git');
 const settings = require("./settings");
 const fs = require("fs");
-const prettier = require("prettier");
+// Conditional prettier loading for pkg compatibility
+let prettier;
+try {
+  if (process.pkg) {
+    // In pkg environment, skip prettier functionality
+    prettier = null;
+  } else {
+    prettier = require("prettier");
+  }
+} catch (error) {
+  prettier = null;
+}
 const acorn = require('acorn');
 const { lintFiles } = require("../eslint-integration")
 const sass = require("sass")
@@ -92,7 +103,9 @@ async function getFileContentsForCommit({
     if (status !== 'A') {
       beforeContent = await git.show([`${commitHash}^:${filename}`]);
       try {
-        beforeContent = await prettier.format(beforeContent, setInfo);
+        if (prettier) {
+          beforeContent = await prettier.format(beforeContent, setInfo);
+        }
       } catch (error) {
         throw new Error(error)
       }
@@ -101,8 +114,10 @@ async function getFileContentsForCommit({
       afterContent = fs.readFileSync(completePath, 'utf-8');
       afterContentOrigin = await git.show([`${commitHash}:${filename}`])
       try {
-        afterContent = await prettier.format(afterContent, setInfo);
-        afterContentOrigin = await prettier.format(afterContentOrigin, setInfo);
+        if (prettier) {
+          afterContent = await prettier.format(afterContent, setInfo);
+          afterContentOrigin = await prettier.format(afterContentOrigin, setInfo);
+        }
       } catch (error) {
         throw new Error(error)
       }

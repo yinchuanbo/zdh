@@ -1,6 +1,17 @@
 const { getDynamicFilePath, getRequireDynamicFile } = require("./setData");
 const { execSync } = require("child_process");
-const prettier = require("prettier");
+// Conditional prettier loading for pkg compatibility
+let prettier;
+try {
+  if (process.pkg) {
+    // In pkg environment, skip prettier functionality
+    prettier = null;
+  } else {
+    prettier = require("prettier");
+  }
+} catch (error) {
+  prettier = null;
+}
 const settings = require("./settings");
 const fs = require("fs").promises;
 const simpleGit = require("simple-git");
@@ -112,10 +123,12 @@ async function getStagedFileDiffs({
             beforeContent = execSync(`git -C ${lanPath} show HEAD:${file}`, {
               encoding: "utf-8",
             });
-            beforeContent = await prettier.format(
-              beforeContent,
-              settings(file)
-            );
+            if (prettier) {
+              beforeContent = await prettier.format(
+                beforeContent,
+                settings(file)
+              );
+            }
           } catch (error) {
             beforeContent = "";
             console.log("error01", error);
@@ -124,7 +137,9 @@ async function getStagedFileDiffs({
             afterContent = execSync(`git -C ${lanPath} show :${file}`, {
               encoding: "utf-8",
             });
-            afterContent = await prettier.format(afterContent, settings(file));
+            if (prettier) {
+              afterContent = await prettier.format(afterContent, settings(file));
+            }
           } catch (error) {
             afterContent = "";
             console.log("error02", error);
@@ -135,10 +150,12 @@ async function getStagedFileDiffs({
             if (status !== "A") {
               try {
                 beforeContent = await git.show([`${lastCommitId}^:${file}`]);
-                beforeContent = await prettier.format(
-                  beforeContent,
-                  settings(file)
-                );
+                if (prettier) {
+                  beforeContent = await prettier.format(
+                    beforeContent,
+                    settings(file)
+                  );
+                }
               } catch (error) {
                 beforeContent = "";
                 console.log("error03", error);
@@ -147,10 +164,12 @@ async function getStagedFileDiffs({
             if (status !== "D") {
               try {
                 afterContent = await git.show([`${lastCommitId}:${file}`]);
-                afterContent = await prettier.format(
-                  afterContent,
-                  settings(file)
-                );
+                if (prettier) {
+                  afterContent = await prettier.format(
+                    afterContent,
+                    settings(file)
+                  );
+                }
               } catch (error) {
                 afterContent = "";
                 console.log("error04", error);

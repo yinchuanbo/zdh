@@ -1,6 +1,8 @@
 const fs = require("fs").promises;
 const fs2 = require("fs");
 const path = require("path");
+const cheerio = require("cheerio");
+const axios = require("axios");
 
 async function findTplFiles(dirPath) {
   const tplFiles = [];
@@ -90,21 +92,44 @@ function getIncludedFiles(curPath) {
   };
 }
 
+async function getAlternateLinksFromUrl(url) {
+  try {
+    const response = await axios.get(url);
+    const html = response.data;
+    const $ = cheerio.load(html);
+    const hrefs = {};
+
+    $('link[rel="alternate"]').each((i, element) => {
+      const href = $(element).attr("href");
+      let hreflang = ($(element).attr("hreflang") || "").trim();
+      if (hreflang === "zh-Hant") hreflang = "tw";
+      if (hreflang === "ko") hreflang = "kr";
+      if (hreflang === "ja") hreflang = "jp";
+      if (href && hreflang !== "x-default") {
+        hrefs[hreflang] = path.basename(href).replaceAll(".html", ".tpl");
+      }
+    });
+
+    return hrefs;
+  } catch (error) {
+    console.error("Error fetching the URL:", error);
+    return [];
+  }
+}
+
 async function getOtherTpl({ url, configs }) {
+  const resss = await getAlternateLinksFromUrl(url);
   const lans = Object.keys(configs.lans);
   let urls = {};
   let otherUrls = {};
   for (let i = 0; i < lans.length; i++) {
     let lan = lans[i];
+    const curResss = resss[lan];
     const alP = configs.LocalListPro[lan];
-    const allP = alP + "tpl";
-    const tplFiles = await findTplFiles(allP);
-    const matchingFiles = await checkLinkHrefInTplFiles(tplFiles, url);
+    const matchingFiles = curResss ? [curResss] : [];
     if (matchingFiles.length > 0) {
       const curP = path.join(alP, "tpl", matchingFiles[0]);
       const includesPath = getIncludedFiles(curP);
-      console.log("----01",matchingFiles )
-      console.log("----02",includesPath )
       urls[lan] = `${matchingFiles[0].replaceAll(".tpl", ".html")}`;
       otherUrls[lan] = includesPath;
     }
