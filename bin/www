@@ -4,8 +4,31 @@
  * Module dependencies.
  */
 
-var createApp = require("../app");
-var app = createApp();
+// 添加全局错误处理
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err.message);
+  console.error(err.stack);
+  console.log('Press any key to exit...');
+  process.stdin.setRawMode(true);
+  process.stdin.resume();
+  process.stdin.on('data', process.exit.bind(process, 1));
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+try {
+  var createApp = require("../app");
+  var app = createApp();
+} catch (err) {
+  console.error('Failed to create app:', err.message);
+  console.error(err.stack);
+  console.log('Press any key to exit...');
+  process.stdin.setRawMode(true);
+  process.stdin.resume();
+  process.stdin.on('data', process.exit.bind(process, 1));
+}
 var debug = require("debug")("zdh:server");
 var http = require("http");
 /**
@@ -102,4 +125,12 @@ function onListening() {
   var addr = server.address();
   var bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
   debug("Listening on " + bind);
+  
+  console.log('\n==============================================');
+  console.log('🚀 ZDH Application Started Successfully!');
+  console.log('==============================================');
+  console.log(`📡 Server running on: http://localhost:${addr.port}`);
+  console.log(`🕐 Started at: ${new Date().toLocaleString()}`);
+  console.log('💡 Press Ctrl+C to stop the server');
+  console.log('==============================================\n');
 }

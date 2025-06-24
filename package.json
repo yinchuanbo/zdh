@@ -2,10 +2,15 @@
   "name": "zdh",
   "version": "2.1.14",
   "private": true,
+  "bin": "./bin/www",
   "scripts": {
     "dev": "nodemon node ./bin/www",
     "start": "node ./bin/www",
-    "bump-version": "node bump-version.js"
+    "bump-version": "node bump-version.js",
+    "build": "pkg . --out-path dist",
+    "build:win": "pkg . --targets node18-win-x64 --out-path dist",
+    "build:linux": "pkg . --targets node18-linux-x64 --out-path dist",
+    "build:mac": "pkg . --targets node18-macos-x64 --out-path dist"
   },
   "browserslist": [
     "> 0%"
@@ -13,11 +18,11 @@
   "dependencies": {
     "@babel/core": "^7.25.8",
     "@babel/preset-env": "^7.25.8",
-
     "acorn": "^8.13.0",
     "autoprefixer": "^10.4.20",
     "axios": "^1.7.7",
     "bcrypt": "^5.1.1",
+    "cheerio": "^1.1.0",
     "chokidar": "^4.0.1",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
@@ -45,6 +50,42 @@
     "stylelint-scss": "^6.8.1",
     "terser": "^5.34.0"
   },
-
-  "packageManager": "pnpm@10.11.0+sha512.6540583f41cc5f628eb3d9773ecee802f4f9ef9923cc45b69890fb47991d4b092964694ec3a4f738a420c918a333062c8b925d312f42e4f0c263eb603551f977"
+  "packageManager": "pnpm@10.11.0+sha512.6540583f41cc5f628eb3d9773ecee802f4f9ef9923cc45b69890fb47991d4b092964694ec3a4f738a420c918a333062c8b925d312f42e4f0c263eb603551f977",
+  "devDependencies": {
+    "pkg": "^5.8.1"
+  },
+  "pkg": {
+    "scripts": [
+      "bin/www",
+      "app.js",
+      "routes/**/*.js",
+      "utils/**/*.js",
+      "*.js"
+    ],
+    "assets": [
+      "views/**/*",
+      "public/**/*",
+      "node_modules/ejs/lib/**/*",
+      "node_modules/axios/dist/**/*",
+      "node_modules/axios/lib/**/*",
+      "node_modules/axios/package.json",
+      "node_modules/ssh2-sftp-client/**/*",
+      "node_modules/cheerio/**/*",
+      "node_modules/socket.io/**/*",
+      "node_modules/socket.io-client/**/*",
+      "node_modules/bcrypt/**/*",
+      "node_modules/jsonwebtoken/**/*",
+      "node_modules/simple-git/**/*",
+      "node_modules/chokidar/**/*",
+      "node_modules/terser/**/*",
+      "node_modules/sass/**/*",
+      "node_modules/@babel/**/*"
+    ],
+    "targets": [
+      "node18-win-x64",
+      "node18-linux-x64",
+      "node18-macos-x64"
+    ],
+    "outputPath": "dist"
+  }
 }
