@@ -1032,7 +1032,7 @@ function setEditor(path = "", modifiedText = "", originalText = "") {
     diffEditor = monaco.editor.createDiffEditor(
       document.querySelector("#compare"),
       {
-        theme: "vs-dark",
+        theme: "vs-dark",// 其他主题：vs-dark, vs, hc-black
         scrollBeyondLastLine: false,
         diffWordWrap: true,
         wordWrap: "on",

@@ -668,11 +668,11 @@ body {
   font-size: 14px;
   height: 38px;
   padding: 0 20px;
-  background: linear-gradient(
+  /* background: linear-gradient(
     135deg,
     rgba(36, 36, 36, 0.95),
     rgba(28, 28, 28, 0.95)
-  );
+  ); */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -688,11 +688,11 @@ body {
 }
 
 .ui-button:hover {
-  background: linear-gradient(
+  /* background: linear-gradient(
     135deg,
     rgba(46, 46, 46, 0.98),
     rgba(36, 36, 36, 0.98)
-  );
+  ); */
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
