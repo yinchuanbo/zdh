@@ -15,7 +15,7 @@
     />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/editor/editor.main.css"
+      href="/stylesheets/editor.main.css"
     />
     <link rel="stylesheet" href="/stylesheets/mergely.css" />
     <link rel="stylesheet" href="/stylesheets/index.css" />
@@ -150,7 +150,8 @@
           <div class="wrappper__sider_03">
             <!-- <p>Commit Ids:</p> -->
             <!-- value="77b054b92d614"  -->
-            <input autocomplete="off" id="commit-ids" class="ui-input" placeholder="OR, 多个 commit id 用 , 逗号分隔">
+            <!-- <input autocomplete="off" id="commit-ids" class="ui-input" placeholder="OR, 多个 commit id 用 , 逗号分隔"> -->
+            <textarea name="" id="commit-ids" placeholder="OR, 多个 commit id 用 , 逗号分隔"></textarea>
           </div>
           <div class="wrappper__sider_02">
             <!-- <p>Select Languages:</p> -->
@@ -199,7 +200,7 @@
     <script src="/javascripts/jquery.js"></script>
     <script src="/javascripts/mergely.min.js"></script>
     <script src="//qidian.gtimg.com/lulu/theme/peak/js/common/all.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/loader.js"></script>
+    <script src="https://unpkg.com/monaco-editor@0.47.0/min/vs/loader.js"></script>
     <script src="/javascripts/index.js"></script>
   </body>
 </html>

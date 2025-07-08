@@ -54,7 +54,7 @@ body {
   height: 40px;
   margin-left: 10px;
   line-height: 40px;
-  padding: 0;
+  padding: 0!important;
   width: 40px;
   display: flex;
   align-items: center;

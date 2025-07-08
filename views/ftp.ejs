@@ -17,7 +17,7 @@
     />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/editor/editor.main.css"
+      href="/stylesheets/editor.main.css"
     />
     <link rel="stylesheet" href="/stylesheets/ftp.css" />
     <script src="/javascripts/socket.io.min.js"></script>
@@ -47,7 +47,7 @@
               <label for="checkbox<%=idx%>" class="ui-checkbox"></label>
               <label for="checkbox<%=idx%>"><%=lan%></label>
               <input class="ui-input input-<%=lan%>" placeholder="输入 commitIds, 逗号分隔" />
-              <a href="javascript:" class="ui-button ui-button-primary pull-new-code" data-lan="<%=lan%>" title="Pull Code" role="button">pull</a>
+              <a href="javascript:" class="ui-button ui-button-primary pull-new-code" data-lan="<%=lan%>" title="Pull Code" role="button"><svg t="1750758863690" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6031" width="50" height="50"><path d="M316.373 736c7.964-47.787 30.364-87.609 67.2-119.467S463.218 568.747 512 568.747s91.591 15.929 128.427 47.787c36.836 31.858 58.24 71.68 64.213 119.467h170.24v56.747H704.64c-5.973 47.787-27.378 87.609-64.213 119.467C603.591 944.071 560.782 960 512 960s-91.591-15.929-128.427-47.787c-36.836-31.858-59.236-71.68-67.2-119.467H149.12V736h167.253z m334.507 26.88c0-37.831-13.44-70.684-40.32-98.56S550.827 623.004 512 624s-72.178 14.933-100.053 41.813-41.316 59.733-40.32 98.56c0.996 38.827 14.933 71.68 41.813 98.56s59.733 40.32 98.56 40.32 71.68-13.44 98.56-40.32 40.32-60.231 40.32-100.053zM280.533 219.307L238.72 261.12 492.587 512h38.827l250.88-250.88-38.827-41.813-203.093 206.08V64h-56.747v361.387l-203.094-206.08z" p-id="6032" fill="#ffffff"></path></svg></a>
             </div>
             <% }); %>
         </div>
@@ -60,7 +60,7 @@
     </div>
     <script src="/javascripts/jquery.js"></script>
     <script src="//qidian.gtimg.com/lulu/theme/peak/js/common/all.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/loader.js"></script>
+    <script src="https://unpkg.com/monaco-editor@0.47.0/min/vs/loader.js"></script>
     <script src="/javascripts/ftp.js"></script>
   </body>
 </html>
