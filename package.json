@@ -2,10 +2,21 @@
   "name": "zdh",
   "version": "2.1.14",
   "private": true,
+  "bin": "start.js",
   "scripts": {
     "dev": "nodemon node ./bin/www",
     "start": "node ./bin/www",
-    "bump-version": "node bump-version.js"
+    "bump-version": "node bump-version.js",
+    "build": "pkg ."
+  },
+  "pkg": {
+    "assets": [
+      "views/**/*",
+      "public/**/*",
+      "node_modules/playwright-core/**/*"
+    ],
+    "targets": [ "node16-win-x64" ],
+    "outputPath": "dist"
   },
   "browserslist": [
     "> 0%"
