@@ -1017,6 +1017,45 @@ const setMerge = (item, lan) => {
 
 let originalModel, modifiedModel, diffEditor, diffNavigator;
 
+function setEditorNavitor() {
+  if (!diffEditor) return;
+  let currentDiffIndex = -1;
+  let lineChanges = [];
+  // 监听差异更新
+  diffEditor.onDidUpdateDiff(() => {
+    lineChanges = diffEditor.getLineChanges() || [];
+    currentDiffIndex = -1; // 重置索引
+  });
+  // 跳转到下一个差异
+  function goToNextDiff() {
+    if (lineChanges.length === 0) return;
+    currentDiffIndex = Math.min(currentDiffIndex + 1, lineChanges.length - 1);
+    const change = lineChanges[currentDiffIndex];
+    diffEditor.revealLineInCenter(change.modifiedStartLineNumber);
+    diffEditor.getModifiedEditor().setPosition({
+      lineNumber: change.modifiedStartLineNumber,
+      column: 1,
+    });
+    diffEditor.getModifiedEditor().focus();
+  }
+
+  // 跳转到上一个差异
+  function goToPreviousDiff() {
+    if (lineChanges.length === 0) return;
+    currentDiffIndex = Math.max(currentDiffIndex - 1, 0);
+    const change = lineChanges[currentDiffIndex];
+    diffEditor.revealLineInCenter(change.modifiedStartLineNumber);
+    diffEditor.getModifiedEditor().setPosition({
+      lineNumber: change.modifiedStartLineNumber,
+      column: 1,
+    });
+    diffEditor.getModifiedEditor().focus();
+  }
+
+  Prev.onclick = goToPreviousDiff;
+  Next.onclick = goToNextDiff;
+}
+
 function setEditor(path = "", modifiedText = "", originalText = "") {
   if (originalModel) originalModel.dispose();
   if (modifiedModel) modifiedModel.dispose();
@@ -1029,7 +1068,7 @@ function setEditor(path = "", modifiedText = "", originalText = "") {
 
   require.config({
     paths: {
-      vs: "https://unpkg.com/monaco-editor@0.34.1/min/vs",
+      vs: "https://unpkg.com/monaco-editor@0.52.2/min/vs",
     },
   });
 
@@ -1070,6 +1109,9 @@ function setEditor(path = "", modifiedText = "", originalText = "") {
         formatOnPaste: true,
         glyphMargin: true,
         selectOnLineNumbers: true,
+        enableSplitViewResizing: true, // 允许调整左右视图大小
+        ignoreTrimWhitespace: true, // 忽略空白差异
+        renderIndicators: true, // 是否渲染差异指示器
       }
     );
 
@@ -1081,11 +1123,12 @@ function setEditor(path = "", modifiedText = "", originalText = "") {
     //   renderSideBySide: false
     // })
     // 创建差异导航器
-    diffNavigator = monaco.editor.createDiffNavigator(diffEditor, {
-      followsCaret: true, // 跟随光标
-      ignoreCharChanges: true, // 只关注行级别的变化
-      alwaysRevealFirst: true, // 初次打开时自动跳到第一个差异
-    });
+    // diffNavigator = monaco.editor.createDiffNavigator(diffEditor, {
+    //   followsCaret: true, // 跟随光标
+    //   ignoreCharChanges: true, // 只关注行级别的变化
+    //   alwaysRevealFirst: true, // 初次打开时自动跳到第一个差异
+    // });
+    setEditorNavitor();
   });
 }
 
@@ -1138,47 +1181,12 @@ const diffHTML = function (
   // setEditor(path, data.initC.content, data.nowC.content);
   if (!data.initC.path.endsWith(".json")) {
     setEditor(path, data.nowC.content, data.initC.content);
-    // const selectLines = document.querySelector(".select-lines");
-    // selectLines.onchange = () => {
-    //   const line = selectLines.value || 0;
-    //   const a = diffEditor.getOriginalEditor()
-    //   a.setPosition({ lineNumber: Number(line), column: 1 });
-    //   a.revealLine(Number(line))
-    // }
-    // doc = new Mergely("#compare", {
-    //   sidebar: true,
-    //   ignorews: false,
-    //   license: "lgpl-separate-notice",
-    //   lhs: data.nowC.content,
-    //   rhs: data.initC.content,
-    //   bgcolor: "#3c3c3c",
-    //   cmsettings: {
-    //     readOnly: false,
-    //   },
-    // });
-    // doc.once("updated", () => {
-    //   doc.once("updated", () => {
-    //     doc.scrollToDiff("next");
-    //   });
-    // });
-    Prev.onclick = () => {
-      // doc.scrollToDiff("prev");
-      if (diffNavigator) {
-        diffNavigator.previous(); // 跳到下一个差异
-      }
-    };
-    Next.onclick = () => {
-      if (diffNavigator) {
-        diffNavigator.next(); // 跳到下一个差异
-      }
-      // doc.scrollToDiff("next");
-    };
   } else {
     if (jsonEditor) jsonEditor.dispose();
     jsonEditor = null;
     require.config({
       paths: {
-        vs: "https://unpkg.com/monaco-editor@0.34.1/min/vs",
+        vs: "https://unpkg.com/monaco-editor@0.52.2/min/vs",
       },
     });
     require(["vs/editor/editor.main"], function () {
