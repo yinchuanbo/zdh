@@ -1112,9 +1112,9 @@ function setEditor(path = "", modifiedText = "", originalText = "") {
         enableSplitViewResizing: true,
         ignoreTrimWhitespace: true,
         renderIndicators: true,
-        hideUnchangedRegions: {
-          enabled: true
-        },
+        // hideUnchangedRegions: {
+        //   enabled: true
+        // },
       }
     );
 
