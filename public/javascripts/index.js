@@ -1109,9 +1109,12 @@ function setEditor(path = "", modifiedText = "", originalText = "") {
         formatOnPaste: true,
         glyphMargin: true,
         selectOnLineNumbers: true,
-        enableSplitViewResizing: true, // 允许调整左右视图大小
-        ignoreTrimWhitespace: true, // 忽略空白差异
-        renderIndicators: true, // 是否渲染差异指示器
+        enableSplitViewResizing: true,
+        ignoreTrimWhitespace: true,
+        renderIndicators: true,
+        hideUnchangedRegions: {
+          enabled: true
+        },
       }
     );
 
