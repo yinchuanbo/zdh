@@ -63,6 +63,32 @@ let editor = null,
     ".tif",
     ".heic",
     ".avif",
+    // 主流格式
+    ".mp4",
+    ".m4v",
+    ".mov",
+    ".avi",
+    ".mkv",
+    ".flv",
+    ".webm",
+    // 专业/旧格式
+    ".wmv",
+    ".mpg",
+    ".mpeg",
+    ".m2ts",
+    ".ts",
+    ".vob",
+    ".3gp",
+    ".3g2",
+    // 高清/流媒体
+    ".h264",
+    ".hevc",
+    ".avchd",
+    ".ogv",
+    ".mxf",
+    // 苹果相关
+    ".qt",
+    ".f4v",
   ];
 const vsCodes = document.querySelectorAll(".vs-code");
 const openSite = document.querySelectorAll(".open-site");
@@ -1032,7 +1058,7 @@ function setEditor(path = "", modifiedText = "", originalText = "") {
     diffEditor = monaco.editor.createDiffEditor(
       document.querySelector("#compare"),
       {
-        theme: "vs-dark",// 其他主题：vs-dark, vs, hc-black
+        theme: "vs-dark", // 其他主题：vs-dark, vs, hc-black
         scrollBeyondLastLine: false,
         diffWordWrap: true,
         wordWrap: "on",
