@@ -2,7 +2,13 @@ const fs = require("fs").promises;
 const fs2 = require("fs");
 const path = require("path");
 const cheerio = require("cheerio");
+const https = require('https');
 const axios = require("axios");
+
+const agent = new https.Agent({  
+  rejectUnauthorized: false // 忽略证书验证（不安全！）
+});
+
 
 async function findTplFiles(dirPath) {
   const tplFiles = [];
@@ -94,11 +100,12 @@ function getIncludedFiles(curPath) {
 
 async function getAlternateLinksFromUrl(url) {
   try {
-    const response = await axios.get(url);
+    const response = await axios.get(url, { 
+      httpsAgent: agent 
+    });
     const html = response.data;
     const $ = cheerio.load(html);
     const hrefs = {};
-
     $('link[rel="alternate"]').each((i, element) => {
       const href = $(element).attr("href");
       let hreflang = ($(element).attr("hreflang") || "").trim();
@@ -119,6 +126,7 @@ async function getAlternateLinksFromUrl(url) {
 
 async function getOtherTpl({ url, configs }) {
   const resss = await getAlternateLinksFromUrl(url);
+  console.log("resss", resss)
   const lans = Object.keys(configs.lans);
   let urls = {};
   let otherUrls = {};

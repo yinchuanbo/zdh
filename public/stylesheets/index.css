@@ -1123,7 +1123,7 @@ select {
 .select-all-btn {
   background-color: #0d0d0d;
   min-width: initial;
-  display: none;
+  /* display: none; */
 }
 
 .select-all-btn:hover {
