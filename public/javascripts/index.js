@@ -1029,7 +1029,7 @@ function setEditor(path = "", modifiedText = "", originalText = "") {
 
   require.config({
     paths: {
-      vs: "https://unpkg.com/monaco-editor@0.47.0/min/vs",
+      vs: "https://unpkg.com/monaco-editor@0.34.1/min/vs",
     },
   });
 
@@ -1178,7 +1178,7 @@ const diffHTML = function (
     jsonEditor = null;
     require.config({
       paths: {
-        vs: "https://unpkg.com/monaco-editor@0.47.0/min/vs",
+        vs: "https://unpkg.com/monaco-editor@0.34.1/min/vs",
       },
     });
     require(["vs/editor/editor.main"], function () {
