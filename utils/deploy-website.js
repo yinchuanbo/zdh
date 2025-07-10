@@ -6,7 +6,7 @@ let deployInfo;
 let successArr = [];
 let errorArr = [];
 let inProgress = 0;
-const socket = io("http://localhost:4000");
+const socket = io("http://localhost:4001");
 
 const maxLen = 2;
 

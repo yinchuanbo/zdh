@@ -6,7 +6,7 @@ let selectVals = [];
 
 const allBox = document.querySelector("[name='all']");
 const lanBox = document.querySelectorAll("[name='checkbox']");
-const socket = io("http://localhost:4000");
+const socket = io("http://localhost:4001");
 
 function uniqueArray(arr) {
   return [...new Set(arr)];

@@ -4,7 +4,7 @@ const path = require("path");
 const os = require("os");
 const io = require("socket.io-client");
 
-const socket = io("http://localhost:4000");
+const socket = io("http://localhost:4001");
 
 async function deployBatch(batchOutputs, env, configs) {
   return new Promise((resolve, reject) => {

@@ -18,9 +18,11 @@ process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
 
+var app = null
+
 try {
   var createApp = require("../app");
-  var app = createApp();
+  app = createApp();
 } catch (err) {
   console.error('Failed to create app:', err.message);
   console.error(err.stack);
@@ -35,7 +37,7 @@ var http = require("http");
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || "4000");
+var port = normalizePort(process.env.PORT || "4001");
 app.set("port", port);
 
 /**
@@ -46,10 +48,11 @@ var server = http.createServer(app);
 const io = require("socket.io")(server, {
   cors: {
     origin: "*", // 允许所有来源，或者根据需求限制某些域名
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   },
 });
+
 
 io.on("connection", (socket) => {
   console.log("a user connected");

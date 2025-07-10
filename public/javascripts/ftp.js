@@ -1,4 +1,4 @@
-const socket = io("http://localhost:4000");
+const socket = io("http://localhost:4001");
 
 const getFiles = document.querySelector(".getFiles");
 const preview = document.querySelector(".preview");

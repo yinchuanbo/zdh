@@ -35,7 +35,7 @@ router.post("/get-files", authenticateToken, async function (req, res, next) {
 router.post("/upload-ftp", authenticateToken, async function (req, res, next) {
   const configs = getConf(req.uname, res);
   const { env, data } = req.body;
-  const socket = io("http://localhost:4000");
+  const socket = io("http://localhost:4001");
   try {
     handleFtp({ env, data, configs }).then(() => {
       socket.emit("chat message", {
