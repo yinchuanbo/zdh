@@ -7,7 +7,7 @@ function deferNonCriticalResources() {
       function () {
         require.config({
           paths: {
-            vs: "https://unpkg.com/monaco-editor@0.52.2/min/vs",
+            vs: "https://unpkg.com/monaco-editor@0.34.1/min/vs",
           },
         });
       },
@@ -1068,7 +1068,7 @@ function setEditor(path = "", modifiedText = "", originalText = "") {
 
   require.config({
     paths: {
-      vs: "https://unpkg.com/monaco-editor@0.52.2/min/vs",
+      vs: "https://unpkg.com/monaco-editor@0.34.1/min/vs",
     },
   });
 
@@ -1126,12 +1126,12 @@ function setEditor(path = "", modifiedText = "", originalText = "") {
     //   renderSideBySide: false
     // })
     // 创建差异导航器
-    // diffNavigator = monaco.editor.createDiffNavigator(diffEditor, {
-    //   followsCaret: true, // 跟随光标
-    //   ignoreCharChanges: true, // 只关注行级别的变化
-    //   alwaysRevealFirst: true, // 初次打开时自动跳到第一个差异
-    // });
-    setEditorNavitor();
+    diffNavigator = monaco.editor.createDiffNavigator(diffEditor, {
+      followsCaret: true, // 跟随光标
+      ignoreCharChanges: true, // 只关注行级别的变化
+      alwaysRevealFirst: true, // 初次打开时自动跳到第一个差异
+    });
+    // setEditorNavitor();
   });
 }
 
@@ -1184,12 +1184,25 @@ const diffHTML = function (
   // setEditor(path, data.initC.content, data.nowC.content);
   if (!data.initC.path.endsWith(".json")) {
     setEditor(path, data.nowC.content, data.initC.content);
+
+    Prev.onclick = () => {
+      // doc.scrollToDiff("prev");
+      if (diffNavigator) {
+        diffNavigator.previous(); // 跳到下一个差异
+      }
+    };
+    Next.onclick = () => {
+      if (diffNavigator) {
+        diffNavigator.next(); // 跳到下一个差异
+      }
+      // doc.scrollToDiff("next");
+    };
   } else {
     if (jsonEditor) jsonEditor.dispose();
     jsonEditor = null;
     require.config({
       paths: {
-        vs: "https://unpkg.com/monaco-editor@0.52.2/min/vs",
+        vs: "https://unpkg.com/monaco-editor@0.34.1/min/vs",
       },
     });
     require(["vs/editor/editor.main"], function () {
@@ -1455,7 +1468,6 @@ const getUrlNameHanle = () => {
             p.innerHTML = `<span>${key}: https://${key}-test.vidnoz.com/${ress[key]}</span>`;
             p.appendChild(button);
             textarea.appendChild(p);
-
             button.onclick = () => {
               document
                 .querySelectorAll(".get-Sync-btn")
@@ -1463,19 +1475,35 @@ const getUrlNameHanle = () => {
               button.parentNode.classList.add("active");
               popup.innerHTML = "";
               let toTestData = [`${ress[key]}`];
-              let html = `<ul><li>${`${ress[key]}`}</li>`;
+              console.log('toTestData', toTestData)
+              let html = `<ul><li data-text="${`${ress[key]}`}">${`${ress[key]}`} <span class="removeToTestFile">×</span></li>`;
               let lanData = urlData2[key];
               for (const key1 in lanData) {
                 const resourses = lanData[key1];
                 for (let i = 0; i < resourses.length; i++) {
                   const resourse = resourses[i];
-                  html += `<li>${resourse}</li>`;
+                  html += `<li data-text="${resourse}">${resourse} <span class="removeToTestFile">×</span></li>`;
                   toTestData.push(resourse);
                 }
               }
               html += `</ul><a href="javascript:;" class="ui-button ui-button-primary to-test">To Test</a>`;
               popup.insertAdjacentHTML("beforeend", html);
               const toTest = popup.querySelector(".to-test");
+              const removeToTestFiles = document.querySelectorAll(".removeToTestFile");
+              removeToTestFiles.forEach((removeToTestFile) => {
+                removeToTestFile.onclick = (e) => {
+                  e.stopPropagation();
+                  const parentNodeText = removeToTestFile.parentNode.dataset.text.trim();
+                  for (var i = 0; i < toTestData.length; i++) {
+                    if((toTestData[i] || '').trim() === parentNodeText) {
+                        toTestData.splice(i, 1); 
+                        break;
+                    }
+                  }
+                  removeToTestFile.parentNode.remove();
+                  console.log("toTestData", toTestData)
+                }
+              })
               toTest.onclick = () => {
                 toTest.classList.add("loading");
                 fetch("/ftp/upload-ftp", {

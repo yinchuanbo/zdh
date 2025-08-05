@@ -1805,12 +1805,16 @@ select {
   margin-bottom: 20px;
 }
 
-.getUrlName-popup ul li + li {
+/* .getUrlName-popup ul li + li {
   margin-top: 15px;
-}
+} */
 
 .getUrlName-popup ul li {
   font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px dashed #fff;
 }
 
 .to-test {
@@ -1823,4 +1827,22 @@ select {
 
 .getUrlName-input:focus {
   box-shadow: 0 0 0 2px rgb(29 33 38);
+}
+
+.removeToTestFile {
+  display: inline-block;
+  background-color: #1d1a15;
+  width: 20px;
+  height: 20px;
+  border-radius: 100%;
+  line-height: 20px;
+  text-align: center;
+  color: white;
+  margin-left: auto;
+  cursor: pointer;
+  margin-left: 20px;
+}
+
+.removeToTestFile:active {
+  opacity: 0.8;
 }

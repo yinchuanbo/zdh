@@ -95,7 +95,7 @@ function setEditor(obj = {}) {
   if (editor) editor.dispose();
   require.config({
     paths: {
-      vs: "https://unpkg.com/monaco-editor@0.52.2/min/vs",
+      vs: "https://unpkg.com/monaco-editor@0.34.1/min/vs",
     },
   });
   require(["vs/editor/editor.main"], function () {
