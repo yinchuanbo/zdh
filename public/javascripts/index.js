@@ -102,6 +102,7 @@ const arSwitchCss = document.querySelector(".ar-switch-css");
 const selectAllBtn = document.querySelector(".select-all-btn");
 const handleBtn = document.querySelector(".handle-btn");
 const allPublish = document.querySelector(".all-publish");
+const allDiscard = document.querySelector(".all-discard");
 const allPull = document.querySelector(".all-pull");
 const allPush = document.querySelector(".all-push");
 const OneClick = document.querySelector(".One-click");
@@ -195,6 +196,12 @@ const handleSocket = () => {
         content: message,
       });
       allPull.classList.remove("loading");
+    } else if (type === "all-discard") {
+      new Dialog({
+        title: "Discard Info",
+        content: message,
+      });
+      allDiscard.classList.remove("loading");
     } else if (type === "all-push") {
       new Dialog({
         title: "Push Info",
@@ -1667,6 +1674,26 @@ allPublish.onclick = () => {
     selectedValues.push(checkbox.value);
   });
   fetch("/all-publish", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      lans: selectedValues,
+    }),
+  }).then((res) => {
+    return res.json();
+  });
+};
+
+allDiscard.onclick = () => {
+  allDiscard.classList.add("loading");
+  const checkboxes = document.querySelectorAll("[name='checkbox']:checked");
+  var selectedValues = [];
+  checkboxes.forEach(function (checkbox) {
+    selectedValues.push(checkbox.value);
+  });
+  fetch("/all-discard", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

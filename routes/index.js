@@ -549,6 +549,89 @@ router.post("/all-pull", authenticateToken, async (req, res) => {
   });
 });
 
+router.post("/all-discard", authenticateToken, async (req, res) => {
+  if (res.app.locals.isW) {
+    res.json({
+      code: 200,
+      message: "discard-error",
+      data: "请先关闭 Watching",
+    });
+    return;
+  }
+  const { localPaths, ports } = getConf(req.uname, res);
+  let { lans } = req.body;
+  if (!lans?.length) {
+    lans = Object.keys(ports);
+  }
+
+  // 并发控制函数
+  async function runWithConcurrency(tasks, maxConcurrent = 2) {
+    const results = [];
+    const running = new Set();
+
+    async function runTask(task) {
+      running.add(task);
+      try {
+        const result = await task();
+        results.push(result);
+      } catch (err) {
+        results.push({ error: err });
+      } finally {
+        running.delete(task);
+      }
+    }
+
+    const taskQueue = tasks.map((lan) => async () => {
+      try {
+        await discardCode({ lan, localPaths, isChecked: true})
+        return { success: true, lan };
+      } catch (error) {
+        return {
+          success: false,
+          lan,
+          error: error?.message || error,
+        };
+      }
+    });
+
+    while (taskQueue.length > 0 || running.size > 0) {
+      while (running.size < maxConcurrent && taskQueue.length > 0) {
+        const task = taskQueue.shift();
+        runTask(task);
+      }
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+
+    return results;
+  }
+
+  // 执行并发任务
+  runWithConcurrency(lans).then((results) => {
+    const successful = results.filter((r) => r.success).map((r) => r.lan);
+    const failed = results.filter((r) => !r.success).map((r) => r.lan);
+    const errors = results
+      .filter((r) => !r.success)
+      .reduce((acc, r) => ({ ...acc, [r.lan]: r.error }), {});
+
+    let message = "";
+    if (successful.length) {
+      message += `${successful.join(",")} Discard Success, `;
+    }
+    if (failed.length) {
+      message += `${failed.join(",")} Discard Fail, ${JSON.stringify(errors)}`;
+    }
+
+    socket.emit("chat message", {
+      type: "all-discard",
+      message,
+    });
+  });
+
+  res.json({
+    code: 200,
+  });
+});
+
 router.post("/check-status", authenticateToken, async (req, res) => {
   const { localPaths } = getConf(req.uname, res);
   const { lan } = req.body;
