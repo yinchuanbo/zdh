@@ -171,6 +171,7 @@ const handleSocket = () => {
   });
   socket.on("chat message", (msg) => {
     const { type, message, file } = msg;
+    console.log("----------", msg)
     if (type === "watch error") {
       closeWatch();
       new Dialog({
@@ -1687,6 +1688,10 @@ allPublish.onclick = () => {
 };
 
 allDiscard.onclick = () => {
+  if (isWatching) {
+    new LightTip().error("请先关闭 Watching，其他操作需要开启");
+    return;
+  }
   allDiscard.classList.add("loading");
   const checkboxes = document.querySelectorAll("[name='checkbox']:checked");
   var selectedValues = [];
