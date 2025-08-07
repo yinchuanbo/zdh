@@ -12,6 +12,7 @@ const ftpRouter = require("./routes/ftp");
 const loginRouter = require("./routes/login");
 const settingsRouter = require("./routes/settings");
 const coderestorationRouter = require("./routes/code-restoration");
+const apitestRouter = require("./routes/apitest");
 
 function createApp() {
   const app = express();
@@ -53,6 +54,7 @@ function createApp() {
   app.use("/users", usersRouter);
   app.use("/deploy", deployRouter);
   app.use("/ftp", ftpRouter);
+  app.use("/", apitestRouter);
 
   // 添加简单的性能监控
   app.use((req, res, next) => {
