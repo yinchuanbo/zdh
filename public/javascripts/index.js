@@ -171,7 +171,7 @@ const handleSocket = () => {
   });
   socket.on("chat message", (msg) => {
     const { type, message, file } = msg;
-    console.log("----------", msg)
+    console.log("----------", msg);
     if (type === "watch error") {
       closeWatch();
       new Dialog({
@@ -1023,7 +1023,13 @@ const setMerge = (item, lan) => {
   }
 };
 
-let originalModel, modifiedModel, diffEditor, diffNavigator;
+let originalModel,
+  modifiedModel,
+  diffEditor,
+  diffNavigator,
+  originalEditor,
+  markedLines,
+  originalDecorations = [];
 
 function setEditorNavitor() {
   if (!diffEditor) return;
@@ -1105,7 +1111,7 @@ function setEditor(path = "", modifiedText = "", originalText = "") {
     diffEditor = monaco.editor.createDiffEditor(
       document.querySelector("#compare"),
       {
-        theme: "vs-dark", // 其他主题：vs-dark, vs, hc-black
+        theme: "vs-dark",
         scrollBeyondLastLine: false,
         diffWordWrap: true,
         wordWrap: "on",
@@ -1120,9 +1126,6 @@ function setEditor(path = "", modifiedText = "", originalText = "") {
         enableSplitViewResizing: true,
         ignoreTrimWhitespace: true,
         renderIndicators: true,
-        // hideUnchangedRegions: {
-        //   enabled: true
-        // },
       }
     );
 
@@ -1130,16 +1133,57 @@ function setEditor(path = "", modifiedText = "", originalText = "") {
       original: originalModel,
       modified: modifiedModel,
     });
-    // diffEditor.updateOptions({
-    //   renderSideBySide: false
-    // })
-    // 创建差异导航器
-    diffNavigator = monaco.editor.createDiffNavigator(diffEditor, {
-      followsCaret: true, // 跟随光标
-      ignoreCharChanges: true, // 只关注行级别的变化
-      alwaysRevealFirst: true, // 初次打开时自动跳到第一个差异
+
+    // 获取左侧编辑器
+    originalEditor = diffEditor.getOriginalEditor();
+
+    // 从 localStorage 读取上次的标记行
+    markedLines = JSON.parse(localStorage.getItem("markedLines") || "{}");
+    if (!markedLines?.[path]) markedLines[path] = [];
+    // 添加标记
+    function applyMarks(lines) {
+      if (!originalEditor) return;
+      const newDecs = lines.map((line) => ({
+        range: new monaco.Range(line, 1, line, 1),
+        options: {
+          isWholeLine: true,
+          className: "myLineHighlight",
+          glyphMarginClassName: "myGlyphMargin",
+        },
+      }));
+      // 保存返回的装饰 id（下次用来移除或更新）
+      originalDecorations = originalEditor.deltaDecorations(
+        originalDecorations,
+        newDecs
+      );
+      markedLines[path] = lines.slice();
+      localStorage.setItem("markedLines", JSON.stringify(markedLines));
+    }
+
+    applyMarks(markedLines[path]);
+
+    // 点击左侧行号或 glyphMargin 时添加/删除标记
+    originalEditor.onMouseDown((e) => {
+      if (e.target.type === monaco.editor.MouseTargetType.GUTTER_GLYPH_MARGIN) {
+        const lineNumber = e.target.position.lineNumber;
+        console.log("====", markedLines, path);
+        const idx = markedLines[path].indexOf(lineNumber);
+        if (idx === -1) {
+          markedLines[path].push(lineNumber);
+        } else {
+          markedLines[path].splice(idx, 1);
+        }
+        localStorage.setItem("markedLines", JSON.stringify(markedLines));
+        applyMarks(markedLines[path]);
+      }
     });
-    // setEditorNavitor();
+
+    // 差异导航器
+    diffNavigator = monaco.editor.createDiffNavigator(diffEditor, {
+      followsCaret: true,
+      ignoreCharChanges: true,
+      alwaysRevealFirst: true,
+    });
   });
 }
 
@@ -1173,6 +1217,8 @@ const diffHTML = function (
         <div class="diffHTML-header">
             <a href="javascript:" class="ui-button ui-button-primary" id="Prev" role="button">Prev</a>
             <a href="javascript:" class="ui-button ui-button-primary" id="Next" role="button">Next</a>
+            <a href="javascript:" class="ui-button ui-button-primary" id="clearAllMarks" role="button">Clear All Marks</a>
+            <a href="javascript:" class="ui-button ui-button-primary" id="changeMarks" role="button">Next Mark</a>
             <input class="ui-input select-text" style="display: none" placeholder="Search...">
             <a href="javascript:" data-lan="${lan}" class="ui-button ui-button-primary" id="Save" role="button">Save</a>
             <a href="javascript:" class="ui-button ui-button-warning red_button" id="Cancel" role="button">Cancel</a>
@@ -1205,6 +1251,62 @@ const diffHTML = function (
       }
       // doc.scrollToDiff("next");
     };
+    clearAllMarks.onclick = () => {
+      if (!originalEditor) return;
+      // 清空标记数组
+      markedLines = {};
+      // 从 localStorage 移除
+      localStorage.removeItem("markedLines");
+
+      // 用之前保存的 id 替换成空数组，真正移除
+      if (originalDecorations && originalDecorations.length) {
+        originalDecorations = originalEditor.deltaDecorations(
+          originalDecorations,
+          []
+        );
+        originalDecorations = []; // 清空本地缓存
+      }
+
+      // 清除 dom 中所有 .myLineHighlight 和 .myGlyphMargin
+      document
+        .querySelectorAll(".myLineHighlight, .myGlyphMargin")
+        .forEach((el) => {
+          el.classList.remove("myLineHighlight", "myGlyphMargin");
+        });
+    };
+
+    let currentMarkIndex = {};
+
+    // 点击按钮切换到下一个标记
+changeMarks.onclick = () => {
+  const marks = markedLines[path]; // 当前文件的标记行数组
+  if (!Array.isArray(marks) || marks.length === 0) {
+    console.log("当前文件没有标记行");
+    return;
+  }
+
+  // 确保有记录当前索引
+  if (typeof currentMarkIndex[path] !== "number") {
+    currentMarkIndex[path] = 0;
+  } else {
+    // 递增索引并循环
+    currentMarkIndex[path] = (currentMarkIndex[path] + 1) % marks.length;
+  }
+
+  const targetLine = marks[currentMarkIndex[path]];
+
+  // 获取左侧 originalEditor
+  const originalEditor = diffEditor.getOriginalEditor();
+
+  if (originalEditor && targetLine) {
+    // 跳转到对应行
+    originalEditor.revealLineInCenter(targetLine);
+    // 设置光标位置
+    originalEditor.setPosition({ lineNumber: targetLine, column: 1 });
+    // 聚焦编辑器
+    originalEditor.focus();
+  }
+};
   } else {
     if (jsonEditor) jsonEditor.dispose();
     jsonEditor = null;
@@ -1483,7 +1585,7 @@ const getUrlNameHanle = () => {
               button.parentNode.classList.add("active");
               popup.innerHTML = "";
               let toTestData = [`${ress[key]}`];
-              console.log('toTestData', toTestData)
+              console.log("toTestData", toTestData);
               let html = `<ul><li data-text="${`${ress[key]}`}">${`${ress[key]}`} <span class="removeToTestFile">×</span></li>`;
               let lanData = urlData2[key];
               for (const key1 in lanData) {
@@ -1497,21 +1599,23 @@ const getUrlNameHanle = () => {
               html += `</ul><a href="javascript:;" class="ui-button ui-button-primary to-test">To Test</a>`;
               popup.insertAdjacentHTML("beforeend", html);
               const toTest = popup.querySelector(".to-test");
-              const removeToTestFiles = document.querySelectorAll(".removeToTestFile");
+              const removeToTestFiles =
+                document.querySelectorAll(".removeToTestFile");
               removeToTestFiles.forEach((removeToTestFile) => {
                 removeToTestFile.onclick = (e) => {
                   e.stopPropagation();
-                  const parentNodeText = removeToTestFile.parentNode.dataset.text.trim();
+                  const parentNodeText =
+                    removeToTestFile.parentNode.dataset.text.trim();
                   for (var i = 0; i < toTestData.length; i++) {
-                    if((toTestData[i] || '').trim() === parentNodeText) {
-                        toTestData.splice(i, 1); 
-                        break;
+                    if ((toTestData[i] || "").trim() === parentNodeText) {
+                      toTestData.splice(i, 1);
+                      break;
                     }
                   }
                   removeToTestFile.parentNode.remove();
-                  console.log("toTestData", toTestData)
-                }
-              })
+                  console.log("toTestData", toTestData);
+                };
+              });
               toTest.onclick = () => {
                 toTest.classList.add("loading");
                 fetch("/ftp/upload-ftp", {
