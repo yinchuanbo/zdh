@@ -1029,7 +1029,7 @@ let originalModel,
   diffNavigator,
   originalEditor,
   markedLines,
-  originalDecorations = [];
+  originalDecorations = [], currentMarkIndex = {};
 
 function setEditorNavitor() {
   if (!diffEditor) return;
@@ -1140,6 +1140,8 @@ function setEditor(path = "", modifiedText = "", originalText = "") {
     // 从 localStorage 读取上次的标记行
     markedLines = JSON.parse(localStorage.getItem("markedLines") || "{}");
     if (!markedLines?.[path]) markedLines[path] = [];
+
+    changeMarks.textContent = `Next Mark(${currentMarkIndex[path]} - ${markedLines[path].length})`
     // 添加标记
     function applyMarks(lines) {
       if (!originalEditor) return;
@@ -1158,6 +1160,7 @@ function setEditor(path = "", modifiedText = "", originalText = "") {
       );
       markedLines[path] = lines.slice();
       localStorage.setItem("markedLines", JSON.stringify(markedLines));
+      changeMarks.textContent = `Next Mark(${currentMarkIndex[path]} - ${markedLines[path].length})`
     }
 
     applyMarks(markedLines[path]);
@@ -1274,9 +1277,6 @@ const diffHTML = function (
           el.classList.remove("myLineHighlight", "myGlyphMargin");
         });
     };
-
-    let currentMarkIndex = {};
-
     // 点击按钮切换到下一个标记
 changeMarks.onclick = () => {
   const marks = markedLines[path]; // 当前文件的标记行数组
