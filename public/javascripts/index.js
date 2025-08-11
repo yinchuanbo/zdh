@@ -1141,7 +1141,7 @@ function setEditor(path = "", modifiedText = "", originalText = "") {
     markedLines = JSON.parse(localStorage.getItem("markedLines") || "{}");
     if (!markedLines?.[path]) markedLines[path] = [];
 
-    changeMarks.textContent = `Next Mark(${currentMarkIndex[path]} - ${markedLines[path].length})`
+    changeMarks.textContent = `Next Mark(${currentMarkIndex[path] || 0 } - ${markedLines[path].length})`
     // 添加标记
     function applyMarks(lines) {
       if (!originalEditor) return;
@@ -1160,7 +1160,7 @@ function setEditor(path = "", modifiedText = "", originalText = "") {
       );
       markedLines[path] = lines.slice();
       localStorage.setItem("markedLines", JSON.stringify(markedLines));
-      changeMarks.textContent = `Next Mark(${currentMarkIndex[path]} - ${markedLines[path].length})`
+      changeMarks.textContent = `Next Mark(${currentMarkIndex[path] || 0} - ${markedLines[path].length})`
     }
 
     applyMarks(markedLines[path]);
@@ -1306,6 +1306,7 @@ changeMarks.onclick = () => {
     // 聚焦编辑器
     originalEditor.focus();
   }
+  changeMarks.textContent = `Next Mark(${currentMarkIndex[path] || 0 } - ${markedLines[path].length})`
 };
   } else {
     if (jsonEditor) jsonEditor.dispose();
