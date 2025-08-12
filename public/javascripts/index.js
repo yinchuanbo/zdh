@@ -1071,7 +1071,7 @@ function setEditorNavitor() {
   Next.onclick = goToNextDiff;
 }
 
-function setEditor(path = "", modifiedText = "", originalText = "") {
+function setEditor(path = "", modifiedText = "", originalText = "", initLan = '') {
   if (originalModel) originalModel.dispose();
   if (modifiedModel) modifiedModel.dispose();
   if (diffEditor) diffEditor.dispose();
@@ -1140,7 +1140,9 @@ function setEditor(path = "", modifiedText = "", originalText = "") {
 
     // 从 localStorage 读取上次的标记行
     markedLines = JSON.parse(localStorage.getItem("markedLines") || "{}");
-    if (!markedLines?.[path]) markedLines[path] = [];
+    console.log("=====", path)
+    const lineKey = `${initLan}/${path}`
+    if (!markedLines?.[lineKey]) markedLines[lineKey] = [];
 
     // 添加标记
     function applyMarks(lines) {
@@ -1158,25 +1160,24 @@ function setEditor(path = "", modifiedText = "", originalText = "") {
         originalDecorations,
         newDecs
       );
-      markedLines[path] = lines.slice();
+      markedLines[lineKey] = lines.slice();
       localStorage.setItem("markedLines", JSON.stringify(markedLines));
     }
 
-    applyMarks(markedLines[path]);
+    applyMarks(markedLines[lineKey]);
 
     // 点击左侧行号或 glyphMargin 时添加/删除标记
     originalEditor.onMouseDown((e) => {
       if (e.target.type === monaco.editor.MouseTargetType.GUTTER_GLYPH_MARGIN) {
         const lineNumber = e.target.position.lineNumber;
-        console.log("====", markedLines, path);
-        const idx = markedLines[path].indexOf(lineNumber);
+        const idx = markedLines[lineKey].indexOf(lineNumber);
         if (idx === -1) {
-          markedLines[path].push(lineNumber);
+          markedLines[lineKey].push(lineNumber);
         } else {
-          markedLines[path].splice(idx, 1);
+          markedLines[lineKey].splice(idx, 1);
         }
         localStorage.setItem("markedLines", JSON.stringify(markedLines));
-        applyMarks(markedLines[path]);
+        applyMarks(markedLines[lineKey]);
       }
     });
 
@@ -1237,9 +1238,10 @@ const diffHTML = function (
   Cancel.onclick = () => {
     diffHTML.remove();
   };
-  // setEditor(path, data.initC.content, data.nowC.content);
   if (!data.initC.path.endsWith(".json")) {
-    setEditor(path, data.nowC.content, data.initC.content);
+    setEditor(path, data.nowC.content, data.initC.content, initLan);
+
+    console.log('initLan', initLan)
 
     Prev.onclick = () => {
       // doc.scrollToDiff("prev");
@@ -1278,21 +1280,22 @@ const diffHTML = function (
     };
     // 点击按钮切换到下一个标记
     changeMarks.onclick = () => {
-      const marks = markedLines[path]; // 当前文件的标记行数组
+      const lineKey = `${initLan}/${path}`
+      const marks = markedLines[lineKey]; // 当前文件的标记行数组
       if (!Array.isArray(marks) || marks.length === 0) {
         console.log("当前文件没有标记行");
         return;
       }
 
       // 确保有记录当前索引
-      if (typeof currentMarkIndex[path] !== "number") {
-        currentMarkIndex[path] = 0;
+      if (typeof currentMarkIndex[lineKey] !== "number") {
+        currentMarkIndex[lineKey] = 0;
       } else {
         // 递增索引并循环
-        currentMarkIndex[path] = (currentMarkIndex[path] + 1) % marks.length;
+        currentMarkIndex[lineKey] = (currentMarkIndex[lineKey] + 1) % marks.length;
       }
 
-      const targetLine = marks[currentMarkIndex[path]];
+      const targetLine = marks[currentMarkIndex[lineKey]];
 
       // 获取左侧 originalEditor
       const originalEditor = diffEditor.getOriginalEditor();
@@ -1306,6 +1309,8 @@ const diffHTML = function (
         originalEditor.focus();
       }
     };
+    clearAllMarks.style.display = 'flex'
+    changeMarks.style.display = 'flex'
   } else {
     if (jsonEditor) jsonEditor.dispose();
     jsonEditor = null;
@@ -1327,6 +1332,9 @@ const diffHTML = function (
         lineHeight: 40,
       });
     });
+
+    clearAllMarks.style.display = 'none'
+    changeMarks.style.display = 'none'
   }
 
   Save.onclick = () => {
