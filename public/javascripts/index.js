@@ -1029,7 +1029,8 @@ let originalModel,
   diffNavigator,
   originalEditor,
   markedLines,
-  originalDecorations = [], currentMarkIndex = {};
+  originalDecorations = [],
+  currentMarkIndex = {};
 
 function setEditorNavitor() {
   if (!diffEditor) return;
@@ -1141,7 +1142,6 @@ function setEditor(path = "", modifiedText = "", originalText = "") {
     markedLines = JSON.parse(localStorage.getItem("markedLines") || "{}");
     if (!markedLines?.[path]) markedLines[path] = [];
 
-    changeMarks.textContent = `Next Mark(${currentMarkIndex[path] || 0 } - ${markedLines[path].length})`
     // 添加标记
     function applyMarks(lines) {
       if (!originalEditor) return;
@@ -1160,7 +1160,6 @@ function setEditor(path = "", modifiedText = "", originalText = "") {
       );
       markedLines[path] = lines.slice();
       localStorage.setItem("markedLines", JSON.stringify(markedLines));
-      changeMarks.textContent = `Next Mark(${currentMarkIndex[path] || 0} - ${markedLines[path].length})`
     }
 
     applyMarks(markedLines[path]);
@@ -1278,36 +1277,35 @@ const diffHTML = function (
         });
     };
     // 点击按钮切换到下一个标记
-changeMarks.onclick = () => {
-  const marks = markedLines[path]; // 当前文件的标记行数组
-  if (!Array.isArray(marks) || marks.length === 0) {
-    console.log("当前文件没有标记行");
-    return;
-  }
+    changeMarks.onclick = () => {
+      const marks = markedLines[path]; // 当前文件的标记行数组
+      if (!Array.isArray(marks) || marks.length === 0) {
+        console.log("当前文件没有标记行");
+        return;
+      }
 
-  // 确保有记录当前索引
-  if (typeof currentMarkIndex[path] !== "number") {
-    currentMarkIndex[path] = 0;
-  } else {
-    // 递增索引并循环
-    currentMarkIndex[path] = (currentMarkIndex[path] + 1) % marks.length;
-  }
+      // 确保有记录当前索引
+      if (typeof currentMarkIndex[path] !== "number") {
+        currentMarkIndex[path] = 0;
+      } else {
+        // 递增索引并循环
+        currentMarkIndex[path] = (currentMarkIndex[path] + 1) % marks.length;
+      }
 
-  const targetLine = marks[currentMarkIndex[path]];
+      const targetLine = marks[currentMarkIndex[path]];
 
-  // 获取左侧 originalEditor
-  const originalEditor = diffEditor.getOriginalEditor();
+      // 获取左侧 originalEditor
+      const originalEditor = diffEditor.getOriginalEditor();
 
-  if (originalEditor && targetLine) {
-    // 跳转到对应行
-    originalEditor.revealLineInCenter(targetLine);
-    // 设置光标位置
-    originalEditor.setPosition({ lineNumber: targetLine, column: 1 });
-    // 聚焦编辑器
-    originalEditor.focus();
-  }
-  changeMarks.textContent = `Next Mark(${currentMarkIndex[path] || 0 } - ${markedLines[path].length})`
-};
+      if (originalEditor && targetLine) {
+        // 跳转到对应行
+        originalEditor.revealLineInCenter(targetLine);
+        // 设置光标位置
+        originalEditor.setPosition({ lineNumber: targetLine, column: 1 });
+        // 聚焦编辑器
+        originalEditor.focus();
+      }
+    };
   } else {
     if (jsonEditor) jsonEditor.dispose();
     jsonEditor = null;
