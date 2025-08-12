@@ -1219,7 +1219,7 @@ const diffHTML = function (
         <div class="diffHTML-header">
             <a href="javascript:" class="ui-button ui-button-primary" id="Prev" role="button">Prev</a>
             <a href="javascript:" class="ui-button ui-button-primary" id="Next" role="button">Next</a>
-            <a href="javascript:" class="ui-button ui-button-primary" id="clearAllMarks" role="button">Clear All Marks</a>
+            <a href="javascript:" class="ui-button ui-button-primary" id="clearAllMarks" role="button">Clear Marks</a>
             <a href="javascript:" class="ui-button ui-button-primary" id="changeMarks" role="button">Next Mark</a>
             <input class="ui-input select-text" style="display: none" placeholder="Search...">
             <a href="javascript:" data-lan="${lan}" class="ui-button ui-button-primary" id="Save" role="button">Save</a>
