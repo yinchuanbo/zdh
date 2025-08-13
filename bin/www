@@ -1,43 +1,47 @@
 #!/usr/bin/env node
 
+const dotenv = require("dotenv");
+dotenv.config();
+
+dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
+
 /**
  * Module dependencies.
  */
 
 // 添加全局错误处理
-process.on('uncaughtException', (err) => {
-  console.error('Uncaught Exception:', err.message);
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err.message);
   console.error(err.stack);
-  console.log('Press any key to exit...');
+  console.log("Press any key to exit...");
   process.stdin.setRawMode(true);
   process.stdin.resume();
-  process.stdin.on('data', process.exit.bind(process, 1));
+  process.stdin.on("data", process.exit.bind(process, 1));
 });
 
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection at:", promise, "reason:", reason);
 });
 
-var app = null
+var app = null;
 
 try {
   var createApp = require("../app");
   app = createApp();
 } catch (err) {
-  console.error('Failed to create app:', err.message);
+  console.error("Failed to create app:", err.message);
   console.error(err.stack);
-  console.log('Press any key to exit...');
+  console.log("Press any key to exit...");
   process.stdin.setRawMode(true);
   process.stdin.resume();
-  process.stdin.on('data', process.exit.bind(process, 1));
+  process.stdin.on("data", process.exit.bind(process, 1));
 }
 var debug = require("debug")("zdh:server");
 var http = require("http");
 /**
  * Get port from environment and store in Express.
  */
-
-var port = normalizePort(process.env.PORT || "4001");
+var port = normalizePort(process.env.PORT || "3000");
 app.set("port", port);
 
 /**
@@ -53,14 +57,13 @@ const io = require("socket.io")(server, {
   },
 });
 
-
 io.on("connection", (socket) => {
   console.log("a user connected");
   socket.on("chat message", (msg) => {
     console.log("message: " + msg);
     io.emit("chat message", msg);
   });
-  
+
   socket.on("disconnect", () => {
     console.log("user disconnected");
   });
@@ -128,12 +131,12 @@ function onListening() {
   var addr = server.address();
   var bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
   debug("Listening on " + bind);
-  
-  console.log('\n==============================================');
-  console.log('🚀 ZDH Application Started Successfully!');
-  console.log('==============================================');
+
+  console.log("\n==============================================");
+  console.log("🚀 ZDH Application Started Successfully!");
+  console.log("==============================================");
   console.log(`📡 Server running on: http://localhost:${addr.port}`);
   console.log(`🕐 Started at: ${new Date().toLocaleString()}`);
-  console.log('💡 Press Ctrl+C to stop the server');
-  console.log('==============================================\n');
+  console.log("💡 Press Ctrl+C to stop the server");
+  console.log("==============================================\n");
 }

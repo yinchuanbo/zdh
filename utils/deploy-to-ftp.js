@@ -1,10 +1,9 @@
 const { Worker } = require("worker_threads");
-const fs = require("fs");
 const path = require("path");
 const os = require("os");
 const io = require("socket.io-client");
 
-const socket = io("http://localhost:4001");
+const socket = io(process.env.SOCKER_URL);
 
 async function deployBatch(batchOutputs, env, configs) {
   return new Promise((resolve, reject) => {

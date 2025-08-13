@@ -43,7 +43,7 @@ if (window.performance && window.performance.mark) {
   });
 }
 
-const socket = io("http://localhost:4001");
+const socket = io(location.host);
 let imgs = [];
 let isWatching = false;
 

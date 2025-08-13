@@ -43,7 +43,7 @@ imageExtensions = [
   ".avif",
 ];
 
-const socket = io("http://localhost:4001");
+const socket = io(process.env.SOCKER_URL);
 
 router.get("/", authenticateToken, async function (req, res, next) {
   const { lans } = await getConf(req.uname, res, req.user.id);
