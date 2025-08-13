@@ -1,7 +1,7 @@
 var express = require("express");
 const getConf = require("../utils/conf");
 const { outputRead, outputOtherRead } = require("../utils/supabase")
-const { getFileFunc, getRequireDynamicFile } = require("../utils/get-files");
+const { getFileFunc } = require("../utils/get-files");
 const { setFile } = require("../utils/set-file");
 const deployToFtp = require("../utils/deploy-to-ftp");
 const listenWatch = require("../utils/watch");
