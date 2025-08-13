@@ -7,12 +7,12 @@ const fs = require("fs").promises;
 const fs2 = require("fs");
 const path = require("path");
 const sass = require("sass");
-const io = require("socket.io-client");
 const babel = require("@babel/core");
 const postcss = require("postcss");
 const autoprefixer = require("autoprefixer");
 const acorn = require("acorn");
 const { lintFiles } = require("../eslint-integration");
+const { sendSSEMessage } = require("../utils/sse")
 
 const watcherList = [];
 
@@ -28,7 +28,6 @@ function listenWatch(isWatching, pathname, lans, ports, domain) {
   if (!curWatching) return;
   lans = JSON.parse(lans);
   ports = JSON.parse(ports);
-  const socket = io(process.env.SOCKER_URL);
   let allDirs = {};
 
   function handleError(err, file = "") {
@@ -39,11 +38,11 @@ function listenWatch(isWatching, pathname, lans, ports, domain) {
       });
     }
     const m = typeof err === "string" ? err : err?.message || "未知错误";
-    socket.emit("chat message", {
+    sendSSEMessage({
       type: "watch error",
       message: m,
       file,
-    });
+    })
   }
   process.on("uncaughtException", (err) => {
     console.error("未捕获的异常:", err);
@@ -164,22 +163,22 @@ function listenWatch(isWatching, pathname, lans, ports, domain) {
       .then((res) => {
         if (curWatching) {
           if (res.data.code == 200) {
-            socket.emit("chat message", {
+            sendSSEMessage({
               type: "publish success",
-            });
+            })
           } else {
-            socket.emit("chat message", {
+            sendSSEMessage({
               type: "publish error",
               message: res.data.message,
-            });
+            })
           }
         }
       })
       .catch((err) => {
-        socket.emit("chat message", {
+        sendSSEMessage({
           type: "publish error",
           message: err?.message || "Publish 失败",
-        });
+        })
       });
   };
 

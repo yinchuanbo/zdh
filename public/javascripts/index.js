@@ -43,7 +43,6 @@ if (window.performance && window.performance.mark) {
   });
 }
 
-const socket = io(location.host);
 let imgs = [];
 let isWatching = false;
 
@@ -163,74 +162,6 @@ const watchBtnListen = () => {
     }
     setWatch();
   };
-};
-
-const handleSocket = () => {
-  socket.on("connect", () => {
-    console.log("Connected to server");
-  });
-  socket.on("chat message", (msg) => {
-    const { type, message, file } = msg;
-    console.log("----------", msg);
-    if (type === "watch error") {
-      closeWatch();
-      new Dialog({
-        title: "Error Info",
-        content: message + "-" + file,
-      });
-    } else if (type === "publish success") {
-      new LightTip().success("publish 成功");
-    } else if (type === "publish error") {
-      new Dialog({
-        title: "Publish Error Info",
-        content: message || "publish 失败",
-      });
-    } else if (type === "all-publish") {
-      new Dialog({
-        title: "Publish Info",
-        content: message,
-      });
-      allPublish.classList.remove("loading");
-    } else if (type === "all-pull") {
-      new Dialog({
-        title: "Pull Info",
-        content: message,
-      });
-      allPull.classList.remove("loading");
-    } else if (type === "all-discard") {
-      new Dialog({
-        title: "Discard Info",
-        content: message,
-      });
-      allDiscard.classList.remove("loading");
-    } else if (type === "all-push") {
-      new Dialog({
-        title: "Push Info",
-        content: message,
-      });
-      allPush.classList.remove("loading");
-      allPush.classList.remove("loading");
-      const saveBtn = document.querySelector(".setCommit .ui-button-primary");
-      const cancelBtn = document.querySelector(".setCommit .ui-button-warning");
-      if (saveBtn && cancelBtn) {
-        cancelBtn.classList.remove("disabled");
-        saveBtn.classList.remove("loading");
-      }
-    } else if (type === "upload-ftp-success") {
-      const toTest = document.querySelector(
-        ".getUrlName .getUrlName-popup .to-test"
-      );
-      if (toTest) {
-        new Dialog({
-          title: "Ftp Success Info",
-          content: message,
-        });
-        toTest.classList.remove("loading");
-      }
-    } else if (type === "ftp-upload-progress") {
-      new LightTip().success(`${message}`);
-    }
-  });
 };
 
 function generateRandomString(length) {
@@ -1071,7 +1002,12 @@ function setEditorNavitor() {
   Next.onclick = goToNextDiff;
 }
 
-function setEditor(path = "", modifiedText = "", originalText = "", initLan = '') {
+function setEditor(
+  path = "",
+  modifiedText = "",
+  originalText = "",
+  initLan = ""
+) {
   if (originalModel) originalModel.dispose();
   if (modifiedModel) modifiedModel.dispose();
   if (diffEditor) diffEditor.dispose();
@@ -1140,8 +1076,8 @@ function setEditor(path = "", modifiedText = "", originalText = "", initLan = ''
 
     // 从 localStorage 读取上次的标记行
     markedLines = JSON.parse(localStorage.getItem("markedLines") || "{}");
-    console.log("=====", path)
-    const lineKey = `${initLan}/${path}`
+    console.log("=====", path);
+    const lineKey = `${initLan}/${path}`;
     if (!markedLines?.[lineKey]) markedLines[lineKey] = [];
 
     // 添加标记
@@ -1241,7 +1177,7 @@ const diffHTML = function (
   if (!data.initC.path.endsWith(".json")) {
     setEditor(path, data.nowC.content, data.initC.content, initLan);
 
-    console.log('initLan', initLan)
+    console.log("initLan", initLan);
 
     Prev.onclick = () => {
       // doc.scrollToDiff("prev");
@@ -1280,7 +1216,7 @@ const diffHTML = function (
     };
     // 点击按钮切换到下一个标记
     changeMarks.onclick = () => {
-      const lineKey = `${initLan}/${path}`
+      const lineKey = `${initLan}/${path}`;
       const marks = markedLines[lineKey]; // 当前文件的标记行数组
       if (!Array.isArray(marks) || marks.length === 0) {
         console.log("当前文件没有标记行");
@@ -1292,7 +1228,8 @@ const diffHTML = function (
         currentMarkIndex[lineKey] = 0;
       } else {
         // 递增索引并循环
-        currentMarkIndex[lineKey] = (currentMarkIndex[lineKey] + 1) % marks.length;
+        currentMarkIndex[lineKey] =
+          (currentMarkIndex[lineKey] + 1) % marks.length;
       }
 
       const targetLine = marks[currentMarkIndex[lineKey]];
@@ -1309,8 +1246,8 @@ const diffHTML = function (
         originalEditor.focus();
       }
     };
-    clearAllMarks.style.display = 'flex'
-    changeMarks.style.display = 'flex'
+    clearAllMarks.style.display = "flex";
+    changeMarks.style.display = "flex";
   } else {
     if (jsonEditor) jsonEditor.dispose();
     jsonEditor = null;
@@ -1333,8 +1270,8 @@ const diffHTML = function (
       });
     });
 
-    clearAllMarks.style.display = 'none'
-    changeMarks.style.display = 'none'
+    clearAllMarks.style.display = "none";
+    changeMarks.style.display = "none";
   }
 
   Save.onclick = () => {
@@ -1948,9 +1885,84 @@ const iframeCover = (src = "") => {
   };
 };
 
+const parseJson = (data) => {
+  try {
+    return JSON.parse(data);
+  } catch (error) {
+    return data;
+  }
+};
+
+const handlerSSE = () => {
+  const source = new EventSource("/events");
+  source.onmessage = (event) => {
+    const msg = parseJson(event.data);
+    console.log("msg", msg);
+    const { type, message, file } = msg;
+    if (type === "watch error") {
+      closeWatch();
+      new Dialog({
+        title: "Error Info",
+        content: message + "-" + file,
+      });
+    } else if (type === "publish success") {
+      new LightTip().success("publish 成功");
+    } else if (type === "publish error") {
+      new Dialog({
+        title: "Publish Error Info",
+        content: message || "publish 失败",
+      });
+    } else if (type === "all-publish") {
+      new Dialog({
+        title: "Publish Info",
+        content: message,
+      });
+      allPublish.classList.remove("loading");
+    } else if (type === "all-pull") {
+      new Dialog({
+        title: "Pull Info",
+        content: message,
+      });
+      allPull.classList.remove("loading");
+    } else if (type === "all-discard") {
+      new Dialog({
+        title: "Discard Info",
+        content: message,
+      });
+      allDiscard.classList.remove("loading");
+    } else if (type === "all-push") {
+      new Dialog({
+        title: "Push Info",
+        content: message,
+      });
+      allPush.classList.remove("loading");
+      allPush.classList.remove("loading");
+      const saveBtn = document.querySelector(".setCommit .ui-button-primary");
+      const cancelBtn = document.querySelector(".setCommit .ui-button-warning");
+      if (saveBtn && cancelBtn) {
+        cancelBtn.classList.remove("disabled");
+        saveBtn.classList.remove("loading");
+      }
+    } else if (type === "upload-ftp-success") {
+      const toTest = document.querySelector(
+        ".getUrlName .getUrlName-popup .to-test"
+      );
+      if (toTest) {
+        new Dialog({
+          title: "Ftp Success Info",
+          content: message,
+        });
+        toTest.classList.remove("loading");
+      }
+    } else if (type === "ftp-upload-progress") {
+      new LightTip().success(`${message}`);
+    }
+  };
+};
+
 window.addEventListener("load", () => {
   watchBtnListen();
-  handleSocket();
+  handlerSSE();
   handleGetFile();
   selectOnChange();
   logOut();

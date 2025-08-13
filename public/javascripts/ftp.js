@@ -1,5 +1,3 @@
-const socket = io(location.host);
-
 const getFiles = document.querySelector(".getFiles");
 const preview = document.querySelector(".preview");
 const upload = document.querySelector(".upload");
@@ -184,11 +182,20 @@ pullNewCodes.forEach((item) => {
   };
 });
 
-const handleSocket = () => {
-  socket.on("connect", () => {
-    console.log("Connected to server");
-  });
-  socket.on("chat message", (msg) => {
+const parseJson = (data) => {
+  try {
+    return JSON.parse(data);
+  } catch (error) {
+    return data;
+  }
+};
+
+
+const handlerSSE = () => {
+  const source = new EventSource("/events");
+  console.log("source", source);
+  source.onmessage = (event) => {
+    const msg = parseJson(event.data);
     const { type, message } = msg;
     if (type === "upload-ftp-success") {
       new Dialog({
@@ -202,12 +209,12 @@ const handleSocket = () => {
         content: message,
       });
       upload.classList.remove("loading");
-    } else if (type === 'ftp-upload-progress') {
+    } else if (type === "ftp-upload-progress") {
       new LightTip().success(`${message}`);
     }
-  });
+  };
 };
 
 window.addEventListener("load", () => {
-  handleSocket();
+  handlerSSE();
 });

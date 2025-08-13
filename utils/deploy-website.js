@@ -1,17 +1,16 @@
 const { Worker } = require("worker_threads");
 const path = require("path");
-const io = require("socket.io-client");
+const { sendSSEMessage } = require("../utils/sse");
+const { send } = require("process");
 
 let deployInfo;
 let successArr = [];
 let errorArr = [];
 let inProgress = 0;
-const socket = io(process.env.SOCKER_URL);
-
 const maxLen = 2;
 
 function sendProgressUpdate(total) {
-  socket.emit("chat message", {
+  sendSSEMessage({
     type: "deploy-progress",
     message: `部署进度: ${successArr.length + errorArr.length}/${total}，成功: ${successArr.length}，失败: ${errorArr.length}, 成功语言: ${successArr + ""}`,
   });
@@ -106,7 +105,7 @@ async function deployAllLanguages(needLans = [], configs) {
   if (errorArr.length) {
     resultMessage += `${errorArr.join(",")} 部署失败。`;
   }
-  socket.emit("chat message", {
+  sendSSEMessage({
     type: "deploy-result",
     message: resultMessage,
   });

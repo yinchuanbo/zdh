@@ -14,6 +14,10 @@ const settingsRouter = require("./routes/settings");
 const coderestorationRouter = require("./routes/code-restoration");
 const apitestRouter = require("./routes/apitest");
 
+const { registerClient } = require("./utils/sse");
+
+const clients = [];
+
 function createApp() {
   const app = express();
 
@@ -47,6 +51,15 @@ function createApp() {
   );
 
   // 路由
+  // SSE 连接接口
+  app.get("/events", (req, res) => {
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.flushHeaders?.();
+    registerClient(res); // 注册客户端
+  });
+
   app.use("/", indexRouter);
   app.use("/", loginRouter);
   app.use("/", settingsRouter);

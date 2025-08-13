@@ -6,7 +6,6 @@ let selectVals = [];
 
 const allBox = document.querySelector("[name='all']");
 const lanBox = document.querySelectorAll("[name='checkbox']");
-const socket = io(location.host);
 
 function uniqueArray(arr) {
   return [...new Set(arr)];
@@ -74,23 +73,38 @@ allDeploy.onclick = () => {
   });
 };
 
-socket.on("connect", () => {
-  console.log("Connected to server");
-});
-socket.on("chat message", (msg) => {
-  const { type, message } = msg;
-  if (type === "deploy-result") {
-    new Dialog({
-      title: "Deploy Result",
-      content: message,
-    });
-    allDeploy.classList.remove("loading");
-  } else if (type === 'deploy-progress') {
-    new LightTip().success(`${message}`);
+const parseJson = (data) => {
+  try {
+    return JSON.parse(data);
+  } catch (error) {
+    return data;
   }
-});
+};
 
-const wrapperBack = document.querySelector(".wrapper__back")
+
+const handlerSSE = () => {
+  const source = new EventSource("/events");
+  console.log("source", source);
+  source.onmessage = (event) => {
+    const msg = parseJson(event.data);
+    const { type, message } = msg;
+    if (type === "deploy-result") {
+      new Dialog({
+        title: "Deploy Result",
+        content: message,
+      });
+      allDeploy.classList.remove("loading");
+    } else if (type === "deploy-progress") {
+      new LightTip().success(`${message}`);
+    }
+  };
+};
+
+const wrapperBack = document.querySelector(".wrapper__back");
 wrapperBack.onclick = () => {
-  window.close()
-}
+  window.close();
+};
+
+window.addEventListener("load", () => {
+  handlerSSE();
+});

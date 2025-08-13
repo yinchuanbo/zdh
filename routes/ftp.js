@@ -2,7 +2,7 @@ var express = require("express");
 const getConf = require("../utils/conf");
 const { getAllFiles, handleFtp } = require("../utils/handle-ftp");
 const { authenticateToken } = require("../permissions");
-const io = require("socket.io-client");
+const { sendSSEMessage } = require("../utils/sse");
 var router = express.Router();
 
 router.get("/", authenticateToken, async function (req, res, next) {
@@ -17,7 +17,7 @@ router.post("/get-files", authenticateToken, async function (req, res, next) {
     const result = await getAllFiles({
       env,
       data,
-      configs
+      configs,
     });
     res.json({
       code: 200,
@@ -35,19 +35,20 @@ router.post("/get-files", authenticateToken, async function (req, res, next) {
 router.post("/upload-ftp", authenticateToken, async function (req, res, next) {
   const configs = await getConf(req.uname, res, req.user.id);
   const { env, data } = req.body;
-  const socket = io(process.env.SOCKER_URL);
   try {
-    handleFtp({ env, data, configs }).then(() => {
-      socket.emit("chat message", {
-        type: "upload-ftp-success",
-        message: `${env === 'test' ? '测试服' : '正式服'} FTP 上传成功`,
+    handleFtp({ env, data, configs })
+      .then(() => {
+        sendSSEMessage({
+          type: "upload-ftp-success",
+          message: `${env === "test" ? "测试服" : "正式服"} FTP 上传成功`,
+        });
+      })
+      .catch((error) => {
+        sendSSEMessage({
+          type: "upload-ftp-fail",
+          message: error?.message || error || "未知错误",
+        })
       });
-    }).catch((error) => {
-      socket.emit("chat message", {
-        type: "upload-ftp-fail",
-        message: error?.message || error || "未知错误",
-      });
-    })
     res.json({
       code: 200,
       message: "ftp-upload-success",

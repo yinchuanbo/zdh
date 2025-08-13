@@ -16,7 +16,7 @@ const RTLConverter = require("../utils/switch-css-ar");
 const allPush = require("../utils/all-push");
 const getOtherTpl = require("../utils/get-other-tpl");
 const sync = require("../utils/sync");
-const io = require("socket.io-client");
+const { sendSSEMessage } = require("../utils/sse")
 
 const {
   copyAndMoveImg,
@@ -42,8 +42,6 @@ imageExtensions = [
   ".heic",
   ".avif",
 ];
-
-const socket = io(process.env.SOCKER_URL);
 
 router.get("/", authenticateToken, async function (req, res, next) {
   const { lans } = await getConf(req.uname, res, req.user.id);
@@ -256,7 +254,7 @@ router.post("/all-publish", authenticateToken, async (req, res) => {
     if (Object.keys(errorObj)?.length) {
       str += `\n` + JSON.stringify(errorObj);
     }
-    socket.emit("chat message", {
+    sendSSEMessage({
       type: "all-publish",
       message: str,
     });
@@ -538,11 +536,7 @@ router.post("/all-pull", authenticateToken, async (req, res) => {
     if (failed.length) {
       message += `${failed.join(",")} Pull Fail, ${JSON.stringify(errors)}`;
     }
-
-    socket.emit("chat message", {
-      type: "all-pull",
-      message,
-    });
+    sendSSEMessage({ type: "all-pull", message });
   });
 
   res.json({
@@ -622,10 +616,7 @@ router.post("/all-discard", authenticateToken, async (req, res) => {
       message += `${failed.join(",")} Discard Fail, ${JSON.stringify(errors)}`;
     }
 
-    socket.emit("chat message", {
-      type: "all-discard",
-      message,
-    });
+    sendSSEMessage({ type: "all-discard", message });
   });
 
   res.json({
@@ -675,10 +666,7 @@ router.post("/all-push", authenticateToken, async (req, res) => {
   const { localPaths } = await getConf(req.uname, res, req.user.id);
   const { lans, commit } = req.body;
   allPush({ lans, commit, localPaths }).then((results) => {
-    socket.emit("chat message", {
-      type: "all-push",
-      message: JSON.stringify(results),
-    });
+    sendSSEMessage({ type: "all-push-result", message: JSON.stringify(results) });
   });
   res.json({
     code: 200,

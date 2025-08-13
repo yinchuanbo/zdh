@@ -1,9 +1,7 @@
 const { Worker } = require("worker_threads");
 const path = require("path");
 const os = require("os");
-const io = require("socket.io-client");
-
-const socket = io(process.env.SOCKER_URL);
+const { sendSSEMessage } = require("../utils/sse")
 
 async function deployBatch(batchOutputs, env, configs) {
   return new Promise((resolve, reject) => {
@@ -27,10 +25,7 @@ async function deployBatch(batchOutputs, env, configs) {
       const progressStr = Object.entries(progress)
         .map(([key, value]) => `${key}: ${value}%`)
         .join(" | ");
-      socket.emit("chat message", {
-        type: "ftp-upload-progress",
-        message: progressStr,
-      });
+      sendSSEMessage({ type: "ftp-upload-progress", message: progressStr });
     }
 
     function assignTaskToWorker(worker) {
