@@ -138,8 +138,42 @@ function openFullScreenWindow(url) {
   }
 }
 
-const setWatch = () => {
-  fetch("/watching?bool=" + isWatching);
+const setWatch = async () => {
+  try {
+    const response = await fetch("/watching?bool=" + isWatching, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("Watch status updated:", data);
+
+    // Show success feedback to user
+    if (data.watchingStatus) {
+      console.log("Watching started successfully");
+    } else {
+      console.log("Watching stopped successfully");
+    }
+  } catch (error) {
+    console.error("Error updating watch status:", error);
+
+    // Revert the UI state on error
+    isWatching = !isWatching;
+    if (isWatching) {
+      watchBtn.classList.add("watching");
+    } else {
+      watchBtn.classList.remove("watching");
+    }
+
+    // Show error to user
+    alert("Failed to update watch status: " + error.message);
+  }
 };
 
 const closeWatch = () => {

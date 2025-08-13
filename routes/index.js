@@ -53,30 +53,63 @@ router.get("/", authenticateToken, async function (req, res, next) {
 });
 
 router.get("/watching", authenticateToken, async function (req, res, next) {
-  const { pathname, lans, ports, domain } = await getConf(req.uname, res, req.user.id);
-  const isWatching = req.query.bool === "true";
+  try {
+    const { pathname, lans, ports, domain } = await getConf(req.uname, res, req.user.id);
+    const isWatching = req.query.bool === "true";
 
-  res.app.locals.isW = isWatching;
+    res.app.locals.isW = isWatching;
 
-  if (isWatching) {
-    listenWatch(
-      isWatching,
-      pathname,
-      JSON.stringify(lans),
-      JSON.stringify(ports),
-      domain
-    );
-    res.json({
-      code: 200,
-      watchingStatus: true,
-      message: "watching",
-    });
-  } else {
-    listenWatch(isWatching);
-    res.json({
-      code: 200,
+    // Send response immediately to avoid timeout
+    if (isWatching) {
+      res.json({
+        code: 200,
+        watchingStatus: true,
+        message: "watching",
+      });
+      
+      // Start watching asynchronously after response is sent
+      setImmediate(() => {
+        try {
+          listenWatch(
+            isWatching,
+            pathname,
+            JSON.stringify(lans),
+            JSON.stringify(ports),
+            domain
+          );
+        } catch (error) {
+          console.error('Error starting watch:', error);
+          // Send SSE message about the error
+          const { sendSSEMessage } = require("../utils/sse");
+          sendSSEMessage({
+            type: "watch error",
+            message: error.message || "Failed to start watching",
+          });
+        }
+      });
+    } else {
+      res.json({
+        code: 200,
+        watchingStatus: false,
+        message: "not watching",
+      });
+      
+      // Stop watching asynchronously after response is sent
+      setImmediate(() => {
+        try {
+          listenWatch(isWatching);
+        } catch (error) {
+          console.error('Error stopping watch:', error);
+        }
+      });
+    }
+  } catch (error) {
+    console.error('Error in /watching endpoint:', error);
+    res.status(500).json({
+      code: 500,
       watchingStatus: false,
-      message: "not watching",
+      message: "Internal server error",
+      error: error.message
     });
   }
 });
