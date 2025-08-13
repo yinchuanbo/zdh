@@ -37,4 +37,4 @@ function sendSSEMessage(message) {
   });
 }
 
-export { registerClient, sendSSEMessage };
+module.exports ={ registerClient, sendSSEMessage };
