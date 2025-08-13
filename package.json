@@ -7,7 +7,6 @@
     "dev": "nodemon node ./bin/www",
     "start": "node ./bin/www",
     "bump-version": "node bump-version.js",
-    "build": "pkg . --out-path dist",
     "build:win": "pkg . --targets node18-win-x64 --out-path dist",
     "build:linux": "pkg . --targets node18-linux-x64 --out-path dist",
     "build:mac": "pkg . --targets node18-macos-x64 --out-path dist"
