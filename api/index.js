@@ -1,7 +1,3 @@
-const dotenv = require("dotenv");
-dotenv.config();
-dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
-
 // Import the app creation function
 const createApp = require("../app");
 
