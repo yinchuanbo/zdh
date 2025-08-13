@@ -1,21 +1,19 @@
-const fs = require("fs").promises;
-const path = require("path")
-const { getDynamicFilePath, getRequireDynamicFile } = require("./setData")
-
-async function setSettings({ data, uname }) {
-  const userInfo = getRequireDynamicFile("user-info.js", {})
-  if (!userInfo?.[uname]) {
-    userInfo[uname] = data;
+const { settingsInsert, findSettingsByUserId, settingsUpdate } = require("../utils/supabase")
+async function setSettings({ data, req }) {
+  const findId = await findSettingsByUserId(req.user.id)
+  if (!findId) {
+    await settingsInsert({
+      content: JSON.stringify(data, null, 2),
+      userid: req.user.id
+    });
   } else {
-    userInfo[uname] = {
-      ...userInfo[uname],
-      ...data,
-    };
+    await settingsUpdate({
+      newContent: JSON.stringify(data, null, 2),
+      userid: req.user.id
+    })
   }
-  const jsContent = `module.exports = ${JSON.stringify(userInfo, null, 2)};`;
-  const outputPath = getDynamicFilePath('user-info.js');
-  await fs.mkdir(path.dirname(outputPath), { recursive: true });
-  await fs.writeFile(outputPath, jsContent);
+
+
   return Promise.resolve()
 }
 

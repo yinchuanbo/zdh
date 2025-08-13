@@ -1,8 +1,6 @@
 
 var express = require("express");
-const { getDynamicFilePath, getRequireDynamicFile } = require("../utils/setData")
-const fs = require("fs").promises;
-const path = require("path");
+const { supabaseInsert, getUserName, getAllUsers } = require("../utils/supabase")
 var router = express.Router();
 
 var { bcrypt, jwt, JWT_SECRET } = require("../permissions");
@@ -13,10 +11,9 @@ router.get("/login", function (req, res, next) {
 });
 
 router.post("/login", async (req, res) => {
-  let accounts = getRequireDynamicFile("account.js");
   const { username, password } = req.body;
-  const user = accounts.find((u) => u.username === username);
-  // const newP = await bcrypt.hash(password, 10);
+  let accounts = await getAllUsers();
+  const user = accounts.find((u) => u.username === username && u.orginP === password);
   if (user && (await bcrypt.compare(password, user.password))) {
     const token = jwt.sign(
       { id: user.id, role: user.role, uname: user.username },
@@ -39,27 +36,26 @@ router.post("/login", async (req, res) => {
 
 router.post("/register", async (req, res) => {
   const { username, password } = req.body;
-  let accounts = getRequireDynamicFile("account.js");
-  const has = accounts.find(
-    (u) => u.username.toLowerCase() === username.toLowerCase()
-  );
-  if (has) {
-    res.json({ code: 400, message: "用户名已存在" });
-    return;
-  }
   const data = {
-    id: accounts?.length + 1,
     username: username,
     password: await bcrypt.hash(password, 10),
     orginP: password,
     role: "user",
   };
-  accounts = [...accounts, data];
-  const jsContent = `module.exports = ${JSON.stringify(accounts, null, 2)};`;
-  const outputPath = getDynamicFilePath('account.js');
-  await fs.mkdir(path.dirname(outputPath), { recursive: true });
-  await fs.writeFile(outputPath, jsContent);
-  res.json({ code: 200, message: "注册成功" });
+  try {
+    const getUserNameRes = await getUserName();
+    if (getUserNameRes?.length) {
+      const findUName = getUserNameRes.find(item => (item?.username || '').toLowerCase().trim() === (username || '').toLowerCase().trim());
+      if (findUName) {
+        res.json({ code: 400, message: "用户名已存在" });
+        return;
+      }
+    }
+    await supabaseInsert(data)
+    return res.json({ code: 200, message: "注册成功" });
+  } catch (error) {
+    return res.json({ code: 400, message: error || error?.message });
+  }
 });
 
 router.get("/log-out", function (req, res, next) {

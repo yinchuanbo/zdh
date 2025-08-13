@@ -1,140 +1,120 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>接口调试器</title>
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
-    <link rel="stylesheet" href="/stylesheets/api-styles.css" />
-  </head>
-  <body>
-    <div class="container">
-      <header>
-        <h1>API Test</h1>
-        <div class="env-selector">
-          <label>ENV:</label>
-          <select id="environment">
-            <option value="test">TEST</option>
-            <option value="prod">PROD</option>
-          </select>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>接口调试器</title>
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="/stylesheets/api-styles.css" />
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>API Test</h1>
+      <div class="env-selector">
+        <label>ENV:</label>
+        <select id="environment">
+          <option value="test">TEST</option>
+          <option value="prod">PROD</option>
+        </select>
+      </div>
+    </header>
+
+    <main>
+      <div class="request-section">
+        <div class="url-section">
+          <div class="method-site-row">
+            <select id="method">
+              <option value="GET">GET</option>
+              <option value="POST">POST</option>
+              <option value="PUT">PUT</option>
+              <option value="DELETE">DELETE</option>
+            </select>
+            <select id="site">
+              <option value="">Select Site</option>
+            </select>
+          </div>
+          <div class="url-row">
+            <input type="text" id="url" placeholder="Enter API path, e.g. /api/users" />
+            <button id="send-btn">Send Request</button>
+            <button id="polling-btn" class="polling-btn">
+              Start Polling
+            </button>
+          </div>
         </div>
-      </header>
 
-      <main>
-        <div class="request-section">
-          <div class="url-section">
-            <div class="method-site-row">
-              <select id="method">
-                <option value="GET">GET</option>
-                <option value="POST">POST</option>
-                <option value="PUT">PUT</option>
-                <option value="DELETE">DELETE</option>
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="headers">Headers</button>
+          <button class="tab-btn" data-tab="params">Params</button>
+          <button class="tab-btn" data-tab="body">Body</button>
+        </div>
+
+        <div class="tab-content">
+          <!-- 请求头标签页 -->
+          <div id="headers-tab" class="tab-panel active">
+            <div class="content-type-section">
+              <label>Content-Type: </label>
+              <select id="content-type">
+                <option value="application/json">application/json</option>
+                <option value="application/x-www-form-urlencoded">
+                  application/x-www-form-urlencoded
+                </option>
+                <option value="multipart/form-data">
+                  multipart/form-data
+                </option>
+                <option value="text/plain">text/plain</option>
+                <option value="application/xml">application/xml</option>
               </select>
-              <select id="site">
-                <option value="">Select Site</option>
-              </select>
             </div>
-            <div class="url-row">
-              <input
-                type="text"
-                id="url"
-                placeholder="Enter API path, e.g. /api/users"
-              />
-              <button id="send-btn">Send Request</button>
-              <button id="polling-btn" class="polling-btn">
-                Start Polling
-              </button>
-            </div>
-          </div>
-
-          <div class="tabs">
-            <button class="tab-btn active" data-tab="headers">Headers</button>
-            <button class="tab-btn" data-tab="params">Params</button>
-            <button class="tab-btn" data-tab="body">Body</button>
-          </div>
-
-          <div class="tab-content">
-            <!-- 请求头标签页 -->
-            <div id="headers-tab" class="tab-panel active">
-              <div class="content-type-section">
-                <label>Content-Type: </label>
-                <select id="content-type">
-                  <option value="application/json">application/json</option>
-                  <option value="application/x-www-form-urlencoded">
-                    application/x-www-form-urlencoded
-                  </option>
-                  <option value="multipart/form-data">
-                    multipart/form-data
-                  </option>
-                  <option value="text/plain">text/plain</option>
-                  <option value="application/xml">application/xml</option>
-                </select>
-              </div>
-              <div class="headers-section">
-                <h3>Fixed Headers</h3>
-                <div id="fixed-headers"></div>
-                <h3>Custom Headers</h3>
-                <div id="custom-headers">
-                  <div class="header-row">
-                    <input
-                      type="text"
-                      placeholder="Header Name"
-                      class="header-key"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Header Value"
-                      class="header-value"
-                    />
-                    <button class="remove-header">Delete</button>
-                  </div>
-                </div>
-                <button id="add-header">Add Header</button>
-              </div>
-            </div>
-
-            <!-- 请求参数标签页 -->
-            <div id="params-tab" class="tab-panel">
-              <div id="params-section">
-                <div class="param-row">
-                  <input
-                    type="text"
-                    placeholder="Param Name"
-                    class="param-key"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Param Value"
-                    class="param-value"
-                  />
-                  <button class="remove-param">Delete</button>
+            <div class="headers-section">
+              <h3>Fixed Headers</h3>
+              <div id="fixed-headers"></div>
+              <h3>Custom Headers</h3>
+              <div id="custom-headers">
+                <div class="header-row">
+                  <input type="text" placeholder="Header Name" class="header-key" />
+                  <input type="text" placeholder="Header Value" class="header-value" />
+                  <button class="remove-header">Delete</button>
                 </div>
               </div>
-              <button id="add-param">Add Param</button>
-            </div>
-
-            <!-- 请求体标签页 -->
-            <div id="body-tab" class="tab-panel">
-              <textarea
-                id="request-body"
-                placeholder="Enter request body content (JSON format)"
-              ></textarea>
+              <button id="add-header">Add Header</button>
             </div>
           </div>
-        </div>
 
-        <div class="response-section">
-          <h2>Response</h2>
-          <div class="response-info">
-            <span id="status-code"></span>
-            <span id="response-time"></span>
+          <!-- 请求参数标签页 -->
+          <div id="params-tab" class="tab-panel">
+            <div id="params-section">
+              <div class="param-row">
+                <input type="text" placeholder="Param Name" class="param-key" />
+                <input type="text" placeholder="Param Value" class="param-value" />
+                <button class="remove-param">Delete</button>
+              </div>
+            </div>
+            <button id="add-param">Add Param</button>
           </div>
-          <pre id="response-body"></pre>
-        </div>
-      </main>
-    </div>
 
-    <script src="/javascripts/api-config.js"></script>
-    <script src="/javascripts/api-script.js"></script>
-  </body>
+          <!-- 请求体标签页 -->
+          <div id="body-tab" class="tab-panel">
+            <textarea id="request-body" placeholder="Enter request body content (JSON format)"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="response-section">
+        <h2>Response</h2>
+        <div class="response-info">
+          <span id="status-code"></span>
+          <span id="response-time"></span>
+        </div>
+        <pre id="response-body"></pre>
+      </div>
+    </main>
+  </div>
+
+  <script src="/javascripts/api-config.js"></script>
+  <script src="/javascripts/api-script.js"></script>
+</body>
+
 </html>

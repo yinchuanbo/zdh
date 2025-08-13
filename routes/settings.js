@@ -2,11 +2,15 @@ var express = require("express");
 var router = express.Router();
 const setSettings = require("../utils/set-settings");
 const { authenticateToken } = require("../permissions");
-const {getRequireDynamicFile} = require("../utils/setData")
+const { getAllSettingsByUserId } = require("../utils/supabase")
 
-router.get("/settings", authenticateToken, function (req, res, next) {
-  let userInfo = getRequireDynamicFile("user-info.js", {});
-  const info = userInfo?.[req.uname];
+router.get("/settings", authenticateToken, async function (req, res, next) {
+  let findData = await getAllSettingsByUserId(req.user.id)
+  if (findData) {
+    findData = JSON.parse(findData)
+  }
+
+  const info = findData;
   const params = {};
   if (info && info?.lans) {
     params.info = info;
@@ -24,7 +28,7 @@ router.get("/settings", authenticateToken, function (req, res, next) {
 router.post("/settings", authenticateToken, async function (req, res, next) {
   const { data } = req.body;
   try {
-    await setSettings({ data, uname: req.uname });
+    await setSettings({ data, req });
     res.json({
       code: 200,
       message: "settings-success",

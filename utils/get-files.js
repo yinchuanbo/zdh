@@ -1,4 +1,4 @@
-const { getDynamicFilePath, getRequireDynamicFile } = require("./setData");
+const { outputInsert, outputOtherInsert } = require("../utils/supabase")
 const { execSync } = require("child_process");
 // Conditional prettier loading for pkg compatibility
 let prettier;
@@ -197,7 +197,8 @@ async function getFileFunc(
   onlyLan = "en",
   asyncLans = [],
   commitIds = "",
-  configs
+  configs,
+  req
 ) {
   if (!configs || !configs.localPaths || !configs.LocalListPro) {
     throw new Error("Invalid configuration");
@@ -289,11 +290,12 @@ async function getFileFunc(
     const cB = getCurrentBranchName(lanP);
     cbObj[asyncLan] = cB;
   }
-  await handleAsyncLans(allData[onlyLan], asyncLans, onlyLan, configs);
-  const jsContent = `module.exports = ${JSON.stringify(allData, null, 2)};`;
-  const outputPath = getDynamicFilePath("output.js");
-  await fs.mkdir(path.dirname(outputPath), { recursive: true });
-  await fs.writeFile(outputPath, jsContent);
+  await handleAsyncLans(allData[onlyLan], asyncLans, onlyLan, configs, req);
+
+  await outputInsert({
+    userid: req.user.id,
+    input: JSON.stringify(allData, null, 2)
+  })
   return { cbObj, lineObj };
 }
 
@@ -329,7 +331,7 @@ async function checkLinkHrefInTplFiles(tplFiles, url) {
   return matchingFiles;
 }
 
-async function handleAsyncLans(oLan, aLan, onlyLan, configs) {
+async function handleAsyncLans(oLan, aLan, onlyLan, configs, req) {
   console.log("oLan, aLan", oLan, aLan)
   const obj = {};
   for (const al of aLan) {
@@ -352,11 +354,11 @@ async function handleAsyncLans(oLan, aLan, onlyLan, configs) {
       }
     }
   }
-  const jsContent = `module.exports = ${JSON.stringify(obj, null, 2)};`;
 
-  const outputOtherPath = getDynamicFilePath("output-other.js");
-  await fs.mkdir(path.dirname(outputOtherPath), { recursive: true });
-  await fs.writeFile(outputOtherPath, jsContent);
+  await outputOtherInsert({
+    userid: req.user.id,
+    input: JSON.stringify(obj, null, 2)
+  })
 }
 
-module.exports = { getFileFunc, getRequireDynamicFile, getDynamicFilePath };
+module.exports = { getFileFunc };

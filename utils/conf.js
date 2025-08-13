@@ -1,4 +1,4 @@
-const { getRequireDynamicFile } = require("./setData")
+const { getAllSettingsByUserId } = require("../utils/supabase")
 
 let localPaths = {},
   LocalListTest = {},
@@ -25,17 +25,20 @@ let localPaths = {},
   preview = "\\preview\\",
   templates = "\\templates\\new-template\\";
 
-const getConf = (uname = "", resObj = {}) => {
-  const userInfo = getRequireDynamicFile("user-info.js", {});
+const getConf = async (uname = "", resObj = {}, userid) => {
+  let findData = await getAllSettingsByUserId(userid)
+  if (findData) {
+    findData = JSON.parse(findData)
+  }
   let pathname, domain, lans, ports;
-  if (!userInfo?.[uname]) {
+  if (!findData) {
     resObj.redirect("/settings");
     return;
-  } else if (userInfo[uname]) {
-    pathname = userInfo[uname]["pathname"];
-    domain = userInfo[uname]["domain"];
-    lans = userInfo[uname]["lans"];
-    ports = userInfo[uname]["ports"];
+  } else {
+    pathname = findData["pathname"];
+    domain = findData["domain"];
+    lans = findData["lans"];
+    ports = findData["ports"];
   }
   for (const key in lans) {
     const element = lans[key];

@@ -4,13 +4,13 @@ var deployAllLanguages = require("../utils/deploy-website");
 const { authenticateToken } = require("../permissions");
 var router = express.Router();
 
-router.get("/", authenticateToken, function (req, res, next) {
-  const { lans } = getConf(req.uname, res);
+router.get("/", authenticateToken, async function (req, res, next) {
+  const { lans } = await getConf(req.uname, res, req.user.id);
   res.render("deploy", { title: "Deploy", lans: Object.keys(lans) });
 });
 
 router.post("/deploy-one", authenticateToken, async function (req, res, next) {
-  const configs = getConf(req.uname, res);
+  const configs = await getConf(req.uname, res, req.user.id);
   const { lan } = req.body;
   deployAllLanguages(lan, configs);
   res.json({

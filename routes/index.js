@@ -1,5 +1,6 @@
 var express = require("express");
 const getConf = require("../utils/conf");
+const { outputRead, outputOtherRead } = require("../utils/supabase")
 const { getFileFunc, getRequireDynamicFile } = require("../utils/get-files");
 const { setFile } = require("../utils/set-file");
 const deployToFtp = require("../utils/deploy-to-ftp");
@@ -44,8 +45,8 @@ imageExtensions = [
 
 const socket = io("http://localhost:4001");
 
-router.get("/", authenticateToken, function (req, res, next) {
-  const { lans } = getConf(req.uname, res);
+router.get("/", authenticateToken, async function (req, res, next) {
+  const { lans } = await getConf(req.uname, res, req.user.id);
   res.render("index", {
     title: "Index",
     lans: Object.keys(lans),
@@ -53,8 +54,8 @@ router.get("/", authenticateToken, function (req, res, next) {
   });
 });
 
-router.get("/watching", authenticateToken, function (req, res, next) {
-  const { pathname, lans, ports, domain } = getConf(req.uname, res);
+router.get("/watching", authenticateToken, async function (req, res, next) {
+  const { pathname, lans, ports, domain } = await getConf(req.uname, res, req.user.id);
   const isWatching = req.query.bool === "true";
 
   res.app.locals.isW = isWatching;
@@ -83,17 +84,18 @@ router.get("/watching", authenticateToken, function (req, res, next) {
 });
 
 router.post("/handle-files", authenticateToken, async (req, res) => {
-  const configs = getConf(req.uname, res);
+  const configs = await getConf(req.uname, res, req.user.id);
   const { init, async, commitIds, url } = req.body;
   try {
     const { cbObj, lineObj } = await getFileFunc(
       init,
       async,
       commitIds,
-      configs
+      configs,
+      req
     );
-    const output = getRequireDynamicFile("output.js", {});
-    const outputOther = getRequireDynamicFile("output-other.js", {});
+    const output = await outputRead(req.user.id);
+    const outputOther = await outputOtherRead(req.user.id)
     res.json({
       code: 200,
       message: "handle-files-success",
@@ -103,6 +105,7 @@ router.post("/handle-files", authenticateToken, async (req, res) => {
       data4: lineObj || {},
     });
   } catch (error) {
+    console.log("error", error)
     res.json({
       code: 200,
       message: "handle-files-fail",
@@ -112,7 +115,7 @@ router.post("/handle-files", authenticateToken, async (req, res) => {
 });
 
 router.post("/get-urls", authenticateToken, async (req, res) => {
-  const configs = getConf(req.uname, res);
+  const configs = await getConf(req.uname, res, req.user.id);
   const { url } = req.body;
   try {
     const result = await getOtherTpl({
@@ -137,7 +140,7 @@ router.post("/get-urls", authenticateToken, async (req, res) => {
 });
 
 router.post("/publish", authenticateToken, async (req, res) => {
-  const { ports, domain } = getConf(req.uname, res);
+  const { ports, domain } = await getConf(req.uname, res, req.user.id);
   const { lan } = req.body;
   try {
     await handlePublish(lan, ports, domain);
@@ -155,7 +158,6 @@ router.post("/publish", authenticateToken, async (req, res) => {
 });
 
 router.post("/switch-css-ar", authenticateToken, async (req, res) => {
-  const { ports, domain } = getConf(req.uname, res);
   const { csscode } = req.body;
   try {
     const rtlContent = await RTLConverter(csscode);
@@ -174,7 +176,7 @@ router.post("/switch-css-ar", authenticateToken, async (req, res) => {
 });
 
 router.post("/oneclick-sync", authenticateToken, async (req, res) => {
-  const { LocalListPro, localPaths } = getConf(req.uname, res);
+  const { LocalListPro, localPaths } = await getConf(req.uname, res, req.user.id);
   const { init, data, data2 } = req.body;
 
   const result = {};
@@ -221,7 +223,7 @@ router.post("/oneclick-sync", authenticateToken, async (req, res) => {
 
 router.post("/all-publish", authenticateToken, async (req, res) => {
   const { lans } = req.body;
-  const { ports, domain } = getConf(req.uname, res);
+  const { ports, domain } = await getConf(req.uname, res, req.user.id);
   let s = [];
   let f = [];
   let errorObj = {};
@@ -266,7 +268,7 @@ router.post("/all-publish", authenticateToken, async (req, res) => {
 });
 
 router.post("/receive-files", authenticateToken, async (req, res) => {
-  const { LocalListPro, ports, domain } = getConf(req.uname, res);
+  const { LocalListPro, ports, domain } = await getConf(req.uname, res, req.user.id);
   const { path, path2, lan, initLan } = req.body;
   function isImageFile(filepath) {
     const ext = "." + filepath.split(".").pop().toLowerCase();
@@ -312,7 +314,7 @@ router.post("/receive-files", authenticateToken, async (req, res) => {
 });
 
 router.post("/delete-file", authenticateToken, async (req, res) => {
-  const { LocalListPro } = getConf(req.uname, res);
+  const { LocalListPro } = await getConf(req.uname, res, req.user.id);
   const { path2, lan } = req.body;
   try {
     await deleteFile({ path2, lan, LocalListPro });
@@ -331,7 +333,7 @@ router.post("/delete-file", authenticateToken, async (req, res) => {
 });
 
 router.post("/open-vscode", authenticateToken, async (req, res) => {
-  const configs = getConf(req.uname, res);
+  const configs = await getConf(req.uname, res, req.user.id);
   const { lan } = req.body;
   try {
     await openVsCode({ lan, localPaths: configs.localPaths });
@@ -350,7 +352,7 @@ router.post("/open-vscode", authenticateToken, async (req, res) => {
 });
 
 router.post("/open-site", authenticateToken, async (req, res) => {
-  const configs = getConf(req.uname, res);
+  const configs = await getConf(req.uname, res, req.user.id);
   const { lan } = req.body;
   try {
     const url = await openSite({
@@ -371,7 +373,7 @@ router.post("/open-site", authenticateToken, async (req, res) => {
 });
 
 router.post("/receive-imgs", authenticateToken, async (req, res) => {
-  const { LocalListPro, ports, domain } = getConf(req.uname, res);
+  const { LocalListPro, ports, domain } = await getConf(req.uname, res, req.user.id);
   const { lan, imgs, initLan } = req.body;
   try {
     for (let i = 0; i < imgs.length; i++) {
@@ -392,7 +394,6 @@ router.post("/receive-imgs", authenticateToken, async (req, res) => {
 });
 
 router.post("/set-file", authenticateToken, async (req, res) => {
-  const { ports, domain } = getConf(req.uname, res);
   const { path, content, lan } = req.body;
   try {
     await setFile({ path, content });
@@ -422,7 +423,7 @@ router.post("/set-file", authenticateToken, async (req, res) => {
 });
 
 router.post("/deploy-to-ftp", authenticateToken, async (req, res) => {
-  const configs = getConf(req.uname, res);
+  const configs = await getConf(req.uname, res, req.user.id);
   const { lan, data, env } = req.body;
   try {
     await deployToFtp({ lan, data, env, configs });
@@ -448,7 +449,7 @@ router.post("/pull-code", authenticateToken, async (req, res) => {
     });
     return;
   }
-  const { localPaths } = getConf(req.uname, res);
+  const { localPaths } = await getConf(req.uname, res, req.user.id);
   const { lan } = req.body;
   try {
     const result = await pullCode({ lan, localPaths });
@@ -475,7 +476,7 @@ router.post("/all-pull", authenticateToken, async (req, res) => {
     });
     return;
   }
-  const { localPaths, ports } = getConf(req.uname, res);
+  const { localPaths, ports } = await getConf(req.uname, res, req.user.id);
   let { lans } = req.body;
   if (!lans?.length) {
     lans = Object.keys(ports);
@@ -558,7 +559,7 @@ router.post("/all-discard", authenticateToken, async (req, res) => {
     });
     return;
   }
-  const { localPaths, ports } = getConf(req.uname, res);
+  const { localPaths, ports } = await getConf(req.uname, res, req.user.id);
   let { lans } = req.body;
   if (!lans?.length) {
     lans = Object.keys(ports);
@@ -583,7 +584,7 @@ router.post("/all-discard", authenticateToken, async (req, res) => {
 
     const taskQueue = tasks.map((lan) => async () => {
       try {
-        await discardCode({ lan, localPaths, isChecked: true})
+        await discardCode({ lan, localPaths, isChecked: true })
         return { success: true, lan };
       } catch (error) {
         return {
@@ -633,7 +634,7 @@ router.post("/all-discard", authenticateToken, async (req, res) => {
 });
 
 router.post("/check-status", authenticateToken, async (req, res) => {
-  const { localPaths } = getConf(req.uname, res);
+  const { localPaths } = await getConf(req.uname, res, req.user.id);
   const { lan } = req.body;
   try {
     const result = await checkStaus({ lan, localPaths });
@@ -652,7 +653,7 @@ router.post("/check-status", authenticateToken, async (req, res) => {
 });
 
 router.post("/push-code", authenticateToken, async (req, res) => {
-  const { localPaths } = getConf(req.uname, res);
+  const { localPaths } = await getConf(req.uname, res, req.user.id);
   const { lan, commit, status, type } = req.body;
   try {
     const result = await pushCode({ lan, commit, localPaths, status, type });
@@ -671,7 +672,7 @@ router.post("/push-code", authenticateToken, async (req, res) => {
 });
 
 router.post("/all-push", authenticateToken, async (req, res) => {
-  const { localPaths } = getConf(req.uname, res);
+  const { localPaths } = await getConf(req.uname, res, req.user.id);
   const { lans, commit } = req.body;
   allPush({ lans, commit, localPaths }).then((results) => {
     socket.emit("chat message", {
@@ -685,7 +686,7 @@ router.post("/all-push", authenticateToken, async (req, res) => {
 });
 
 router.post("/discard-code", authenticateToken, async (req, res) => {
-  const { localPaths } = getConf(req.uname, res);
+  const { localPaths } = await getConf(req.uname, res, req.user.id);
   const { lan, isChecked } = req.body;
   try {
     const result = await discardCode({ lan, localPaths, isChecked });
@@ -704,7 +705,7 @@ router.post("/discard-code", authenticateToken, async (req, res) => {
 });
 
 router.post("/get-branchs", authenticateToken, async (req, res) => {
-  const { localPaths } = getConf(req.uname, res);
+  const { localPaths } = await getConf(req.uname, res, req.user.id);
   const { lan } = req.body;
   try {
     const result = await getBranchs({ lan, localPaths });
@@ -723,7 +724,7 @@ router.post("/get-branchs", authenticateToken, async (req, res) => {
 });
 
 router.post("/merge-code", authenticateToken, async (req, res) => {
-  const { localPaths } = getConf(req.uname, res);
+  const { localPaths } = await getConf(req.uname, res, req.user.id);
   const { lan, from, to } = req.body;
   try {
     const result = await mergeCode({ lan, localPaths, from, to });
