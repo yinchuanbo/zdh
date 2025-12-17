@@ -1,5 +1,4 @@
 const { execSync } = require("child_process");
-const Client = require("ssh2-sftp-client");
 const fs = require("fs");
 const crypto = require("crypto");
 const { Readable } = require("stream");

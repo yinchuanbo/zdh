@@ -17,9 +17,13 @@ async function deployBatch(batchOutputs, env, configs) {
 
     let timer = null;
 
+    const ftpFile = env === "test" ? "ftpWorker-test.js" : "ftpWorker.js"
+
+    console.log("ftpFile", ftpFile)
+
     const workerPool = new Array(maxWorkers)
       .fill()
-      .map(() => new Worker(path.join(__dirname, "ftpWorker.js")));
+      .map(() => new Worker(path.join(__dirname, ftpFile)));
 
     let currentKeyIndex = 0;
     const keys = Object.keys(batchOutputs);

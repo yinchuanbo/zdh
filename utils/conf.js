@@ -6,8 +6,8 @@ let localPaths = {},
   testFoldList = {},
   proFoldList = {},
   deployInfo = {
-    username: "lixiaohui@qq.com",
-    password: "123456",
+    username: "zc861988@gmail.com",
+    password: "A7kP9mQ2R8xE4",
     languages: {},
   },
   testConn = {
@@ -18,9 +18,9 @@ let localPaths = {},
   },
   proConn = {
     host: "manage.vidnoz.com",
-    port: 22,
-    username: "ftpuser",
-    password: "kIEmTPdyhIdnjJ2s",
+    port: 50001,
+    username: "videomanage",
+    password: "GcJumoa?MRVWNjjJ",
   },
   preview = "\\preview\\",
   templates = "\\templates\\new-template\\";
