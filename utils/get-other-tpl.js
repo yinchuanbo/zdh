@@ -42,10 +42,11 @@ async function checkLinkHrefInTplFiles(tplFiles, url) {
   return matchingFiles;
 }
 
-function getIncludedFiles(curPath) {
-  console.log("curPath", curPath);
+async function getIncludedFiles(curPath, webUrl = '') {
+  console.log("curPath", curPath, webUrl);
   // 读取 .tpl 文件内容
-  const tplContent = fs2.readFileSync(curPath, "utf-8");
+  let tplContent =  await axios.get(webUrl);
+  tplContent = tplContent.data;
   // 更宽松的正则表达式匹配 <script> 和 <link> 标签
   const jsRegex =
     /<script(?=(?:[^>]*?\s+(?:src|type|async|defer|charset|crossorigin|integrity|nomodule|nonce|referrerpolicy)(?:=["'][^"']*?["'])?)*?\s+src=["']([^"']+)["'])(?:[^>]*?type=["'](?:text\/javascript|application\/javascript|module)["'])?[^>]*>(?:<\/script>)?/gi;
@@ -106,6 +107,7 @@ async function getAlternateLinksFromUrl(url) {
     const html = response.data;
     const $ = cheerio.load(html);
     const hrefs = {};
+    const urls = {};
     $('link[rel="alternate"]').each((i, element) => {
       const href = $(element).attr("href");
       let hreflang = ($(element).attr("hreflang") || "").trim();
@@ -114,10 +116,11 @@ async function getAlternateLinksFromUrl(url) {
       if (hreflang === "ja") hreflang = "jp";
       if (href && hreflang !== "x-default") {
         hrefs[hreflang] = path.basename(href).replaceAll(".html", ".tpl");
+        urls[hreflang] = href;
       }
     });
 
-    return hrefs;
+    return { hrefs, urls };
   } catch (error) {
     console.error("Error fetching the URL:", error);
     return [];
@@ -125,8 +128,8 @@ async function getAlternateLinksFromUrl(url) {
 }
 
 async function getOtherTpl({ url, configs }) {
-  const resss = await getAlternateLinksFromUrl(url);
-  console.log("resss", resss)
+  const { hrefs: resss, urls: allUrls } = await getAlternateLinksFromUrl(url);
+  console.log("resss", resss, allUrls);
   const lans = Object.keys(configs.lans);
   let urls = {};
   let otherUrls = {};
@@ -137,7 +140,7 @@ async function getOtherTpl({ url, configs }) {
     const matchingFiles = curResss ? [curResss] : [];
     if (matchingFiles.length > 0) {
       const curP = path.join(alP, "tpl", matchingFiles[0]);
-      const includesPath = getIncludedFiles(curP);
+      const includesPath = await getIncludedFiles(curP, allUrls[lan]);
       urls[lan] = `${matchingFiles[0].replaceAll(".tpl", ".html")}`;
       otherUrls[lan] = includesPath;
     }
