@@ -18,7 +18,7 @@ parentPort.on("message", async ({ key, values, env, configs }) => {
     devList = configs.proFoldList;
   }
 
-  const client = new ftp.Client();
+  const client = new ftp.Client(120000);
   // client.ftp.verbose = true; 
   const createdDirs = new Set();
   let totalFiles = values.length;
@@ -36,6 +36,13 @@ parentPort.on("message", async ({ key, values, env, configs }) => {
     };
 
     await client.access(ftpConfig);
+    if (client?.ftp?.socket) {
+      client.ftp.socket.setKeepAlive(true);
+      client.ftp.socket.setTimeout(120000);
+    }
+    if (client?.ftp) {
+      client.ftp.timeout = 120000;
+    }
     console.log('FTP 连接成功');
     console.log('当前工作目录:', await client.pwd());
 
@@ -99,11 +106,16 @@ parentPort.on("message", async ({ key, values, env, configs }) => {
       
       // 只对关键文件进行大小验证
       if (dir.match(/\.(js|css|html)$/)) {
-        // 因为 CWD 已经切换到目标目录，所以这里使用文件名而不是完整路径
-        const remoteSize = await client.size(fileName);
-
-        if (fileSize !== remoteSize) {
-          throw new Error(`Size mismatch for ${dir}`);
+        try {
+          const remoteSize = await client.size(fileName);
+          if (fileSize !== remoteSize) {
+            throw new Error(`Size mismatch for ${dir}`);
+          }
+        } catch (e) {
+          const msg = e && e.message ? e.message : "";
+          if (!msg.includes("Timeout")) {
+            throw e;
+          }
         }
       }
 

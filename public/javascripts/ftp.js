@@ -1,5 +1,37 @@
 const socket = io("http://localhost:4001");
 
+const MONACO_BASE = "https://unpkg.com/monaco-editor@0.52.2/min";
+const MONACO_CDN = `${MONACO_BASE}/vs`;
+let monacoConfigured = false;
+
+function configureMonaco() {
+  if (monacoConfigured || !window.require?.config) return;
+  require.config({
+    paths: {
+      vs: MONACO_CDN,
+    },
+  });
+  if (!window.MonacoEnvironment?.getWorkerUrl) {
+    window.MonacoEnvironment = {
+      getWorkerUrl: function () {
+        const proxy = URL.createObjectURL(
+          new Blob(
+            [
+              `
+              self.MonacoEnvironment = { baseUrl: '${MONACO_BASE}' };
+              importScripts('${MONACO_BASE}/vs/base/worker/workerMain.js');
+            `,
+            ],
+            { type: "text/javascript" },
+          ),
+        );
+        return proxy;
+      },
+    };
+  }
+  monacoConfigured = true;
+}
+
 const getFiles = document.querySelector(".getFiles");
 const preview = document.querySelector(".preview");
 const upload = document.querySelector(".upload");
@@ -93,11 +125,7 @@ preview.onclick = () => {
 
 function setEditor(obj = {}) {
   if (editor) editor.dispose();
-  require.config({
-    paths: {
-      vs: "https://unpkg.com/monaco-editor@0.34.1/min/vs",
-    },
-  });
+  configureMonaco();
   require(["vs/editor/editor.main"], function () {
     editor = monaco.editor.create(document.querySelector(".preview__mark"), {
       value: obj,

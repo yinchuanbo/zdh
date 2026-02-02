@@ -1,3 +1,35 @@
+const MONACO_BASE = "https://unpkg.com/monaco-editor@0.52.2/min";
+const MONACO_CDN = `${MONACO_BASE}/vs`;
+let monacoConfigured = false;
+
+function configureMonaco() {
+  if (monacoConfigured || !window.require?.config) return;
+  require.config({
+    paths: {
+      vs: MONACO_CDN,
+    },
+  });
+  if (!window.MonacoEnvironment?.getWorkerUrl) {
+    window.MonacoEnvironment = {
+      getWorkerUrl: function () {
+        const proxy = URL.createObjectURL(
+          new Blob(
+            [
+              `
+              self.MonacoEnvironment = { baseUrl: '${MONACO_BASE}' };
+              importScripts('${MONACO_BASE}/vs/base/worker/workerMain.js');
+            `,
+            ],
+            { type: "text/javascript" },
+          ),
+        );
+        return proxy;
+      },
+    };
+  }
+  monacoConfigured = true;
+}
+
 // 添加到文件顶部
 // 延迟加载非关键资源
 function deferNonCriticalResources() {
@@ -5,19 +37,15 @@ function deferNonCriticalResources() {
   if ("requestIdleCallback" in window) {
     requestIdleCallback(
       function () {
-        require.config({
-          paths: {
-            vs: "https://unpkg.com/monaco-editor@0.34.1/min/vs",
-          },
-        });
+        configureMonaco();
       },
-      { timeout: 2000 }
+      { timeout: 2000 },
     );
   }
 
   // 延迟初始化非关键UI元素
   const nonCriticalElements = document.querySelectorAll(
-    ".nav_a:not(.select-all-btn):not(.handle-btn)"
+    ".nav_a:not(.select-all-btn):not(.handle-btn)",
   );
   nonCriticalElements.forEach((el) => {
     el.style.opacity = "0.7";
@@ -129,7 +157,7 @@ function openFullScreenWindow(url) {
         window.screen.width +
         ",height=" +
         window.screen.height +
-        ",left=0,top=0"
+        ",left=0,top=0",
     );
     if (newWindow) {
       newWindow.focus();
@@ -218,7 +246,7 @@ const handleSocket = () => {
       }
     } else if (type === "upload-ftp-success") {
       const toTest = document.querySelector(
-        ".getUrlName .getUrlName-popup .to-test"
+        ".getUrlName .getUrlName-popup .to-test",
       );
       if (toTest) {
         new Dialog({
@@ -271,7 +299,7 @@ const createContent = (
   data3 = {},
   data4 = {},
   initLan = "en",
-  _idx = 0
+  _idx = 0,
 ) => {
   dataInfo = data;
   data2Info = data2;
@@ -678,7 +706,7 @@ const createContent = (
             },
             {},
           ],
-        }
+        },
       );
     };
   });
@@ -1034,6 +1062,8 @@ let originalModel,
 
 function setEditorNavitor() {
   if (!diffEditor) return;
+  const Prev = document.querySelector("#Prev");
+  const Next = document.querySelector("#Next");
   let currentDiffIndex = -1;
   let lineChanges = [];
   // 监听差异更新
@@ -1067,8 +1097,8 @@ function setEditorNavitor() {
     diffEditor.getModifiedEditor().focus();
   }
 
-  Prev.onclick = goToPreviousDiff;
-  Next.onclick = goToNextDiff;
+  if (Prev) Prev.onclick = goToPreviousDiff;
+  if (Next) Next.onclick = goToNextDiff;
 }
 
 function setEditor(path = "", modifiedText = "", originalText = "", initLan = '') {
@@ -1081,11 +1111,7 @@ function setEditor(path = "", modifiedText = "", originalText = "", initLan = ''
   diffEditor = null;
   diffNavigator = null;
 
-  require.config({
-    paths: {
-      vs: "https://unpkg.com/monaco-editor@0.34.1/min/vs",
-    },
-  });
+  configureMonaco();
 
   const extensionToLanguageMap = {
     ".js": "javascript",
@@ -1095,18 +1121,19 @@ function setEditor(path = "", modifiedText = "", originalText = "", initLan = ''
     ".tpl": "html",
   };
 
-  const lan =
-    Object.keys(extensionToLanguageMap).find((ext) => path.endsWith(ext)) ||
-    "text/plain";
+  const matchedExtension = Object.keys(extensionToLanguageMap).find((ext) =>
+    path.endsWith(ext),
+  );
+  const languageId = extensionToLanguageMap[matchedExtension] || "plaintext";
 
   require(["vs/editor/editor.main"], function () {
     originalModel = monaco.editor.createModel(
       originalText,
-      extensionToLanguageMap[lan]
+      languageId,
     );
     modifiedModel = monaco.editor.createModel(
       modifiedText,
-      extensionToLanguageMap[lan]
+      languageId,
     );
 
     diffEditor = monaco.editor.createDiffEditor(
@@ -1127,7 +1154,7 @@ function setEditor(path = "", modifiedText = "", originalText = "", initLan = ''
         enableSplitViewResizing: true,
         ignoreTrimWhitespace: true,
         renderIndicators: true,
-      }
+      },
     );
 
     diffEditor.setModel({
@@ -1140,8 +1167,8 @@ function setEditor(path = "", modifiedText = "", originalText = "", initLan = ''
 
     // 从 localStorage 读取上次的标记行
     markedLines = JSON.parse(localStorage.getItem("markedLines") || "{}");
-    console.log("=====", path)
-    const lineKey = `${initLan}/${path}`
+    console.log("=====", path);
+    const lineKey = `${initLan}/${path}`;
     if (!markedLines?.[lineKey]) markedLines[lineKey] = [];
 
     // 添加标记
@@ -1158,7 +1185,7 @@ function setEditor(path = "", modifiedText = "", originalText = "", initLan = ''
       // 保存返回的装饰 id（下次用来移除或更新）
       originalDecorations = originalEditor.deltaDecorations(
         originalDecorations,
-        newDecs
+        newDecs,
       );
       markedLines[lineKey] = lines.slice();
       localStorage.setItem("markedLines", JSON.stringify(markedLines));
@@ -1181,12 +1208,7 @@ function setEditor(path = "", modifiedText = "", originalText = "", initLan = ''
       }
     });
 
-    // 差异导航器
-    diffNavigator = monaco.editor.createDiffNavigator(diffEditor, {
-      followsCaret: true,
-      ignoreCharChanges: true,
-      alwaysRevealFirst: true,
-    });
+    setEditorNavitor();
   });
 }
 
@@ -1206,7 +1228,7 @@ const diffHTML = function (
   lan = "",
   path = "",
   initLan = "",
-  lines = ""
+  lines = "",
 ) {
   let doc = null;
   let linesArr = [];
@@ -1235,27 +1257,19 @@ const diffHTML = function (
   const diffHTML = document.querySelector(".diffHTML");
   const Save = document.querySelector("#Save");
   const Cancel = document.querySelector("#Cancel");
+  const clearAllMarks = document.querySelector("#clearAllMarks");
+  const changeMarks = document.querySelector("#changeMarks");
   Cancel.onclick = () => {
     diffHTML.remove();
   };
   if (!data.initC.path.endsWith(".json")) {
     setEditor(path, data.nowC.content, data.initC.content, initLan);
 
-    console.log('initLan', initLan)
+    console.log('initLan', initLan);
 
-    Prev.onclick = () => {
-      // doc.scrollToDiff("prev");
-      if (diffNavigator) {
-        diffNavigator.previous(); // 跳到下一个差异
-      }
-    };
-    Next.onclick = () => {
-      if (diffNavigator) {
-        diffNavigator.next(); // 跳到下一个差异
-      }
-      // doc.scrollToDiff("next");
-    };
-    clearAllMarks.onclick = () => {
+    // 导航交互在 setEditorNavitor 中绑定
+    if (clearAllMarks) {
+      clearAllMarks.onclick = () => {
       if (!originalEditor) return;
       // 清空标记数组
       markedLines = {};
@@ -1266,26 +1280,28 @@ const diffHTML = function (
       if (originalDecorations && originalDecorations.length) {
         originalDecorations = originalEditor.deltaDecorations(
           originalDecorations,
-          []
+          [],
         );
         originalDecorations = []; // 清空本地缓存
       }
 
       // 清除 dom 中所有 .myLineHighlight 和 .myGlyphMargin
-      document
-        .querySelectorAll(".myLineHighlight, .myGlyphMargin")
-        .forEach((el) => {
-          el.classList.remove("myLineHighlight", "myGlyphMargin");
-        });
-    };
+        document
+          .querySelectorAll(".myLineHighlight, .myGlyphMargin")
+          .forEach((el) => {
+            el.classList.remove("myLineHighlight", "myGlyphMargin");
+          });
+      };
+    }
     // 点击按钮切换到下一个标记
-    changeMarks.onclick = () => {
-      const lineKey = `${initLan}/${path}`
-      const marks = markedLines[lineKey]; // 当前文件的标记行数组
-      if (!Array.isArray(marks) || marks.length === 0) {
-        console.log("当前文件没有标记行");
-        return;
-      }
+    if (changeMarks) {
+      changeMarks.onclick = () => {
+        const lineKey = `${initLan}/${path}`;
+        const marks = markedLines[lineKey]; // 当前文件的标记行数组
+        if (!Array.isArray(marks) || marks.length === 0) {
+          console.log("当前文件没有标记行");
+          return;
+        }
 
       // 确保有记录当前索引
       if (typeof currentMarkIndex[lineKey] !== "number") {
@@ -1300,25 +1316,22 @@ const diffHTML = function (
       // 获取左侧 originalEditor
       const originalEditor = diffEditor.getOriginalEditor();
 
-      if (originalEditor && targetLine) {
-        // 跳转到对应行
-        originalEditor.revealLineInCenter(targetLine);
-        // 设置光标位置
-        originalEditor.setPosition({ lineNumber: targetLine, column: 1 });
-        // 聚焦编辑器
-        originalEditor.focus();
-      }
-    };
-    clearAllMarks.style.display = 'flex'
-    changeMarks.style.display = 'flex'
+        if (originalEditor && targetLine) {
+          // 跳转到对应行
+          originalEditor.revealLineInCenter(targetLine);
+          // 设置光标位置
+          originalEditor.setPosition({ lineNumber: targetLine, column: 1 });
+          // 聚焦编辑器
+          originalEditor.focus();
+        }
+      };
+    }
+    if (clearAllMarks) clearAllMarks.style.display = "flex";
+    if (changeMarks) changeMarks.style.display = "flex";
   } else {
     if (jsonEditor) jsonEditor.dispose();
     jsonEditor = null;
-    require.config({
-      paths: {
-        vs: "https://unpkg.com/monaco-editor@0.34.1/min/vs",
-      },
-    });
+    configureMonaco();
     require(["vs/editor/editor.main"], function () {
       jsonEditor = monaco.editor.create(document.querySelector("#compare"), {
         value: data.nowC.content,
@@ -1333,8 +1346,8 @@ const diffHTML = function (
       });
     });
 
-    clearAllMarks.style.display = 'none'
-    changeMarks.style.display = 'none'
+    if (clearAllMarks) clearAllMarks.style.display = "none";
+    if (changeMarks) changeMarks.style.display = "none";
   }
 
   Save.onclick = () => {
@@ -1470,7 +1483,7 @@ const handleGetFile = () => {
               res?.data3,
               res?.data4,
               select.value,
-              _idx
+              _idx,
             );
           });
         } else {
@@ -1861,7 +1874,7 @@ allPush.onclick = () => {
   setAllCommitOrPush(allPush, selectedValues);
 };
 
-const setAllCommitOrPush = (item, selectedValues = []) => {
+function setAllCommitOrPush(item, selectedValues = []) {
   const html = `
     <div class="setCommit">
       <div class="setCommit_left">
@@ -1925,7 +1938,7 @@ const setAllCommitOrPush = (item, selectedValues = []) => {
     item.classList.remove("loading");
     setCommit.remove();
   };
-};
+}
 
 const iframeCover = (src = "") => {
   const html = `

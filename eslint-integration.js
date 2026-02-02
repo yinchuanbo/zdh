@@ -159,7 +159,12 @@ async function lintFiles(input) {
         gsap: 'readonly',
         splitRGB: 'readonly',
         hex2rgb: 'readonly',
-        showLoginWindow: 'readonly'
+        showLoginWindow: 'readonly',
+        LightTip: 'readonly',
+        Dialog: 'readonly',
+        monaco: 'readonly',
+        require: 'readonly',
+        io: 'readonly'
       },
     },
     rules: {
