@@ -32,7 +32,9 @@ parentPort.on("message", async ({ key, values, env, configs }) => {
       port: testConn.port === 22 ? 21 : (testConn.port || 21),
       user: testConn.username || testConn.user,
       password: testConn.password,
-      secure: false
+      secure: false,
+      timeout: 10000,
+      socketTimeout: 300000
     };
 
     await client.access(ftpConfig);
